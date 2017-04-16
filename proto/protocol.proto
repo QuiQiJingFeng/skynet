@@ -1,0 +1,8 @@
+
+message C2GS {
+	required int32 session = 1;
+}
+
+message GS2C {
+	required int32 session = 1;
+}
