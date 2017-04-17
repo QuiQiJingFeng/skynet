@@ -43,9 +43,7 @@ LUAMOD_API int (luaopen_math) (lua_State *L);
 
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
-//TODO5
-#define LUA_PROTOBUFLIBNAME	"protobuf"
-LUAMOD_API int (luaopen_protobuf_c) (lua_State *L);
+LUAMOD_API int (luaopen_debug) (lua_State *L);
 
 #define LUA_LOADLIBNAME	"package"
 LUAMOD_API int (luaopen_package) (lua_State *L);
