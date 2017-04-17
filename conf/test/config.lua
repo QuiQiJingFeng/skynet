@@ -1,9 +1,9 @@
 root = "./"
-luaservice = root.."service/?.lua;"..root.."game/?.lua"
+luaservice = root.."service/?.lua;"..root.."game/service/?.lua"
 lualoader = root .. "lualib/loader.lua"
 lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua"
 lua_cpath = root .. "luaclib/?.so"
-snax = root.."game/?.lua;"
+snax = luaservice
 
 -- preload = "./examples/preload.lua"   -- run preload.lua before every lua service run
 thread = 8
@@ -21,3 +21,17 @@ cpath = root.."cservice/?.so"
 
 game_port = 8888
 maxclient = 8192
+
+--redis config
+game_redis_host = "127.0.0.1" 
+game_redis_port = 6379
+game_redis_auth = ""
+
+-- mysql config
+mysql_ip = "127.0.0.1"
+mysql_user = "root"
+mysql_pass = ""
+mysql_port = 3306
+
+--protobuf
+protobuf = "proto/msg.pb"

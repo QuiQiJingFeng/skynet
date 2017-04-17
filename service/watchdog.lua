@@ -3,23 +3,22 @@ local netpack = require "netpack"
 local protobuf = require "protobuf"
 local mysql = require "mysql"
 local redis = require "redis"
+local constant = require "constant"
+local SOCKET_STATE = constant.SOCKET_STATE
 local CMD = {}
 local SOCKET = {}
 local gate
-local agent = {}
-
-
-
+local agents = {}
 
 function SOCKET.open(fd, ipaddr)
-    skynet.error("New client from : " .. ipaddr)
-    -- agent[fd] = skynet.newservice("agent")
-    -- skynet.call(agent[fd], "lua", "start", { gate = gate, client = fd, watchdog = skynet.self() })
+    local ip = string.match(ipaddr, "([%d.]+):")
+    agents[fd] = {state = SOCKET_STATE.connect, fd = fd, ip = ip}
+    skynet.call(gate, "lua", "accept", fd)
 end
 
 local function close_agent(fd)
-    local a = agent[fd]
-    agent[fd] = nil
+    local a = agents[fd]
+    agents[fd] = nil
     if a then
         skynet.call(gate, "lua", "kick", fd)
         -- disconnect never return
@@ -42,8 +41,65 @@ function SOCKET.warning(fd, size)
     print("socket warning", fd, size)
 end
 
+local function SetSocketState(fd, new_state)
+    local socket_state = agents[fd]
+    if not socket_state then
+        return false
+    end
+
+    if new_state == socket_state.state then
+        return false
+    end
+
+    if new_state == SOCKET_STATE.logining and socket_state.state ~= SOCKET_STATE.connect then
+        return false
+    end
+
+    if new_state == SOCKET_STATE.reconnect and socket_state.state ~= SOCKET_STATE.logining then
+        return false
+    end
+
+    if new_state == SOCKET_STATE.working then
+        if socket_state.state ~= SOCKET_STATE.logining and socket_state.state ~= SOCKET_STATE.reconnect then
+            agents[fd] = nil
+            return false
+        end
+    end
+
+    socket_state.state = new_state
+    return socket_state
+end
+
+local function onReceiveData(fd,msg)
+    local socket_state = SetSocketState(fd, SOCKET_STATE.logining)
+    if not socket_state then
+        return true
+    end
+
+    local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
+    if not succ then
+        skynet.error("decode error==>", socket_state.ip)
+        return false
+    elseif not msg_data then
+        skynet.error("pbc_error==>",pbc_error)
+        return false
+    end
+
+    if not msg_data["login"] and not msg_data["reconnect"] then
+        skynet.error("msg_data error")
+        return false
+    end
+
+    if msg_data.login then
+
+    end
+
+end
+
 function SOCKET.data(fd, msg)
-    print("SOCKET.data =>",msg)
+    if not onReceiveData(fd, msg) then
+        skynet.call(gate, "lua", "kick", fd)
+    end
 end
 
 function CMD.start(conf)
@@ -66,12 +122,15 @@ skynet.start(function()
             skynet.ret(skynet.pack(f(subcmd, ...)))
         end
     end)
+
+    
+    
     --protobuf
     --[[ protobuf 操作
         print("=====================================")
         protobuf.register_file("proto/msg.pb")
         local t = protobuf.encode("C2GS", {session=10})
-        local msg = protobuf.decode2("C2GS", t)
+        local msg = protobuf.decode("C2GS", t)
         print("=============")
         print("session = ",msg.session)
         print("======================================")

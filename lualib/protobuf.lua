@@ -585,7 +585,7 @@ end
 default=set_default
 
 protobuf.encode = encode
-protobuf.decode2 = decode2
+protobuf.decode = decode2
 protobuf.register_file = register_file
 protobuf.pack = pack
 protobuf.unpack = unpack
