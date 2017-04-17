@@ -25,7 +25,7 @@ maxclient = 8192
 --redis config
 game_redis_host = "127.0.0.1" 
 game_redis_port = 6379
-game_redis_auth = ""
+-- game_redis_auth = ""
 
 -- mysql config
 mysql_ip = "127.0.0.1"
@@ -35,3 +35,8 @@ mysql_port = 3306
 
 --protobuf
 protobuf = "proto/msg.pb"
+
+
+server_id = 1
+
+

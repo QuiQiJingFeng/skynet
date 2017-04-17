@@ -4,10 +4,12 @@ local protobuf = require "protobuf"
 skynet.start(function()
     skynet.error("Server start")
     protobuf.register_file(skynet.getenv("protobuf"))
-    --登录校验服务
-    skynet.uniqueservice("logind")
+
     --共享数据服务
     skynet.newservice("static_data")
+    --登录校验服务
+    skynet.uniqueservice("logind")
+
     --debug服务
     skynet.newservice("debug_console",8000)
 

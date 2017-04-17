@@ -93,9 +93,15 @@ local function onReceiveData(fd,msg)
     end
 
     if msg_data.login then
-
+        local user_id = skynet.call(".logind","lua",Login,msg_data.login)
+        if user_id then
+            skynet.error("登陆成功,--->加载玩家数据")
+            agent = self:CreateAgent()
+        else
+            skynet.error("login error")
+        end
     end
-
+    return true
 end
 
 function SOCKET.data(fd, msg)
