@@ -1,13 +1,14 @@
 local skynet = require "skynet"
+require "skynet.manager"    -- import skynet.register
 local sharedata = require "sharedata"
-local constants = require "constants"
+local constant = require "common.constant"
 
 
 local FUNCTION = {}
 --热更
 function FUNCTION.UpdateConfig(name)
-    if name == "constants" then
-        sharedata.update("constants", constants)
+    if name == "constant" then
+        sharedata.update("constant", constant)
     end
 end 
 
@@ -38,7 +39,7 @@ skynet.start(function()
     })
 
     --数据配置
-    sharedata.update("constants", constants)
+    sharedata.update("constant", constant)
 
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = assert(FUNCTION[cmd])

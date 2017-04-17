@@ -1,10 +1,12 @@
 local skynet = require "skynet"
+require "skynet.manager"    -- import skynet.register
 local netpack = require "netpack"
 local protobuf = require "protobuf"
 local mysql = require "mysql"
 local redis = require "redis"
-local constant = require "constant"
-local SOCKET_STATE = constant.SOCKET_STATE
+local sharedata = require "sharedata"
+local constant
+local SOCKET_STATE
 local CMD = {}
 local SOCKET = {}
 local gate
@@ -123,8 +125,8 @@ skynet.start(function()
         end
     end)
 
-    
-    
+    constant = sharedata.query('constant')
+    SOCKET_STATE = constant.SOCKET_STATE
     --protobuf
     --[[ protobuf 操作
         print("=====================================")
