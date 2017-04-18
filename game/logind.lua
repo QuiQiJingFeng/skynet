@@ -21,17 +21,18 @@ end
 
 --热更
 function FUNCTION.Login(msg)
+    local success = false
     local user_key = msg.platform .. ":" .. msg.user
     local user_id = account_redis:hget(user, server_id)
     if not user_id then
         user_id = CreateUserid()
         if not user_id then
-            return 
+            return success
         end
         account_redis:hset(user_key, server_id, user_id)
     end
-
-    return user_id
+    success = true
+    return success,user_id
 end 
 
 skynet.start(function()

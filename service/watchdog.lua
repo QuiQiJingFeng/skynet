@@ -4,6 +4,7 @@ local netpack = require "netpack"
 local protobuf = require "protobuf"
 local mysql = require "mysql"
 local redis = require "redis"
+local socket = require "socket"
 local sharedata = require "sharedata"
 local constant
 local SOCKET_STATE
@@ -11,7 +12,8 @@ local CMD = {}
 local SOCKET = {}
 local gate
 local agents = {}
-
+local user_to_agent_map = {}
+local socket_to_agent_map = {}
 function SOCKET.open(fd, ipaddr)
     local ip = string.match(ipaddr, "([%d.]+):")
     agents[fd] = {state = SOCKET_STATE.connect, fd = fd, ip = ip}
@@ -72,6 +74,25 @@ local function SetSocketState(fd, new_state)
     return socket_state
 end
 
+local function CreateAgent()
+    local service_id = skynet.newservice("agent")
+    local agent = {}
+    table.insert(self.all_agents, agent)
+
+    agent.service_id = service_id
+    agent.fd = -1
+    agent.user_id = ""
+    agent.expire_time = 0
+    agent.save_time = 0
+    agent.can_be_reclaim = false
+    agent.lock = false
+    agent.reconnect_limit = false
+
+    agent.my_agent_id = #self.all_agents
+
+    return agent
+end
+
 local function onReceiveData(fd,msg)
     local socket_state = SetSocketState(fd, SOCKET_STATE.logining)
     if not socket_state then
@@ -91,16 +112,38 @@ local function onReceiveData(fd,msg)
         skynet.error("msg_data error")
         return false
     end
-
+    local success,user_id,send_msg
     if msg_data.login then
-        local user_id = skynet.call(".logind","lua",Login,msg_data.login)
-        if user_id then
-            skynet.error("登陆成功,--->加载玩家数据")
-            agent = self:CreateAgent()
-        else
-            skynet.error("login error")
-        end
+        success,user_id = skynet.call(".logind","lua",Login,msg_data.login)
     end
+
+    if not success then
+        if not self:SetSocketState(fd, SOCKET_STATE.connect) then
+            return false
+        end
+        send_msg = { session = 0, login_ret = { result = "auth_failure" ,client_ip = ip} }
+        local buff, sz = netpack.pack(pbc.encode("GS2C", send_msg))
+        socket.write(fd, buff, sz)
+        return true
+    end
+    
+    assert(user_id)
+
+    local agent = self:CreateAgent()
+    user_to_agent_map[user_id] = agent
+
+    local start_ret = skynet.call(agent.service_id, "lua", "Start")
+ 
+    if not self:SetSocketState(fd, SOCKET_STATE.working) then
+        return false
+    end
+
+    agent.user_id = user_id
+    --绑定新的fd和ip
+    agent.fd = fd
+    
+    socket_to_agent_map[fd] = agent
+
     return true
 end
 
