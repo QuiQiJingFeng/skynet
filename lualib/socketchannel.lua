@@ -453,3 +453,76 @@ channel_socket.read = wrapper_socket_function(socket.read)
 channel_socket.readline = wrapper_socket_function(socket.readline)
 
 return socket_channel
+
+--REDEME:FYD  SocketChanel
+--[[
+	1、请求回应模式是和外部服务交互时所用到的最常用模式之一。通常的协议设计方式有两种。
+	每个请求包对应一个回应包，由 TCP 协议保证时序。redis 的协议就是一个典型。
+	每个 redis 请求都必须有一个回应，但不必收到回应才可以发送下一个请求。
+
+	2、发起每个请求时带一个唯一 session 标识，在发送回应时，带上这个标识。
+	这样设计可以不要求每个请求都一定要有回应，且不必遵循先提出的请求先回应的时序。
+	MongoDB 的通讯协议就是这样设计的。
+
+	对于第一种模式，用 skynet 的 (socket.md) API 很容易实现，但如果在一个 coroutine 中读写一个 socket 的话，由于读的过程是阻塞的，
+	这会导致吞吐量下降（前一个回应没有收到时，无法发送下一个请求）。
+	
+	对于第二种模式，需要用 skynet.fork 开启一个新线程来收取回应包，并自行和请求对应起来，实现比较繁琐。
+
+	所以 skynet 提供了一个更高层的封装：socket channel 。
+
+	example:
+	模式1:
+	--响应解析参数,response 函数的第一个返回值需要是一个 boolean ，如果为 true 表示协议解析正常；
+	--如果为 false 表示协议出错，这会导致连接断开且让 request 的调用者也获得一个 error 。
+	--在 response 函数内的任何异常以及 sock:read 或 sock:readline 读取出错，都会以 error 的形式抛给 request 的调用者。
+	function response(sock)
+	  local  header = sock:read(2)
+	  local data_size = header:byte(1) * 256 + header:byte(2)
+	  local content = sock:read(data_size)
+	  local msg = pbc.decode("xxxx", content, data_size)
+	  return true, msg
+	end
+	
+	local channel = sc.channel {
+	  host = "127.0.0.1",
+	  port = 3271
+	}
+
+	local succ, msg = pcall(channel.request, channel, buff, response, sz)
+	
+	模式2
+	如果协议模式是第 2 种情况，那么你需要在 channel 创建时给出一个通用的 response 解析函数。
+	这里 dispatch 是一个解析回应包的函数，和上面提到的模式 1 中的解析函数类似。但其返回值需要有三个。
+	第一个是这个回应包的 session，第二个是包是否解析正确（同模式 1 ），第三个是回应内容。
+
+	在模式 2 下，request 的参数有所变化。第 2 个参数不再是 response 函数（它已经在创建时给出），而是一个 session 。
+	这个 session 可以是任意类型，但需要和 response 函数返回的类型一致。
+	socket channel 会帮你匹配 session 而让 request 返回正确的值。
+
+	function response2(sock)
+	  local  header = sock:read(2)
+	  local data_size = header:byte(1) * 256 + header:byte(2)
+	  local content = sock:read(data_size)
+	  local msg = pbc.decode("xxxx", content, data_size)
+	  return msg.session,true, msg
+	end
+
+	local channel = sc.channel {
+	  host = "127.0.0.1",
+	  port = 3271,
+	  response = response2,
+	}
+	local session = 1 --可以为任何类型
+	local succ, msg = pcall(channel.request, session, buff, response, sz)
+
+
+	-----------------
+	channel:request(req)
+	local resp = channel:response(dispatch)
+
+	-- 等价于
+
+	local resp = channel:request(req, dispatch)
+
+--]]

@@ -145,3 +145,37 @@ function httpc.post(host, url, form, recvheader)
 end
 
 return httpc
+
+--REDEME:FYD  http模块
+--[[
+
+	skynet 提供了一个非常简单的 http 客户端模块。你可以用:
+	httpc.request(method, host, uri, recvheader, header, content, timeout)
+	来提交一个 http 请求，其中
+		method 是 "GET" "POST" 等。
+		host 为目标机的地址
+		uri 为请求的 URI
+		recvheader 可以是 nil 或一张空表，用于接收回应的 http 协议头。
+		header 是自定义的 http 请求头。注：如果 header 中没有给出 host ，那么将用前面的 host 参数自动补上。
+		content 为请求的内容。
+		timeout 是一个请求的超时设置，如果没有会使用 httpc.timeout 来做为默认值，这个超时是指整个过程，包括连接，获取数据等它返回状态码和内容。如果网络出错，则抛出 error 。
+
+	httpc.dns([server, port])
+
+	可以用来设置一个异步查询 dns 的服务器地址。如果你不给出地址，那么将从 /etc/resolv.conf 查找地址。
+	如果你没有调用它设置异步 dns 查询，那么 skynet 将在网络底层做同步查询。
+	这很有可能阻塞住整个 skynet 的网络消息处理（不仅仅阻塞单个 skynet 服务）。
+
+	另外，httpc 还提供了简单的 httpc.get 以及 httpc.post 的封装
+
+	httpc 可以通过设置 httpc.timeout 的值来控制超时时间。时间单位为 1/100 秒。
+
+	example:
+		local header = {
+		    ["content-type"] = "application/x-www-form-urlencoded"
+		}
+		local content = "app=xxxx&channel=44&serverId=1&accountId=arggr"
+		local host = "127.0.0.1"
+		local succ, status, post_ret = pcall(httpc.request, "POST", host, "/webservice/request.php", {}, header, content)
+		
+]]
