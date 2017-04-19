@@ -1,0 +1,75 @@
+package msg.login;
+
+enum Result {
+	success = 0;
+	create_leader = 1;
+	invalid_pwd = 2;
+	pwd_too_short = 3;
+	account_exist = 4;
+	register_first = 5;
+	invalid_char = 6;
+	auth_failure = 7;
+	version_too_low = 8;
+	server_is_busy = 9;
+	reconnect_failure = 10;
+	forbidden_login = 11;
+	forbidden_create = 12;
+}
+
+message Login {
+	required string user = 1;
+	required string password = 2;
+	required string platform = 3;
+	required string version = 4;
+	required int32 server_id = 5;
+	required string device_id = 6;
+	required string channel = 7;
+	required string locale = 8;
+	optional int32 net_mode = 9;
+	optional int32 device_platform = 10;
+}
+
+message LoginRet {
+	required Result result = 1; // 登陆的结果
+	optional uint32 server_time = 2;
+	optional string user_id = 3;
+	optional uint32 forbidden_time = 4;
+	optional string reconnect_token = 5;
+	optional int32 time_zone = 6;
+	optional string client_ip = 7;
+}
+
+message Logout {
+}
+
+message Register {
+	required string user = 1;
+	required string password = 2;
+	required string version = 3;
+}
+
+message RegisterRet {
+	required Result result = 1; // 登陆的结果
+}
+
+message LogoutRet {
+	enum Reason {
+		success = 0;
+		repeated_login = 1;
+		kick = 2;
+	}
+
+	required Reason reason = 1;
+}
+
+message Reconnect {
+	required string user_id = 1;
+	required string reconnect_token = 2;
+}
+
+message ReconnectRet {
+	required Result result = 1;
+	optional uint32 server_time = 2;
+	optional int32 time_zone = 3;
+}
+

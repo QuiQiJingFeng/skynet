@@ -1,0 +1,93 @@
+package msg.adventure;
+
+enum Result {
+	success = 0;
+	not_enough_event_time = 1;
+	already_solved = 2;
+	battle_failure = 3;
+	not_enough_resource = 4;
+	not_enough_item = 5;
+	not_enough_satiety = 6;
+	failure = 7;
+	bag_full = 8;
+	event_cd = 9;
+	bp_limit = 10;
+	not_enough_blood_diamond = 11;
+	not_enough_buy_nums = 12;
+	not_enough_vip = 13;
+}
+
+message Maze {
+	required int32 id = 1;
+	required int32 first_box_status = 2;//1:未生成，2:未领取，3:已领取
+	required bool event_is_finish = 3;
+	required uint32 event_time = 4;
+	required int32 box_num = 5;
+	required uint32 box_time = 6;
+}
+
+message EventCD {
+	required int32 id = 1;
+	required int32 cd_time = 2;
+}
+
+message EventFailTime {
+	required int32 id = 1;
+	required int32 fail_time = 2;
+}
+
+message QueryMaze {
+}
+
+
+message QueryMazeRet {
+	required int32 cur_maze_id = 1;
+	required int32 max_box_num = 2;
+	repeated Maze maze_list = 3;
+	repeated EventCD event_cd_list = 4;
+	required bytes area_list = 5;
+	repeated EventFailTime event_fail_time_list = 6;
+	required int32 event_reset_mark = 7;
+	optional int32 buy_adventure_num = 8;
+}
+
+message EnterMaze {
+	required int32 maze_id = 1;
+}
+
+message EnterMazeRet {
+	required Result result = 1;
+	optional int32 maze_id = 2;
+}
+
+message SolveEvent {
+	required int32 event_id = 1;
+}
+
+message SolveEventRet {
+	required Result result = 1;
+	required int32 event_id = 2;
+	repeated int32 battle_record = 3;
+	optional string battle_property = 4;
+}
+
+message OpenBox {
+}
+
+message UpdateMazeInfo {
+	required Result result = 1;
+	optional Maze maze_info = 2;
+	optional int32 open_box_num = 3;
+}
+
+message BuyAdventureReward {
+}
+
+message BuyAdventureRewardRet {
+	required Result result = 1;
+	optional string maze_name = 2;
+	optional int32 difficulty = 3;
+	optional int32 get_exp = 4;
+	optional int32 get_gold_coin = 5;
+	optional int32 buy_adventure_num = 6;
+}

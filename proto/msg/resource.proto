@@ -1,0 +1,236 @@
+package msg.resource;
+
+message Query {
+
+}
+
+message QueryRet {
+	optional double gold_coin = 1;
+	optional double blood_diamond = 2;
+
+	optional double soul_chip = 3;
+	optional double king_medal = 4;
+	optional double demon_medal = 5;
+	optional double adventure_medal = 6;
+
+	optional double copper = 7;
+	optional double iron = 8;
+	optional double silver = 9;
+	optional double tin = 10;
+	optional double gold = 11;
+	optional double diamond = 12;
+	optional double titan_iron = 13;
+	optional double ruby = 14;
+	optional double purple_gem = 15;
+	optional double emerald = 16;
+	optional double topaz = 17;
+	optional double golem = 18;
+	optional double red_soul_crystal = 19;
+	optional double green_soul_crystal = 20;
+	optional double light_soul_crystal = 21;
+	optional double dark_soul_crystal = 22;
+	optional double inferno_brimstone = 23;
+	optional double time_sand = 24;
+
+	optional double junior_tool = 25;
+	optional double intermediate_tool = 26;
+	optional double senior_tool = 27;
+	optional double tnt = 28;
+	optional double ultimate_tool = 29;
+
+	optional double saint_cross = 30;
+	optional double blue_skull = 31;
+	optional double lava_heart = 32;
+	optional double icha_paradise = 33;
+	optional double vital_essence = 34;
+	optional double contract_stone = 35;
+
+	optional double exp = 36;
+	optional double friendship_pt = 37;
+
+	optional double chest_key1 = 38;
+	optional double chest_key2 = 39;
+	optional double chest_key3 = 40;
+
+	optional double campaign_score = 41;
+
+	optional double	golem2 = 42;
+	optional double	golem3 = 43;
+	optional double	golem4 = 44;
+    
+	optional double soul_bone1 = 45;
+	optional double soul_bone2 = 46;
+	optional double soul_bone3 = 47;
+	optional double soul_bone4 = 48;
+	optional double soul_bone5 = 49;
+	optional double soul_bone6 = 50;
+
+	optional double guild_war_point = 51;
+
+	optional double crystal = 52;
+	optional double crystal_bag = 53;
+
+	optional double guild_boss_ticket = 54;
+    optional double guild_boss_contribution = 55;
+
+	optional double forge_ticket = 56;
+	
+	optional double senior_soul_crystal1 = 57;
+	optional double senior_soul_crystal2 = 58;
+
+	optional double magic_gold = 59;
+
+	optional double mine_stone1 = 60;
+	optional double mine_stone2 = 61;
+	optional double mine_stone3 = 62;
+	optional double mine_stone4 = 63;
+	optional double mine_stone5 = 64;
+	optional double mine_stone6 = 65;
+	optional double mine_stone7 = 66;
+	optional double mine_stone8 = 67;
+	optional double mine_stone9 = 68;
+	optional double mine_stone10 = 69;
+	optional double mine_stone11 = 70;
+	optional double mine_stone12 = 71;
+	optional double mine_stone13 = 72;
+	optional double mine_stone14 = 73;
+	optional double mine_stone15 = 74;
+	optional double mine_stone16 = 75;
+	optional double mine_stone17 = 76;
+	optional double mine_stone18 = 77;
+	optional double mine_stone19 = 78;
+	optional double mine_stone20 = 79;
+	optional double mine_stone21 = 80;
+	optional double mine_stone22 = 81;
+	optional double mine_stone23 = 82;
+	optional double mine_stone24 = 83;
+	optional double mine_stone25 = 84;
+	optional double mine_stone26 = 85;
+	optional double mine_stone27 = 86;
+	optional double mine_stone28 = 87;
+	optional double mine_stone29 = 88;
+	optional double mine_stone30 = 89;
+	optional double mine_stone31 = 90;
+	optional double spare = 91;
+	optional double fatecrystal = 92;
+	optional double share_integral = 93;
+}
+
+message UpdateResource {
+	enum ResourceType  {
+		gold_coin = 1;
+		blood_diamond = 2;
+		soul_chip = 3;
+		king_medal = 4;
+		demon_medal = 5;
+		adventure_medal = 6;
+		copper = 7;
+		iron = 8;
+		silver = 9;
+		tin = 10;
+		gold = 11;
+		diamond = 12;
+		titan_iron = 13;
+		ruby = 14;
+		purple_gem = 15;
+		emerald = 16;
+		topaz = 17;
+		golem = 18;
+		red_soul_crystal = 19;
+		green_soul_crystal = 20;
+		light_soul_crystal = 21;
+		dark_soul_crystal = 22;
+		inferno_brimstone = 23;
+		time_sand = 24;
+
+		junior_tool = 25;
+		intermediate_tool = 26;
+		senior_tool = 27;
+		tnt = 28;
+		ultimate_tool = 29;
+
+		saint_cross = 30;
+		blue_skull = 31;
+		lava_heart = 32;
+		icha_paradise = 33;
+		vital_essence = 34;
+		contract_stone = 35;
+
+		exp = 36;
+		friendship_pt = 37;
+
+		chest_key1 = 38;
+		chest_key2 = 39;
+		chest_key3 = 40;
+
+		campaign_score = 41;
+
+		golem2 = 42;
+		golem3 = 43;
+		golem4 = 44;
+        
+		soul_bone1 = 45;
+		soul_bone2 = 46;
+		soul_bone3 = 47;
+		soul_bone4 = 48;
+		soul_bone5 = 49;
+		soul_bone6 = 50;
+
+		guild_war_point = 51;
+		
+		crystal = 52;
+		crystal_bag = 53;
+		
+		guild_boss_ticket = 54;
+		guild_boss_contribution = 55;
+
+		forge_ticket = 56;
+
+	    senior_soul_crystal1 = 57;
+	    senior_soul_crystal2 = 58;
+
+	    magic_gold = 59;
+
+		mine_stone1 = 60;
+		mine_stone2 = 61;
+		mine_stone3 = 62;
+		mine_stone4 = 63;
+		mine_stone5 = 64;
+		mine_stone6 = 65;
+		mine_stone7 = 66;
+		mine_stone8 = 67;
+		mine_stone9 = 68;
+		mine_stone10 = 69;
+		mine_stone11 = 70;
+		mine_stone12 = 71;
+		mine_stone13 = 72;
+		mine_stone14 = 73;
+		mine_stone15 = 74;
+		mine_stone16 = 75;
+		mine_stone17 = 76;
+		mine_stone18 = 77;
+		mine_stone19 = 78;
+		mine_stone20 = 79;
+		mine_stone21 = 80;
+		mine_stone22 = 81;
+		mine_stone23 = 82;
+		mine_stone24 = 83;
+		mine_stone25 = 84;
+		mine_stone26 = 85;
+		mine_stone27 = 86;
+		mine_stone28 = 87;
+		mine_stone29 = 88;
+		mine_stone30 = 89;
+		mine_stone31 = 90;
+		spare = 91;
+		fatecrystal = 92;
+		share_integral = 93;
+	}
+	required ResourceType resource_type = 1;
+	required double resource_value = 2;
+}
+
+message UpdateResourceList {
+	repeated UpdateResource update_resource_list = 1;
+	required int32 source = 2;
+}

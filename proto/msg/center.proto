@@ -1,0 +1,309 @@
+package msg.center;
+
+enum Result {
+    success = 0;
+    failure = 1;
+    challenge_rank_limit = 2;
+    not_in_challenge_time = 3;
+    target_limit = 4;
+    not_enough_resource = 5;
+    status_is_not_ready = 6;
+    in_refresh_target_cd = 7;
+    target_be_robbed_to_much_times = 8;
+    target_is_not_escorting = 9;
+    has_robbed_this_target = 10;
+    no_target_troop_info = 11;
+    no_troop_info = 12;
+    no_rob_times = 13;
+    status_is_not_finish = 14;
+    already_specify_tramcar = 15;
+    has_buy_too_much_rob_times = 16;
+    has_buy_too_much_escort_times = 17;
+    need_refresh_tramcar = 18;
+}
+
+message ErrorRet {
+}
+
+message RankInfo {    
+    required string user_id = 1;
+    required string leader_name = 2;    
+    required int32 rank = 3;
+    required int32 template_id = 4;
+    required int32 server_id = 5;
+}
+
+message RuneProperty {
+    optional int32 speed = 1;
+    optional int32 defense = 2;
+    optional int32 dodge = 3;
+    optional int32 authority = 4;    
+}
+
+message CultivationProperty {
+    optional int32 coefficient1 = 1;
+    optional int32 coefficient2 = 2;
+}
+
+message WeaponInfo {
+    required int32 weapon_id = 1;
+    required int32 star_level = 2;
+}
+
+message TroopsInfo {
+    repeated int32 template_id_list = 1;
+    required string user_id = 2;
+    required int32 battle_point = 3;
+    optional int32 speed = 4;
+    optional int32 defense = 5;
+    optional int32 dodge = 6;
+    optional int32 authority = 7;
+    required int32 leader_skill_id = 8;
+    repeated string rune_list = 9;
+    optional RuneProperty mine_rune_property = 10;
+    optional RuneProperty enemy_rune_property = 11;
+    repeated CultivationProperty cultivation_property = 12;
+    optional WeaponInfo weapon_info = 13;
+}
+
+message TargetPlayInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    repeated int32  template_id_list = 3;
+}
+
+message PvPUserRank {
+	required string user_id = 1;
+}
+
+message PvPUserRankRet {
+    required int32 cur_rank = 1;
+    repeated RankInfo ranks = 2;
+}
+
+message PvPWorldRank {
+
+}
+
+message PvPWorldRankRet {
+    repeated RankInfo rank_list = 1;
+}
+
+message PvPBattle {
+    required string user_id = 1;
+    required int32 challenge_rank = 2;
+    required TroopsInfo troop_info = 3;
+    required string leader_name = 4;
+}
+
+message PvPBattleRet {
+    required Result result = 1;
+    optional bool is_winner = 2;
+    optional string battle_property = 3;
+    repeated int32 battle_record = 4;  //战斗记录
+    optional TargetPlayInfo target_info = 5;
+    optional int32 challenge_times = 6;
+    optional int32 challenge_cd_end_time = 7;
+    optional int32 cur_rank = 8;
+    optional int32 pvp_season_id = 9;
+}
+
+message SendPvPTroop {
+    required string user_id = 1;
+    required TroopsInfo troop_info = 2;
+}
+
+message SendPvPTroopRet {
+    required Result result = 1;
+}
+
+message PvPRank {
+    required string user_id = 1;
+    required int32 cur_rank = 2;
+}
+
+message PvPSeasonRank {
+    required int32 season_id = 1;
+}
+
+message PvPSeasonRankRet {
+    required Result result = 1;
+    repeated PvPRank user_ranks = 2;
+}
+
+message SyncPvPSeasonTime {
+    
+}
+
+message SyncPvPSeasonTimeRet {
+    required int32 pvp_season_id = 1;
+    required double cur_season_end_remain_time = 2;
+    required double next_season_beg_remain_time = 3;
+}
+
+message PvPTopRank {
+    required int32 top_limit = 1;   
+}
+
+message PvPTopRankRet {
+    repeated RankInfo ranks = 1;
+}
+
+message CheckLastPvPSeason {
+    
+}
+
+message CheckLastPvPSeasonRet {
+    required Result result = 1;
+    required int32 last_season_id = 2;
+    repeated PvPRank user_ranks = 3;
+}
+
+enum RefreshTramcarType {
+    random = 0;
+    specify = 1;
+    auto = 2;
+}
+
+enum RefreshRobTargetListType {
+    normal = 0;
+    immediately = 1;
+}
+
+message BeRobbedInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    required int32 result = 3;
+    required uint32 be_robbed_time = 4;
+}
+
+message RobTargetInfo {
+    required int32 pos = 1;
+    required string user_id = 2;
+    required string leader_name = 3;
+    required int32 tramcar_id = 4;
+    required int32 battle_point = 5;
+    required int32 template_id = 6;
+    required int32 is_robot = 7;
+    required uint32 escort_beg_time = 8;
+    required uint32 escort_end_time = 9;
+    repeated BeRobbedInfo be_robbed_list = 10;
+}
+
+message Query {
+    required string user_id = 1;
+    required int32 battle_point = 2;
+}
+
+// 运送矿车信息
+message EscortInfo {
+    required string user_id = 1;
+    required int32 status = 2;
+    required int32 tramcar_id = 3;
+    required uint32 escort_beg_time = 4;
+    required uint32 escort_end_time = 5;
+    required uint32 refresh_rob_target_time = 6;
+    required int32 auto_refresh_tramcar = 7;
+    repeated BeRobbedInfo be_robbed_list = 8;
+}
+
+message QueryEscortInfoRet {
+    required EscortInfo escort_info = 1;
+}
+
+message QueryRobTargetListRet {
+    repeated RobTargetInfo rob_target_list = 1;
+}
+
+message RefreshTramcar {
+    required string user_id = 1;
+    required RefreshTramcarType refresh_type = 2;
+}
+
+message RefreshTramcarRet {
+    required Result result = 1;
+    required RefreshTramcarType refresh_type = 2;
+    optional int32 tramcar_id = 3;
+}
+
+message RefreshRobTargetList {
+    required string user_id = 1;
+    required RefreshRobTargetListType refresh_type = 2;
+}
+
+message RefreshRobTargetListRet {
+    required Result result = 1;
+    required RefreshRobTargetListType refresh_type = 2;
+    repeated RobTargetInfo rob_target_list = 3;
+    optional int32 refresh_rob_target_time = 4;
+}
+
+message UpdateRobTargetListRet {
+    required string user_id = 1;
+    repeated RobTargetInfo rob_target_list = 2;
+}
+
+message EscortStart {
+    required string user_id = 1;
+    required string leader_name = 2;
+    required TroopsInfo troop_info = 3;
+}
+
+message EscortStartRet {
+    required Result result = 1;
+    optional EscortInfo escort_info = 2;
+}
+
+message UpdateBeRobbedListRet {
+    required string user_id = 1;
+    required string rob_target_user_id = 2;
+    repeated BeRobbedInfo be_robbed_list = 3;
+}
+
+message EscortRobTarget {
+    required string user_id = 1;
+    required string leader_name = 2;
+    required TroopsInfo troop_info = 3;
+    required string target_user_id = 4;
+}
+
+message PlayerInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    repeated int32 template_id_list = 3;
+}
+
+message EscortRobTargetRet {
+    required Result result = 1;
+    required string target_user_id = 2;
+    optional bool is_winner = 3;
+    optional string battle_property = 4;
+    repeated int32 battle_record = 5;
+    optional PlayerInfo target_info = 6;
+    optional int32 target_tramcar_id = 7;
+}
+
+message EscortFinishRet {
+    required string user_id = 1;
+    required EscortInfo escort_info = 2;
+}
+
+message EscortReceiveReward {
+    required string user_id = 1;
+}
+
+message EscortReceiveRewardRet {
+    required Result result = 1;
+    optional EscortInfo escort_info = 2;
+    optional int32 tramcar_id = 3;
+    optional int32 be_robbed_times = 4;
+    optional int32 be_robbed_success_times = 5;
+}
+
+message CheckUserStatus {
+    required string user_id = 1;
+}
+
+message CheckUserStatusRet {
+    optional bool is_online = 1;
+}

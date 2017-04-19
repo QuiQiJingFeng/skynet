@@ -1,0 +1,277 @@
+package msg.mining;
+
+enum Result {
+	success = 0;
+	time_limit = 1;
+	collect_first = 2;
+	not_enough_count = 3;
+	destroy_level = 4;
+	explore_first = 5;
+	battle_failure = 6;
+	bug = 7;
+	failure = 8;
+	not_enough_resource = 9;
+	not_enough_layer = 10;
+	refresh_time_limit = 11;
+	event_cd = 12;
+	not_enough_golem_lv = 13;
+}
+
+enum AcceptOpeation {
+	accept = 0;
+	refuse = 1;
+}
+
+message Position {
+	required int32 x = 1;
+	required int32 y = 2;
+}
+
+message DigBlock{
+	optional Position position = 1;	
+	optional bool open_random_event = 2;
+}
+
+message QueryBlock {
+}
+
+message QueryBlockRet {
+	required int32 y_offset = 1;
+	required bytes negative_block_list = 2;
+	required bytes positive_block_list = 3;
+	required bool is_finish_query = 4;
+	required bool is_ext = 5;
+	optional int32 count = 6;
+	repeated RandomEvent random_event_list = 7;
+}
+
+//随机事件
+message RandomEvent{
+	required int32    event_type  = 1;   //随机事件类型
+	required int32    occupy_type = 2;   //事件ID
+	optional Position position    = 3;	 //坐标
+	optional uint32   end_time    = 4;   //结束时间
+}
+
+message DigBlockRet {
+	required Result result 				= 1;
+	required Position cur_position 		= 2;		//当前坐标
+	optional uint32 dig_endtime 		= 3;		//当前挖矿结束时间
+	optional uint32 dig_count 			= 4;		//矿稿数量
+	optional string block_list 			= 5;		//矿区
+	optional int32 golem_num 			= 6;		//当前巨魔数量
+	optional int32 golem_lv 			= 7;		//巨魔等级
+	optional uint32 dig_recover_time 	= 8;		//矿稿恢复时间
+	optional RandomEvent random_event 	= 9; 		//随机事件
+}
+
+message RewardList
+{
+	optional int32 reward_type = 1;
+	optional int32 param1  = 2;
+	optional int32 param2 = 3;
+}
+
+message acceptEvent{
+	required Result result 					= 1;			
+	optional RandomEvent random_event    	= 2;	//随机事件
+	repeated RewardList  reward_list    	= 3;	//奖励组
+}
+
+//是否接受随机事件
+message AcceptRandomEvent{
+	required AcceptOpeation accept_opeation = 1;
+	required RandomEvent random_event    	= 2;	//随机事件
+}
+
+message AcceptRandomEventRet{
+	required Result result 					= 1;
+	required AcceptOpeation accept_opeation = 2;
+	optional RandomEvent random_event    	= 3;	//随机事件
+	optional int32 pick_cost 				= 4;	//矿镐扣除数量
+	repeated RewardList  reward_list    	= 5;	//奖励组
+	optional string reource_type 			= 6;	//资源不足所指的资源名
+}
+
+message UseTNT {
+	optional Position explosive_pos = 1;
+}
+
+message UseTNTRet {
+	required Result result = 1;
+	optional int32 tnt_num = 2;
+}
+
+message Project {
+	required int32 id = 1;
+	required int32 endtime = 2;
+}
+
+message QueryMining {
+}
+
+message QueryMiningRet {
+	required int32 pickaxe_id = 1;				//矿稿等级(id)
+	required int32 dig_count = 2;
+	required int32 dig_max_count = 3;			//最大矿稿数量
+	required int32 dig_endtime = 4;
+	required Position cur_position = 5;
+	required int32 golem_num = 6;
+	required int32 golem_lv = 7;
+	required uint32 dig_recover_time = 8;
+	required string resource_type_found = 9;	//已探索出的资源类型
+	required int32 project_max_count = 10;		//工程最大数量
+	repeated Project project_list = 11;			//工程列表
+	required int32 refresh_time = 12;			//矿区刷新时间
+	required int32 boss_time = 13;				//boss重置时间
+	required Position boss_pos = 14;			//boss坐标
+	required int32 golem_nightmare_lv = 15;		//魇魔等级
+	required int32 boss_id = 16;
+	repeated int32 cave_challenge_nums = 17;
+	repeated int32 cave_buy_challenge_nums = 18;
+	repeated int32 cave_levels = 19;
+	required double cave_boss_bp = 20;
+	required uint32 cave_boss_end_time = 21;
+	required int32 cave_boss_lv = 22;
+	required uint32 dig_depth = 23;
+	repeated RandomEvent random_event_list = 24;
+	optional int32 event_count = 25;            //剩余矿区随机事件次数
+}
+
+message CollectMineRet {
+	required Result result = 1;
+}
+
+message QueryGolemInfo {
+}
+
+message QueryGolemInfoRet {
+	required Position cur_position = 1;
+	required int32 event_id = 2;
+	required int32 endtime = 3;
+}
+
+message AddProject {
+	required int32 id = 1;
+}
+
+message GetProjectReward {
+}
+
+message AddProjectRet {
+	required Result result = 1;
+	required int32 id = 2;
+	repeated Project project_list = 3;	
+}
+
+message UnlockMiningProject {
+}
+
+message UnlockMiningProjectRet {
+	required Result result = 1;
+	required int32 max_count = 2;
+}
+
+message UpdateMiningInfo {
+	optional int32 pickaxe_id = 1;
+	optional int32 dig_count = 2;
+	optional int32 dig_max_count = 3;
+}
+
+message UseTool {
+	required int32 resource_id = 1;
+	required int32 num = 2;
+}
+
+message UseToolRet {
+	required Result result = 1;
+	required int32 resource_id = 2;
+	required int32 num = 3;
+}
+
+message Refresh {
+    required int32 golem_lv = 1;
+}
+
+message RefreshRet {
+    required Result result = 1;
+    optional string block_list = 2;
+    optional int32 refresh_time = 3;
+    optional int32 golem_lv = 4;
+    optional string reource_type = 5;	//资源不足所指的资源类型
+}
+
+message BossInfo {
+    required string block_info = 1;
+    required int32 boss_time = 2;
+}
+
+message SolveEvent {
+    required int32 cave_type = 1;
+    required int32 cave_lv = 2;
+
+}
+
+message SolveEventRet {
+    required Result result = 1;
+    required int32 cave_type = 2;
+    required int32 cave_lv = 3;
+    optional bool is_winner = 4;
+    optional string battle_property = 5;
+    repeated int32 battle_record = 6;
+    optional uint32 dig_count = 7;
+}
+
+message QueryCaveEventConfigInfo {
+}
+
+message CaveOpenConfig {
+    required uint32 day = 1;
+    repeated uint32 cave_types = 2;
+}
+
+message QueryCaveEventConfigInfoRet {
+    repeated CaveOpenConfig cave_open_config = 1;	//副本每周开启信息
+}
+
+message UnlockCaveBoss {
+
+}
+
+message UnlockCaveBossRet {
+    required Result result = 1;
+    optional uint32 cave_boss_end_time = 2;
+    optional string reource_type = 3;	//资源不足所指的资源类型
+}
+
+message BuyCaveChallenge {
+    required int32 cave_type = 1;
+}
+
+message FinishRandomEvent{
+    required RandomEvent random_event    	= 1;	//随机事件
+} 
+
+message FinishRandomEventRet{
+    required Result   result      			= 1; 
+    required RandomEvent random_event    	= 2;	//随机事件
+    repeated RewardList  reward_list    	= 3;   //奖励组
+}
+
+message BuyCaveChallengeRet {
+    required Result result = 1;
+    required int32 cave_type = 2;
+    optional string reource_type = 3;	//资源不足所指的资源类型
+}
+
+message ChallengeCaveBoss {
+}
+
+message ChallengeCaveBossRet {
+    required Result result = 1;
+    optional int32 cave_boss_lv = 2;
+    optional double cave_boss_bp = 3;
+    repeated int32 battle_record = 4;
+    optional string battle_property = 5;
+    optional uint32 cave_boss_end_time = 6;
+}

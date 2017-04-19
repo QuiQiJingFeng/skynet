@@ -1,0 +1,11 @@
+package msg.notice;
+
+message Query {
+}
+
+message QueryRet {
+	required string title = 1;
+	required uint32 time = 2;
+	required string desc = 3;
+}
+

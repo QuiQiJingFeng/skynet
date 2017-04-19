@@ -1,0 +1,92 @@
+package msg.arena;
+
+message Rival {
+	repeated int32 template_id_list = 1;
+	required string leader_name = 2;
+	required int32 battle_point = 3;
+	required bool state = 4; // 挑战结果 false:未挑战。true:挑战成功
+	required int32 speed = 5;
+	required int32 defense = 6;
+	required int32 dodge = 7;
+	required int32 authority = 8;
+	optional string user_id = 9;
+}
+
+enum Result {
+	success = 1;
+	failure = 2;
+	not_enough_blood_diamond = 3;
+	already_challenge_rival = 4;
+	not_enough_count = 5;
+	rival_info_missing = 6;
+}
+message Query {
+
+}
+
+message QueryRet {
+	repeated Rival rival = 1;
+	required int32 challenge_num = 2;     //挑战次数
+	required int32 win_num = 3;           //胜利次数
+	required int32 refresh_time = 4;      //刷新时间
+	required int32 prize_status = 5;
+}
+
+//挑战
+message Challenge {
+	required int32 rival_pos = 1; //挑战对象的pos
+}
+
+message ChallengeRet {
+	required Result result = 1;
+	required int32 rival_pos = 2;
+	optional string battle_property = 3; //战斗属性
+	repeated int32 battle_record = 4; //战斗结果
+	optional int32 challenge_num = 5;//挑战次数
+	optional int32 win_num = 6;	//胜利次数
+}
+
+//刷新时间
+message RefreshRival {
+
+}
+
+message RefreshRivalRet {
+	required Result result = 1;
+}
+
+message RewardInfo
+{
+    required int32 reward_type = 1;
+    required int32 param1  = 2;
+    required int32 param2 = 3;
+}
+
+message SingleExchangeInfo
+{
+	required int32 ID = 1;
+	required int32 need_resource1 = 2;	
+	required int32 need_count1 = 3;	
+	required int32 need_resource2 = 4;	
+	required int32 need_count2 = 5;
+	repeated RewardInfo reward_info = 6;
+}
+
+message QueryExchangeConfig {
+}
+
+message QueryExchangeConfigRet {
+	repeated SingleExchangeInfo config_list = 1;
+}
+
+//兑换奖励
+message MedalExchange {
+	required int32 prize_id = 1;
+	required int32 exchange_num = 2;			
+}
+
+message MedalExchangeRet {
+	required Result result = 1;
+	optional int32 prize_id = 2;
+}
+

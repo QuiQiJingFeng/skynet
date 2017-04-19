@@ -8,7 +8,7 @@ local account_redis
 
 local MAX_USER_ID = 4967000
 
-local FUNCTION = {}
+local CMD = {}
 
 local function CreateUserId()
     local max_id = account_redis:incrby("user_id_generator", 1)
@@ -20,12 +20,12 @@ local function CreateUserId()
 end
 
 --热更
-function FUNCTION.Login(msg)
+function CMD.Login(msg)
     local success = false
     local user_key = msg.platform .. ":" .. msg.user
-    local user_id = account_redis:hget(user, server_id)
+    local user_id = account_redis:hget(user_key, server_id)
     if not user_id then
-        user_id = CreateUserid()
+        user_id = CreateUserId()
         if not user_id then
             return success
         end

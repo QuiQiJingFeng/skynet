@@ -268,3 +268,46 @@ luaopen_profile(lua_State *L) {
 
 	return 1;
 }
+
+/*
+ 	REDEME:FYD  性能分析
+	
+	虽然 skynet 可以尽可能的利用多核计算，但要特别小心在不能并发的流程上某个环节的处理能力过低。
+	如果在一条处理流水线上，某个服务的处理能力明显低于前一个环节，消息就很有可能堆积在这个服务的消息队列里。 
+	所以应该尽量避免设计出单点服务。不要把太多不相关的处理放在同一个服务内（因为单一服务的消息处理是不能并行的）。
+	对于复杂的系统，靠猜测找到这些瓶颈非常困难，需要利用一些分析工具，然后再从设计上拆分优化。
+
+	
+	debug_console当中 stat命令可以获取所有服务中的性能统计信息
+	skynet.stat(what) 可以返回当前服务的性能统计信息，what 可以是以下字符串。
+
+	1、"mqlen" 消息队列中堆积的消息数量。如果消息是均匀输入的，那么 mqlen 不断增长就说明已经过载。
+	你可以在消息的 dispatch 函数中首先判断 mqlen ，在过载发生时做一些处理（至少 log 记录下来，方便定位问题）。
+	2、"cpu" 占用的 cpu 总时间。需要在 skynet 配置 中设置 profile 为 true 。
+	3、"message" 处理的消息条数。
+	4、"time" 当前消息处理的时间。
+
+	profile 模块
+
+	profile 模块可以帮助统计一个消息处理使用的系统时间。
+
+	使用 skynet 内置的 profile 记时而不用系统带的 os.time 
+	是因为 profile 可以剔除阻塞调用的时间，准确统计出当前 coroutine 真正的开销。
+	
+	example:
+		local profile = require "profile"
+		profile.start()
+		func()
+		local time = profile.stop() --profile.start() 和 profile.stop() 统计出其间的时间开销（返回单位是秒)
+ */
+
+
+
+
+
+
+
+
+
+
+

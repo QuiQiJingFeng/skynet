@@ -1,3 +1,3 @@
 #!/bin/sh
 
-protoc -o msg.pb *.proto
+protoc -o msg.pb msg/*.proto *.proto

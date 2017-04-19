@@ -1,8 +1,753 @@
+import "msg/login.proto";
+import "msg/user.proto";
+import "msg/resource.proto";
+import "msg/mercenary.proto";
+import "msg/adventure.proto";
+import "msg/mining.proto";
+import "msg/destiny_weapon.proto";
+import "msg/reward.proto";
+import "msg/bag.proto";
+import "msg/temple.proto";
+import "msg/merchant.proto";
+import "msg/arena.proto";
+import "msg/store.proto";
+import "msg/ladder.proto";
+import "msg/payment.proto";
+import "msg/mail.proto";
+import "msg/daily.proto";
+import "msg/notice.proto";
+import "msg/social.proto";
+import "msg/achievement.proto";
+import "msg/vip.proto";
+import "msg/quest.proto";
+import "msg/campaign.proto";
+import "msg/guild.proto";
+import "msg/carnival.proto";
+import "msg/sns.proto";
+import "msg/rune.proto";
+import "msg/escort.proto";
+import "msg/magic_shop.proto";
+import "msg/pvp.proto";
+import "msg/coze.proto";
+import "msg/jump.proto";
+import "msg/liveness.proto";
+import "msg/mine.proto";
+import "msg/cultivation.proto";
+import "msg/blood_replace.proto";
+import "msg/sns_center.proto";
+import "msg/expedition.proto";
+import "msg/evolution.proto";
 
 message C2GS {
 	required int32 session = 1;
+
+	optional msg.user.HeartBeat heart_beat = 7;
+	optional msg.login.Register register = 8;
+	optional msg.login.Login login = 9;
+	optional msg.login.Logout logout = 10;
+	optional msg.user.CreateLeader create_leader = 11;
+	optional msg.user.Query	query_user_base_info = 12;
+
+	optional msg.resource.Query query_resource_list = 13;
+	optional msg.mercenary.Query query_troop_info = 14;
+
+	optional msg.adventure.QueryMaze query_adventure_maze_list = 15;
+	optional msg.destiny_weapon.Query query_destiny_weapon = 16;
+
+	optional msg.adventure.SolveEvent solve_adventure_event = 17;
+	optional msg.adventure.EnterMaze enter_adventure_maze = 18;
+
+	optional msg.login.Reconnect reconnect = 19;
+
+	optional msg.mercenary.AllocExp alloc_mercenary_exp = 20;
+
+	optional msg.mining.QueryBlock query_mining_block_info = 22;
+	optional msg.mining.QueryMining query_mining_info = 23;
+	optional msg.mining.DigBlock dig_block = 24;
+	optional msg.mining.UseTNT use_tnt = 25;
+	optional msg.mining.Position collect_mine = 26;
+	optional msg.mining.Position query_golem_info = 27;
+
+	optional msg.mercenary.Rest rest_mercenary = 29;
+	optional msg.mercenary.Fire fire_mercenary = 30;
+	optional msg.mercenary.ForgeWeapon forge_mercenary_weapon = 31;
+	optional msg.mercenary.UpgradeWakeup upgrade_mercenary_wakeup = 32;
+
+	optional msg.bag.Query query_bag_info = 33;
+	optional msg.bag.UseItem use_item = 34;
+	optional msg.bag.UpgradeBag upgrade_bag = 35;
+
+	optional msg.adventure.OpenBox open_box = 36;
+	optional msg.mercenary.Recruit recruit_mercenary = 37;
+	optional msg.mercenary.Transmigrate transmigrate_mercenary = 38;
+	optional msg.mining.AddProject add_mining_project = 39;
+	optional msg.mining.GetProjectReward get_mining_project_reward = 40;
+	optional msg.temple.Query query_temple_mercenary = 41;
+	optional msg.temple.Recruit recruit_temple_mercenary = 42;
+	optional msg.merchant.Query query_merchant = 43;
+	optional msg.merchant.Exchange merchant_exchange = 44;
+	optional msg.merchant.SoulChip merchant_soul_chip = 45;
+	optional msg.merchant.ResetList merchant_reset = 46;
+	optional msg.mining.UnlockMiningProject unlock_mining_project = 47;
+
+	optional msg.arena.Query query_arena_rival = 48;
+	optional msg.arena.Challenge challenge_arena_rival = 49;
+	optional msg.arena.RefreshRival refresh_arena_rival = 50;
+
+	optional msg.arena.MedalExchange medal_exchange = 52;
+	optional msg.store.Query query_store_info = 53;
+	optional msg.store.BuyGoods buy_store_goods = 54;
+
+	optional msg.destiny_weapon.Forge forge_destiny_weapon = 56;
+	optional msg.destiny_weapon.ChooseWeapon choose_destiny_weapon = 57;
+	optional msg.ladder.Query query_ladder_info = 58;
+	optional msg.ladder.Challenge challenge_ladder = 59;
+	optional msg.mining.UseTool use_mining_tool = 60;
+	optional msg.ladder.TopTenQuery ladder_top_ten = 61;
+
+	optional msg.arena.QueryExchangeConfig query_medal_exchange_config = 62;
+
+	optional msg.mercenary.OpenArtifact open_mercenary_artifact = 63;
+	optional msg.mercenary.UpgradeForce upgrade_mercenary_force = 64;
+	optional msg.mining.Refresh refresh_mining_area = 65;
+	optional msg.payment.FinishAppleOrder finish_apple_order = 67;
+	optional msg.payment.CloseOrder close_payment_order = 68;
+	optional msg.payment.Query query_payment_info = 69;
+	optional msg.mercenary.InsertFormation insert_formation = 70;
+	optional msg.mercenary.ExchangeFormationPos exchange_formation_pos = 71;
+	optional msg.mail.Query query_mail_info = 72;
+	optional msg.mail.Open open_mail = 73;
+	optional msg.mail.Send send_mail = 74;
+	optional msg.daily.CheckinDailyQuery query_check_in_daily_list = 75;
+	optional msg.daily.CheckinWeeklyQuery query_check_in_weekly_list = 76;
+	optional msg.daily.TakeCheckinReward take_check_in_reward = 77;
+	optional msg.mercenary.AdjustMercenaryPosition adjust_mercenary_position = 78;
+	//公告
+	optional msg.notice.Query query_notice_info = 79;
+	//血钻商店列表
+	optional msg.payment.QueryPaymentProductsList query_payment_products_list = 80;
+
+	optional msg.social.Query query_social_info = 87;
+	optional msg.social.Invite invite_friend = 88;
+	optional msg.social.Accept accept_invitation = 89;
+	optional msg.social.Refuse refuse_invitation = 90;
+	optional msg.social.Remove remove_friend = 91;
+	optional msg.social.SetBan set_ban_invite = 92;
+	optional msg.social.SendGift send_gift = 93;
+	optional msg.social.SearchFriend search_friend = 94;
+	optional msg.social.QueryFriendTroop query_friend_troop = 95;
+
+	optional msg.achievement.Query query_achievement_list = 96;
+	optional msg.achievement.Complete complete_achievement = 97;
+
+	optional msg.carnival.QueryCarnivalConfig query_carnival_config = 98;
+	optional msg.carnival.QueryCarnivalInfo query_carnival_info = 99;
+	optional msg.carnival.TakeCarnivalReward take_carnival_reward = 100;
+
+	optional msg.vip.Query query_vip = 101;
+	optional msg.vip.Buy buy_vip = 102;
+	optional msg.vip.TakeReward take_vip_reward = 103;
+
+	optional msg.payment.NewOrder new_payment_order = 104;
+	optional msg.payment.CheckOrder check_payment_order = 105;
+	optional msg.daily.TakeRewardByCdkey take_reward_by_cdkey = 106;
+	optional msg.mercenary.LibraryRecruit library_recruit = 107;
+	optional msg.social.ChallengeFriend challenge_friend = 108;
+	optional msg.user.BindAccount bind_account = 109;
+	optional msg.user.FinishAllQuery finish_all_query = 110;
+	optional msg.mercenary.ChangeFormation change_formation = 111;
+
+	//任务委托邮件列表
+	optional msg.quest.Query query_quest_mail_list = 112;
+	//新邮件
+	optional msg.quest.GetNewQuestMail get_new_quest_mail = 113;
+	//读邮件
+	optional msg.quest.ReadQuestMail read_quest_mail = 114;
+	//主角改名
+	optional msg.user.ChangeLeaderName change_leader_name = 115;
+	//合成灵魂石
+	optional msg.mercenary.CraftSoulStone craft_soul_stone = 116;
+
+	optional msg.mercenary.SignContract sign_contract = 117;
+
+	// 合战系统协议
+	optional msg.campaign.NoParameters query_campaign_info = 118;			// 合战信息
+	optional msg.campaign.QueryReq query_campaign_level = 119;				// 查询合战关卡
+	optional msg.campaign.QueryReq query_campaign_buff = 120;				// 查询合战BUFF
+	optional msg.campaign.QueryReq query_campaign_rank = 121;				// 查询合战排行
+	optional msg.campaign.QueryReq query_campaign_reward = 122;				// 查询合战奖励
+	optional msg.campaign.QueryReq query_campaign_rule = 123;				// 查询合战规则
+	optional msg.campaign.BattleReq battle_campaign = 124;					// 请求合战
+	optional msg.campaign.ConvertReq convert_campaign_exp = 125;			// 经验兑换
+	optional msg.campaign.ConvertReq convert_campaign_reward = 126;			// 奖励兑换
+	optional msg.campaign.NoParameters buy_campaign_overtime = 127;			// 申请加时赛
+	optional msg.campaign.QueryReq query_campaign_overtime = 128;			// 查询加时状态
+	optional msg.mercenary.ChangeExProperty change_mercenary_exproperty = 129;
+
+	optional msg.campaign.BattleReq revive_campaign_battle = 130;		// 合战战斗复活
+	optional msg.carnival.QueryCarnivalUnionData query_carnival_union_data = 131;
+	// 日常系统
+	optional msg.daily.DailyQuery query_daily = 132;// 查询日常信息
+	optional msg.daily.PrayerTake take_daily_prayer = 133; //执行祈祷
+	optional msg.daily.AlchemyTake take_daily_alchemy = 134;//执行炼金
+	// 公会系统
+	optional msg.guild.Query query_guild = 135;
+	optional msg.guild.CreateGuild create_guild = 136;
+	optional msg.guild.SearchGuild search_guild = 137;
+	optional msg.guild.JoinGuild join_guild = 138;
+	optional msg.guild.Query dismiss_guild = 139;
+	optional msg.guild.Query exit_guild = 140;
+	optional msg.guild.GuildMemberCommand fire_guild_member = 141;
+	optional msg.guild.GuildMemberCommand transfer_guild = 142;
+	optional msg.guild.GuildSetting set_guild_conf = 143;
+	optional msg.guild.Query query_guild_member_list = 144;
+	optional msg.guild.Query guild_notice_tips = 145;
+	optional msg.user.QueryToken query_chat_token = 146;
+
+	// 矿区副本
+	optional msg.mining.SolveEvent solve_cave_event = 147;
+	optional msg.mining.ChallengeCaveBoss challenge_cave_boss = 148;
+	optional msg.mining.UnlockCaveBoss unlock_cave_boss = 149;
+
+	// 新手引导
+	optional msg.user.ChangeNoviceMark change_novice_mark = 150;
+
+	optional msg.mining.BuyCaveChallenge buy_cave_challenge = 151; // 购买次数
+
+	optional msg.mining.QueryCaveEventConfigInfo query_cave_event_config_info = 152; // 查询矿区信息
+	// 完成谷歌订单
+	optional msg.payment.FinishGoogleOrder finish_google_order = 153;
+	optional msg.carnival.VoteCarnival vote_carnival = 154;
+	optional msg.carnival.TakeLottery take_lottery_reward = 155;
+	optional msg.carnival.TakeEvolution take_evolution = 156;
+	//修改阵容名字
+	optional msg.mercenary.ChangeFormationName change_formation_name = 157;
+
+	optional msg.carnival.TakeCarnivalReward take_fund_profit = 158;
+    
+	//公会战
+	optional msg.guild.GuildAppointMember guild_appoint_member = 159;
+	optional msg.guild.GuildSeasonConfigQuery query_guild_season_config = 160;
+	optional msg.guild.GuildEnterFor guild_enter_for = 161;
+	optional msg.guild.GuildUpdateWarfield guild_update_warfield = 162;
+	optional msg.guild.Query query_guild_war_result = 163;
+	optional msg.guild.QueryGuildWarRecord query_guild_war_record = 164;
+	optional msg.social.QueryFriendTroop query_guild_member_troop = 165;
+	optional msg.guild.Query query_guild_rival_info = 166;
+	optional msg.guild.BuyBuff buy_guild_member_buff = 167;
+
+	optional msg.guild.Query query_guild_war_reward_config = 168;
+	optional msg.guild.ExchangeReward exchange_guild_war_reward = 169;
+
+    optional msg.guild.Query query_guild_rival_round_info = 170;
+    optional msg.guild.ScoutRival scout_guild_rival = 171;
+    optional msg.guild.ScoutTroop scout_guild_troop = 172;
+
+    optional msg.guild.Query query_rank_list = 173;
+
+    //分配公会奖励点
+	optional msg.guild.GuildAllocBonus guild_alloc_bonus = 174;
+
+	//符文
+	optional msg.rune.Query query_rune_info = 175;
+	optional msg.rune.OneKeyReceive rune_one_key_receive = 176;
+	optional msg.rune.DrawRune draw_rune = 177;
+	optional msg.rune.BuyRuneBugCell buy_rune_bag_cell = 178;
+	optional msg.rune.EquipRune equip_rune = 179;
+	optional msg.rune.UpgradeRune upgrade_rune = 180;
+
+	//矿车运送
+	optional msg.escort.Query query_escort_info = 181;
+	optional msg.escort.Query query_escort_times = 182;
+	optional msg.escort.Query query_tramcar_list = 183;
+	optional msg.escort.Query query_rob_target_list = 184;
+	optional msg.escort.RefreshTramcar escort_refresh_tramcar = 185;
+	optional msg.escort.RefreshRobTargetList escort_refresh_rob_target_list = 186;
+	optional msg.escort.EscortStart escort_start = 187;
+	optional msg.escort.BuyRobTimes escort_buy_rob_times = 188;
+	optional msg.escort.BuyEscortTimes escort_buy_escort_times = 189;
+	optional msg.escort.EscortRobTarget escort_rob_target = 190;
+	optional msg.escort.EscortReceiveReward escort_receive_reward = 191;
+
+	//功能开关
+	optional msg.user.QueryFeatureConfig query_feature_config = 192;
+
+	//查询公会列表
+	optional msg.guild.GetGuildShowList get_guild_list = 193;
+
+	//随机事件
+	optional msg.mining.FinishRandomEvent finish_random_event = 194;
+	optional msg.mining.AcceptRandomEvent accept_random_event = 195;
+	
+	//跨服PvP
+	optional msg.pvp.RankList query_server_pvp_info = 196;
+	optional msg.pvp.PvPSeason query_server_pvp_season = 197;
+	optional msg.pvp.PvPBattle challenge_server_pvp = 198;
+	optional msg.pvp.RankList update_server_pvp_rank = 199;
+	optional msg.pvp.PvPTopRank query_server_pvp_world_rank = 200;
+	optional msg.pvp.PvPBuyTimes buy_server_pvp_times = 201;
+
+	//积分商城
+	optional msg.magic_shop.Query query_mogic_shop_info = 202;	//查询商城信息
+	optional msg.magic_shop.GetMercenary get_mercenary = 203;   //兑换佣兵
+	optional msg.magic_shop.GetCarnivalTimeInfo get_carnival_time_info = 204;  //获取活动结束时间
+    
+	//购买最大关卡奖励
+	optional msg.adventure.BuyAdventureReward buy_adventure_reward = 205;
+    
+	optional msg.sns.Query query_sns_info = 206;
+    
+	optional msg.sns.QueryProgress query_sns_invitee_progress = 207;
+	optional msg.sns.TakeInvitationReward take_sns_invitation_reward = 208;
+	optional msg.sns.TakeShareReward take_sns_event_reward = 209;
+    
+    optional msg.coze.CozeRecordAppend coze_record_append = 210;
+
+	//资源缺失跳转
+	optional msg.jump.GetJumpList get_jump_list = 211;	//获取跳转所用到的信息
+
+	//活跃度
+	optional msg.liveness.QueryLivenessInfo query_liveness_info = 212;
+	optional msg.liveness.GetLivenessReward get_liveness_reward = 213;
+	optional msg.liveness.GetActivityReward get_activity_reward = 214;
+
+	//公会Boss
+	optional msg.guild.QueryGuildBossReward query_guild_boss_exchange_reward_info = 215;
+	optional msg.guild.GuildBossExchange guild_boss_exchange_reward = 216;
+	optional msg.guild.GuildBossRank query_guild_boss_rank = 217;
+	optional msg.guild.QueryGuildBossInfo query_guild_boss_info = 218;
+	optional msg.guild.GuildBossBuyTicket guild_boss_buy_ticket = 219;
+	optional msg.guild.GuildBossChallenge guild_boss_challenge = 220;
+	optional msg.guild.GuildBossReward guild_boss_reward = 221;
+
+	//限时礼包
+	optional msg.carnival.BuyLimitePackage buy_limite_package = 222;
+	optional msg.carnival.QueryLimitePackage query_limite_package = 223;
+	optional msg.carnival.UpdateLimitePackageInfo update_limite_package_info = 224;
+
+	//宝具升级
+	optional msg.mercenary.UpgradeArtifact upgrade_mercenary_artifact = 225;
+
+	//矿山
+	optional msg.mine.Query query_mine_info = 226;						//查询矿山开采数据
+	optional msg.mine.Query query_mine_times = 227;						//查询矿山相关次数
+	optional msg.mine.Query query_mine_rob_target_list = 229;			//查询可掠夺目标
+	optional msg.mine.Query refresh_mine_rob_target_list = 230;			//刷新可掠夺目标
+	optional msg.mine.Query query_all_mine_rewards = 231;				//查询所有矿山的奖励列表
+	optional msg.mine.RefreshReward refresh_mine_rewards = 232;			//刷新制定矿山全额奖励
+	optional msg.mine.Query check_mine_report = 234;					//检查战报状态
+	optional msg.mine.Query query_mine_report = 235;					//查询战报数据
+	optional msg.mine.MineStart mine_start = 236;						//开始开采矿山
+	optional msg.mine.MineReceiveReward mine_receive_reward = 237;		//收取矿山奖励
+	optional msg.mine.MineRobTarget mine_rob_target = 238;				//掠夺目标
+	optional msg.mine.BuyTimes mine_buy_times = 239;					//购买矿山相关次数（刷新掠夺目标、掠夺）
+	optional msg.mine.UnlockMine mine_unlock = 240;					    //解锁矿山
+	optional msg.mine.QueryRevengeInfo query_revenge_info = 241;		//查询复仇信息
+	optional msg.mine.ReceiveAdditionalReward mine_receive_additional_reward = 242;	//收取矿山额外奖励
+	optional msg.mine.MineCancel mine_cancel = 243;						//取消开采
+
+	//修炼
+	optional msg.cultivation.Query query_cultivation_info = 244;
+	optional msg.cultivation.Cultivate cultivate = 245;
+
+	//血钻替换
+	optional msg.blood_replace.BuyResource buy_resource = 246;
+
+	//宿命远征
+	optional msg.expedition.QueryExpedition query_expedition = 247;
+	optional msg.expedition.ExpeditionFight expedition_fight = 248;
+	optional msg.expedition.RefreshExpeditionSearch refresh_expedition_search = 249;
+	optional msg.expedition.ExpeditionApendTimes expedition_apend_times = 250;
+	optional msg.expedition.GetExpeditionRank get_expedition_rank = 251;
+	optional msg.expedition.PlayerClickTab player_click_tab = 252;
+	
+	//宿命武器升星
+	optional msg.destiny_weapon.QueryWeaponStarInfo query_weapon_star_info = 253;	//查询宿命武器升星数据
+	optional msg.destiny_weapon.WeaponUpgradeStar weapon_star_upgrade = 254;		//宿命武器升星
+	optional msg.destiny_weapon.GetFinalDestinyWeapon get_final_destiny_weapon = 255;	//激活终极宿命武器
+	optional msg.destiny_weapon.UnlockDestinyWeaponStar unlock_destiny_weapon_star = 256;	//激活终极宿命武器
+
+	optional msg.sns_center.QueryLeadingIntegral query_leading_integral = 257;
+	optional msg.sns_center.GetLeadingIntegral get_leading_integral = 258;
+	optional msg.sns_center.SharedSuccess shared_success = 259;
+	//换装
+	optional msg.evolution.Query query_evolution = 260;
+	optional msg.evolution.FlashGoldLadder evolution_flash_gold_ladder = 261;
+	optional msg.evolution.Dressing evolution_dressing = 262;
 }
 
 message GS2C {
 	required int32 session = 1;
+
+	optional msg.user.HeartBeatRet heart_beat_ret = 7;
+	optional msg.login.RegisterRet register_ret = 8;
+	optional msg.login.LoginRet login_ret = 9;
+	optional msg.login.LogoutRet logout_ret = 10;
+	optional msg.user.CreateLeaderRet create_leader_ret = 11;
+	optional msg.user.QueryRet query_user_base_info_ret = 12;
+
+	optional msg.resource.QueryRet query_resource_list_ret = 13;
+	optional msg.mercenary.QueryRet query_troop_info_ret = 14;
+	optional msg.adventure.QueryMazeRet query_adventure_maze_list_ret = 15;
+	optional msg.destiny_weapon.QueryRet query_destiny_weapon_ret = 16;
+
+	optional msg.adventure.SolveEventRet solve_adventure_event_ret = 17;
+	optional msg.adventure.EnterMazeRet enter_adventure_maze_ret = 18;
+
+	optional msg.login.ReconnectRet reconnect_ret = 19;
+
+	optional msg.mercenary.AllocExpRet alloc_mercenary_exp_ret = 22;
+	optional msg.mining.QueryBlockRet query_mining_block_info_ret = 23;
+
+	optional msg.mining.QueryMiningRet query_mining_info_ret = 24;
+	optional msg.mining.DigBlockRet dig_block_ret = 25;
+	optional msg.mining.UseTNTRet use_tnt_ret = 26;
+	optional msg.mining.CollectMineRet collect_mine_ret = 27;
+
+	optional msg.resource.UpdateResourceList update_resource_list = 28;
+	optional msg.user.UpdateBaseInfo update_base_info = 29;
+	optional msg.mining.QueryGolemInfoRet query_golem_info_ret = 30;
+	optional msg.reward.RewardList reward_info_list = 31;
+
+	optional msg.mercenary.NewMercenary new_mercenary_ret = 32;
+
+	optional msg.mercenary.RestRet rest_mercenary_ret = 34;
+	optional msg.mercenary.FireRet fire_mercenary_ret = 35;
+	optional msg.mercenary.ForgeWeaponRet forge_mercenary_weapon_ret = 36;
+	optional msg.mercenary.UpgradeWakeupRet upgrade_mercenary_wakeup_ret = 37;
+
+	optional msg.bag.QueryRet query_bag_info_ret = 38;
+	optional msg.bag.UseItemRet use_item_ret = 39;
+	optional msg.bag.NewItem new_item = 40;
+	optional msg.bag.UpgradeBagRet upgrade_bag_ret = 41;
+	optional msg.adventure.UpdateMazeInfo open_box_ret = 42;
+	optional msg.mercenary.RecruitRet recruit_mercenary_ret = 43;
+
+	optional msg.mercenary.TransmigrateRet transmigrate_mercenary_ret = 44;
+
+	optional msg.mining.AddProjectRet add_mining_project_ret = 45;
+	optional msg.mining.AddProjectRet get_mining_project_reward_ret = 46;
+	optional msg.temple.QueryRet query_temple_mercenary_ret = 47;
+	optional msg.temple.RecruitRet recruit_temple_mercenary_ret = 48;
+	optional msg.merchant.QueryRet query_merchant_ret = 49;
+	optional msg.merchant.ExchangeRet merchant_exchange_ret = 50;
+	optional msg.merchant.SoulChipRet merchant_soul_chip_ret = 51;
+	optional msg.merchant.ResetListRet merchant_reset_ret = 52;
+	optional msg.mining.UnlockMiningProjectRet unlock_mining_project_ret = 53;
+
+	optional msg.arena.QueryRet query_arena_rival_ret = 54;
+	optional msg.arena.ChallengeRet challenge_arena_rival_ret = 55;
+	optional msg.arena.RefreshRivalRet refresh_arena_rival_ret = 56;
+
+	optional msg.arena.MedalExchangeRet medal_exchange_ret = 58;
+	optional msg.store.QueryRet query_store_info_ret = 59;
+	optional msg.store.BuyGoodsRet buy_store_goods_ret = 60;
+	optional msg.destiny_weapon.ForgeRet forge_destiny_weapon_ret = 62;
+	optional msg.destiny_weapon.ChooseWeaponRet choose_destiny_weapon_ret = 63;
+
+	optional msg.ladder.QueryRet query_ladder_info_ret = 65;
+	optional msg.ladder.ChallengeRet challenge_ladder_ret = 66;
+	optional msg.mining.UpdateMiningInfo update_mining_info = 67;
+	optional msg.mining.UseToolRet use_mining_tool_ret = 68;
+	optional msg.ladder.TopTenQueryRet ladder_top_ten_ret = 69;
+
+	optional msg.arena.QueryExchangeConfigRet query_medal_exchange_config_ret = 70;
+
+	optional msg.mercenary.OpenArtifactRet open_mercenary_artifact_ret = 71;
+	optional msg.mercenary.UpgradeForceRet upgrade_mercenary_force_ret = 72;
+	optional msg.mining.RefreshRet refresh_mining_area_ret = 73;
+	optional msg.mining.BossInfo mining_boss_info_ret = 74;
+	optional msg.ladder.UpdateRivalRet update_ladder_rival_ret = 75;
+	optional msg.payment.FinishAppleOrderRet finish_apple_order_ret = 77;
+	optional msg.payment.CloseOrderRet close_payment_order_ret = 78;
+	optional msg.payment.QueryRet query_payment_info_ret = 79;
+	optional msg.mercenary.InsertFormationRet insert_formation_ret = 80;
+	optional msg.mercenary.ExchangeFormationPosRet exchange_formation_pos_ret = 81;
+	optional msg.mail.QueryRet query_mail_info_ret = 82;
+	optional msg.mail.MailInfo new_mail_info_ret = 83;
+	optional msg.mail.OpenRet open_mail_ret = 84;
+	optional msg.mail.SendRet send_mail_ret = 85;
+
+	optional msg.daily.CheckinDailyQueryRet query_check_in_daily_list_ret = 86;
+	optional msg.daily.CheckinWeeklyQueryRet query_check_in_weekly_list_ret = 87;
+	optional msg.daily.TakeCheckinRewardRet take_check_in_reward_ret = 88;
+
+	optional msg.mercenary.AdjustMercenaryPositionRet adjust_mercenary_position_ret = 89;
+	//公告
+	optional msg.notice.QueryRet query_notice_info_ret = 90;
+	//血钻商店列表
+	optional msg.payment.QueryPaymentProductsListRet query_payment_products_list_ret = 91;
+
+	optional msg.social.QueryRet query_social_info_ret = 98;
+	optional msg.social.InviteRet invite_friend_ret = 99;
+	optional msg.social.AcceptRet accept_invitation_ret = 100;
+	optional msg.social.SingleInfo new_friend_ret = 101;
+	optional msg.social.RefuseRet refuse_invitation_ret = 102;
+	optional msg.social.RemoveRet remove_friend_ret = 103;
+	optional msg.social.SetBanRet set_ban_invite_ret = 104;
+	optional msg.social.SendGiftRet send_gift_ret = 105;
+	optional msg.social.SingleInfo new_invite_ret = 106;
+	optional msg.social.SearchFriendRet search_friend_ret = 107;
+	optional msg.social.QueryFriendTroopRet query_friend_troop_ret = 108;
+
+	optional msg.achievement.QueryRet query_achievement_list_ret = 109;
+	optional msg.achievement.CompleteRet complete_achievement_ret = 110;
+
+	optional msg.carnival.QueryCarnivalConfigRet query_carnival_config_ret = 111;
+	optional msg.carnival.QueryCarnivalInfoRet query_carnival_info_ret = 112;
+	optional msg.carnival.TakeCarnivalRewardRet take_carnival_reward_ret = 113;
+
+	optional msg.vip.QueryRet query_vip_ret = 114;
+	optional msg.vip.BuyRet buy_vip_ret = 115;
+	optional msg.vip.TakeRewardRet take_vip_reward_ret = 116;
+
+	optional msg.payment.NewOrderRet new_payment_order_ret = 117;
+	optional msg.payment.CheckOrderRet check_payment_order_ret = 118;
+
+	optional msg.daily.TakeRewardByCdkeyRet take_reward_by_cdkey_ret = 119;
+	optional msg.mercenary.LibraryRecruitRet library_recruit_ret = 120;
+	optional msg.social.ChallengeFriendRet challenge_friend_ret = 121;
+	optional msg.user.BindAccountRet bind_account_ret = 122;
+
+	optional msg.carnival.UpdateCarnivalInfoRet update_carnival_info_ret = 123;
+	optional msg.user.FinishAllQuery finish_all_query_ret = 124;
+	optional msg.mercenary.ChangeFormationRet change_formation_ret = 125;
+
+	//任务委托邮件列表
+	optional msg.quest.QueryRet query_quest_mail_list_ret = 126;
+	//新邮件
+	optional msg.quest.GetNewQuestMailRet get_new_quest_mail_ret = 127;
+	optional msg.temple.RefreshRet refresh_temple_ret = 128;
+	//读邮件
+	optional msg.quest.ReadQuestMailRet read_quest_mail_ret = 129;
+	optional msg.user.ErrorRet error_ret = 130;
+	//主角改名
+	optional msg.user.ChangeLeaderNameRet change_leader_name_ret = 131;
+	//合成灵魂石
+	optional msg.mercenary.CraftSoulStoneRet craft_soul_stone_ret = 132;
+
+	optional msg.mercenary.SignContractRet sign_contract_ret = 133;
+
+	// 合战协议
+	optional msg.campaign.CampaignInfoRet query_campaign_info_ret = 134;		//合战信息
+	optional msg.campaign.BuffInfoRet query_campaign_buff_ret = 135;			//查询BUFF的反馈
+	optional msg.campaign.RuleInfoRet query_campaign_rule_ret = 136;			//查询Rule的反馈
+	optional msg.campaign.RewardInfoRet query_campaign_reward_ret = 137;		//查询奖励的反馈
+	optional msg.campaign.TopRankRet query_campaign_rank_ret = 138;			//查询排行的反馈
+	optional msg.campaign.ExpConvertRet convert_campaign_exp_ret = 139;			//经验兑换结果
+	optional msg.campaign.RewardConvertRet convert_campaign_reward_ret = 140;	//奖励兑换结果
+	optional msg.campaign.LevelInfoRet query_campaign_level_ret = 141;			//查询关卡信息
+	optional msg.campaign.BattleRet battle_campaign_ret = 142;					//合战战斗反馈
+	optional msg.campaign.OverTimeStatus query_campaign_overtime_ret = 143;		//计时赛状态
+	optional msg.campaign.OverTimeRet campaign_overtime_ret = 144;				//加时赛反馈
+	optional msg.campaign.Property update_campaign_property = 145;				//合战属性更新
+	//佣兵属性转换
+	optional msg.mercenary.ChangeExPropertyRet change_mercenary_exproperty_ret = 146;
+	optional msg.carnival.QueryCarnivalUnionDataRet query_carnival_union_data_ret = 147;
+	// 日常系统
+	optional msg.daily.DailyQueryRet query_daily_ret = 148;
+	optional msg.daily.PrayerTakeRet take_daily_prayer_ret = 149;
+	optional msg.daily.AlchemyTakeRet take_daily_alchemy_ret = 150;
+	// 公会系统
+	optional msg.guild.QueryRet query_guild_ret = 151;
+	optional msg.guild.QueryRet create_guild_ret = 152;
+	optional msg.guild.SearchGuildRet search_guild_ret = 153;
+	optional msg.guild.QueryRet join_guild_ret = 154;
+	optional msg.guild.GuildResult dismiss_guild_ret = 155;
+	optional msg.guild.GuildResult exit_guild_ret = 156;
+	optional msg.guild.GuildResult fire_guild_member_ret = 157;
+	optional msg.guild.GuildResult transfer_guild_ret = 158;
+	optional msg.guild.GuildMemberUpdate update_member_ret = 159;
+	optional msg.guild.GuildNoticeNew update_notice_new = 160;
+	optional msg.guild.GuildResult set_guild_conf_ret = 161;
+
+	optional msg.user.QueryTokenRet query_chat_token_ret = 162;
+	// 矿区副本
+	optional msg.mining.SolveEventRet solve_cave_event_ret = 163;
+	optional msg.mining.ChallengeCaveBossRet challenge_cave_boss_ret = 164;
+	optional msg.mining.UnlockCaveBossRet unlock_cave_boss_ret = 165;
+
+	optional msg.user.UpdateTokenRet update_chat_token_ret = 166;
+
+	// 第一次打开界面触发的新手引导
+	optional msg.user.ChangeNoviceMarkRet change_novice_mark_ret = 167;
+
+	optional msg.mining.BuyCaveChallengeRet buy_cave_challenge_ret = 168; //购买次数
+
+	optional msg.mining.QueryCaveEventConfigInfoRet query_cave_event_config_info_ret = 169; // 矿区信息
+	optional msg.payment.FinishGoogleOrderRet finish_google_order_ret = 170;
+	optional msg.carnival.VoteCarnivalRet vote_carnival_ret = 171;
+	optional msg.carnival.TakeLotteryRet take_lottery_reward_ret = 172;
+	optional msg.carnival.TakeEvolutionRet take_evolution_ret = 173;
+
+	optional msg.campaign.ReviveRet revive_campaign_battle_ret = 174;		//合战战斗复活
+	
+	optional msg.mercenary.ChangeFormationNameRet change_formation_name_ret = 175;
+    
+    optional msg.carnival.TakeCarnivalRewardRet take_fund_profit_ret = 176;
+	//公会战
+	optional msg.guild.GuildAppointMemberRet guild_appoint_member_ret = 177;
+	optional msg.guild.GuildSeasonConfigQueryRet query_guild_season_config_ret = 178;
+	optional msg.guild.GuildEnterForRet guild_enter_for_ret = 179;
+	optional msg.guild.GuildUpdateWarfieldRet guild_update_warfield_ret = 180;
+	optional msg.guild.GuildWarResultRet query_guild_war_result_ret = 181;
+	optional msg.guild.QueryGuildWarRecordRet query_guild_war_record_ret = 182;
+	optional msg.social.QueryFriendTroopRet query_guild_member_troop_ret = 183;
+	optional msg.guild.QueryRivalInfoRet query_guild_rival_info_ret = 184;
+	optional msg.guild.BuyBuffRet buy_guild_member_buff_ret = 185;
+
+	optional msg.guild.QueryRewardRet query_guild_war_reward_config_ret = 187;
+	optional msg.guild.ExchangeRewardRet exchange_guild_war_reward_ret = 188;
+    optional msg.guild.GuildScoutInfo query_guild_rival_round_info_ret = 189;
+    optional msg.guild.GuildScoutInfo scout_guild_rival_ret = 190;
+    optional msg.guild.ScoutTroopRet scout_guild_troop_ret = 191;
+
+    optional msg.guild.RankListRet query_rank_list_ret = 192;
+
+    //公会分配奖励点
+	optional msg.guild.GuildAllocUpdate update_alloc_bonus_ret = 193;
+	optional msg.guild.GuildAllocBonusRet guild_alloc_bonus_ret = 194;
+
+	optional msg.guild.GuildWarSettlementRet update_war_settlement_ret = 195;
+
+	//符文
+	optional msg.rune.QueryRet query_rune_info_ret = 196;
+	optional msg.rune.OneKeyReceiveRet rune_one_key_receive_ret = 197;
+	optional msg.rune.DrawRuneRet draw_rune_ret = 198;
+	optional msg.rune.BuyRuneBugCellRet buy_rune_bag_cell_ret = 199;
+	optional msg.rune.EquipRuneRet equip_rune_ret = 200;
+	optional msg.rune.UpgradeRuneRet upgrade_rune_ret = 201;
+
+	//矿车运送
+	optional msg.escort.QueryEscortInfoRet query_escort_info_ret = 202;
+	optional msg.escort.QueryEscortTimesRet query_escort_times_ret = 203;
+	optional msg.escort.QueryTramcarListRet query_tramcar_list_ret = 204;
+	optional msg.escort.QueryRobTargetListRet query_rob_target_list_ret = 205;
+	optional msg.escort.RefreshTramcarRet escort_refresh_tramcar_ret = 206;
+	optional msg.escort.RefreshRobTargetListRet escort_refresh_rob_target_list_ret = 207;
+	optional msg.escort.UpdateRobTargetListRet escort_update_rob_target_list_ret = 208;
+	optional msg.escort.UpdateBeRobbedListRet escort_update_be_robbed_list_ret = 209;
+	optional msg.escort.EscortStartRet escort_start_ret = 210;
+	optional msg.escort.BuyRobTimesRet escort_buy_rob_times_ret = 211;
+	optional msg.escort.BuyEscortTimesRet escort_buy_escort_times_ret = 212;
+	optional msg.escort.EscortFinishRet escort_finish_ret = 213;
+	optional msg.escort.EscortRobTargetRet escort_rob_target_ret = 214;
+	optional msg.escort.EscortReceiveRewardRet escort_receive_reward_ret = 215;
+	optional msg.escort.QueryEscortTimesRet update_escort_times_ret = 216;
+
+	//功能开关
+	optional msg.user.QueryFeatureConfigRet query_feature_config_ret = 217;
+	optional msg.user.QueryFeatureConfigRet update_feature_config_ret = 218;
+
+	//查询公会列表
+	optional msg.guild.GetGuildShowListRet get_guild_list_ret = 219;
+
+	//完成随机事件
+	optional msg.mining.FinishRandomEventRet finish_random_event_ret = 220;
+
+	//是否接受随机事件
+	optional msg.mining.AcceptRandomEventRet accept_random_event_ret = 221;
+
+	//跨服PvP
+	optional msg.pvp.RankListRet query_server_pvp_info_ret = 222;
+	optional msg.pvp.PvPSeasonRet query_server_pvp_season_ret = 223;
+	optional msg.pvp.PvPBattleRet challenge_server_pvp_ret = 224;
+	optional msg.pvp.RankListRet update_server_pvp_rank_ret = 225;
+	optional msg.pvp.PvPTopRankRet query_server_pvp_world_rank_ret = 226;
+	optional msg.pvp.PvPBuyTimesRet buy_server_pvp_times_ret = 227;
+	
+	//积分商城
+	optional msg.magic_shop.QueryRet query_mogic_shop_info_ret = 228;	//查询商城信息
+	optional msg.magic_shop.GetMercenaryRet get_mercenary_ret = 229;   //兑换佣兵
+	optional msg.magic_shop.UpdateMagicGoldRet update_magic_gold_ret = 230;	//用户积分变更通知 
+	optional msg.magic_shop.GetCarnivalTimeInfoRet get_carnival_time_info_ret = 231;//获取活动结束时间返回
+    
+    optional msg.adventure.BuyAdventureRewardRet buy_adventure_reward_ret = 232;	//购买最大关卡奖励
+    
+    optional msg.sns.QueryRet query_sns_info_ret = 233;
+	optional msg.sns.QueryProgressRet query_sns_invitee_progress_ret = 234;
+	optional msg.sns.TakeInvitationRewardRet take_sns_invitation_reward_ret = 235;
+	optional msg.sns.TakeShareRewardRet take_sns_event_reward_ret = 236;
+    
+    //聊天
+	optional msg.coze.CozeRecordAppendRet coze_record_append_ret = 237;
+	optional msg.coze.UserCozeUpdateRet user_coze_update_ret = 238;
+
+	//资源缺失跳转
+	optional msg.jump.GetJumpListRet get_jump_list_ret = 239;	//获取跳转所用到的信息
+	optional msg.jump.RefreshJumpList refresh_jump_list = 240;  //刷新跳转列表信息
+	
+	//活跃度
+	optional msg.liveness.QueryLivenessInfoRet query_liveness_info_ret = 241;
+	optional msg.liveness.GetLivenessRewardRet get_liveness_reward_ret = 242;
+	optional msg.liveness.GetActivityRewardRet get_activity_reward_ret = 243;
+	optional msg.liveness.UpdateLivenessRet update_liveness_ret = 244;
+	
+	//公会Boss
+	optional msg.guild.QueryGuildBossRewardRet query_guild_boss_exchange_reward_info_ret = 245;
+	optional msg.guild.GuildBossExchangeRet guild_boss_exchange_reward_ret = 246;
+	optional msg.guild.GuildBossRankRet query_guild_boss_rank_ret = 247;
+	optional msg.guild.QueryGuildBossInfoRet query_guild_boss_info_ret = 248;
+	optional msg.guild.GuildBossBuyTicketRet guild_boss_buy_ticket_ret = 249;	
+	optional msg.guild.GuildBossHpUpdateRet guild_boss_update_ret = 250;
+	optional msg.guild.GuildBossChallengeRet guild_boss_challenge_ret = 251;
+	optional msg.guild.GuildBossRewardRet guild_boss_reward_ret = 252;
+
+	//限时礼包
+	optional msg.carnival.BuyLimitePackageRet buy_limite_package_ret = 253;
+	optional msg.carnival.QueryLimitePackageRet query_limite_package_ret = 254;
+	optional msg.carnival.UpdateLimitePackageInfoRet update_limite_package_info_ret = 255;
+
+	//宝具升级
+	optional msg.mercenary.UpgradeArtifactRet upgrade_mercenary_artifact_ret = 256;
+
+	optional msg.magic_shop.RefreshTimesReset refresh_times_reset = 257;//推送刷新
+
+	//矿山
+	optional msg.mine.QueryMineInfoRet query_mine_info_ret = 258;
+	optional msg.mine.QueryMineTimesRet query_mine_times_ret = 259;
+	optional msg.mine.QueryRobTargetListRet query_mine_rob_target_list_ret = 260; 
+	optional msg.mine.QueryRobTargetListRet refresh_mine_rob_target_list_ret = 261;
+	optional msg.mine.QueryRewardRet query_all_mine_rewards_ret = 262;
+	optional msg.mine.RefreshRewardRet refresh_mine_rewards_ret = 263;
+	optional msg.mine.RefreshRewardRet update_mine_rewards_ret = 264;
+	optional msg.mine.CheckMineReportRet check_mine_report_ret = 265;
+	optional msg.mine.QueryMineReportRet query_mine_report_ret = 266;
+	optional msg.mine.MineStartRet mine_start_ret = 267;
+	optional msg.mine.MineReceiveRewardRet mine_receive_reward_ret = 268;
+	optional msg.mine.MineRobTargetRet mine_rob_target_ret = 269;
+	optional msg.mine.BuyTimesRet mine_buy_times_ret = 270;
+	optional msg.mine.UnlockMineRet mine_unlock_ret = 271;
+	optional msg.mine.QueryRevengeInfoRet query_revenge_info_ret = 272;
+	optional msg.mine.ReceiveAdditionalRewardRet mine_receive_additional_reward_ret = 273;
+	optional msg.mine.MineCancelRet mine_cancel_ret = 274;						//取消开采
+
+	//修炼
+	optional msg.cultivation.QueryRet query_cultivation_info_ret = 275;
+	optional msg.cultivation.CultivateRet cultivate_ret = 276;
+
+	//血钻替换
+	optional msg.blood_replace.BuyResourceRet buy_resource_ret = 277;
+
+	//宿命远征
+	optional msg.expedition.QueryExpeditionRet query_expedition_ret = 278;
+	optional msg.expedition.ExpeditionFightRet expedition_fight_ret = 279;
+	optional msg.expedition.RefreshExpeditionSearchRet refresh_expedition_search_ret = 280;
+	optional msg.expedition.ExpeditionApendTimesRet expedition_apend_times_ret = 281;
+	optional msg.expedition.GetExpeditionRankRet get_expedition_rank_ret = 282;
+	optional msg.expedition.PlayerClickTabRet player_click_tab_ret = 283;
+
+	//宿命武器升星
+	optional msg.destiny_weapon.QueryWeaponStarInfoRet query_weapon_star_info_ret = 284;	//查询宿命武器升星数据
+	optional msg.destiny_weapon.WeaponUpgradeStarRet weapon_star_upgrade_ret = 285;		//宿命武器升星
+	optional msg.destiny_weapon.GetFinalDestinyWeaponRet get_final_destiny_weapon_ret = 286;	//激活终极宿命武器
+	optional msg.destiny_weapon.UnlockDestinyWeaponStarRet unlock_destiny_weapon_star_ret = 287;	//激活终极宿命武器
+
+	optional msg.sns_center.QueryLeadingIntegralRet query_leading_integral_ret = 288;
+	optional msg.sns_center.GetLeadingIntegralRet get_leading_integral_ret = 289;
+	optional msg.sns_center.SharedSuccessRet shared_success_ret = 290;
+	//换装
+	optional msg.evolution.QueryRet query_evolution_ret = 291;
+	optional msg.evolution.FlashGoldLadderRet evolution_flash_gold_ladder_ret = 292;
+	optional msg.evolution.DressingRet evolution_dressing_ret = 293;
 }

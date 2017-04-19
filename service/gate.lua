@@ -30,6 +30,23 @@ function handler.connect(fd, ipaddr)
     connection[fd] = c
     skynet.send(watchdog, "lua", "socket", "open", fd, ipaddr)
 end
+
+local function unforward(c)
+    if c.agent then
+        forwarding[c.agent] = nil
+        c.agent = nil
+        c.client = nil
+    end
+end
+
+local function close_fd(fd)
+    local c = connection[fd]
+    if c then
+        unforward(c)
+        connection[fd] = nil
+    end
+end
+
 --当一个连接断开，disconnect 被调用，fd 表示是哪个连接。
 function handler.disconnect(fd)
     close_fd(fd)
@@ -49,7 +66,6 @@ end
     或是通过 skynet.redirect 转发给别的 skynet 服务处理。
 ]]
 function handler.message(fd, msg, sz)
-    print("handler.message ==",fd, msg, sz)
     -- recv a package, forward it
     local c = connection[fd]
     local agent = c.agent

@@ -1,0 +1,52 @@
+package msg.liveness;
+
+enum Result {
+	success = 0;
+	failure = 1;
+}
+
+message RewardInfo {
+	required int32 reward_type = 1;
+    required int32 param1  = 2;
+    required int32 param2 = 3;
+}
+
+message LivenessInfo {
+	required int32 liveness_id = 1;
+	required int32 completion_count = 2;
+	required bool is_reward = 3;
+	repeated RewardInfo reward_info = 4;
+}
+
+message QueryLivenessInfo {
+}
+
+message QueryLivenessInfoRet {
+
+	repeated LivenessInfo liveness_list = 1;
+	required int32 current_activity = 2;
+	repeated int32 receive_list = 3;
+}
+
+message UpdateLivenessRet {
+	required int32 liveness_id = 1;
+	required int32 completion_count = 2;
+}
+
+message GetLivenessReward {
+	required int32 liveness_id = 1;
+}
+
+message GetLivenessRewardRet {
+	required Result result = 1;
+	required int32 liveness_id = 2;
+}
+
+message GetActivityReward {
+	required int32 index = 1;	
+}
+
+message GetActivityRewardRet {
+	required Result result = 1;
+	required int32 index = 2;
+}

@@ -1,0 +1,76 @@
+package msg.magic_shop;
+
+enum Result {
+    success = 0;                            // 成功
+    not_enough_mercenary_space = 1;         //佣兵位不够
+    not_enough_magic_gold = 2;              //积分不够
+    not_enough_times = 3;          //剩余次数不足
+    not_exit_mercenary_id = 4;          //佣兵不存在
+}
+
+enum ShopType {
+    limit = 0;                            // 限时商城
+    forever = 1;                          //永久商城
+}
+
+message Timer{
+    required int32 begin_time = 1;   //开始时间
+    required int32 end_time = 2;    //结束时间
+}
+
+message ShopItem{
+    required string mercenary_id = 1;
+    required int32 times  = 2;
+    required int32 cost = 3;
+    optional int32 order = 4;
+}
+message Shop{
+    repeated ShopItem limit_magic_shop_list = 1;
+    repeated ShopItem forever_magic_shop_list = 2;
+    required Timer timer = 3;
+}
+
+message ReduceTimes{
+    required string mercenary_id = 1;
+    required int32 times  = 2; 
+}
+
+message Query {
+}
+
+message QueryRet {
+    required Shop shop = 1;
+    repeated ReduceTimes limit_times = 2;        //次数
+    repeated ReduceTimes forever_times = 3;      //永久次数
+    optional int32 next_rest_time = 4;      //下一次重置的时间
+}
+
+//用户积分变更通知 
+message UpdateMagicGoldRet {
+    required Result result = 1;  
+    required int32 count = 2; 
+}
+//次数重置通知
+message RefreshTimesReset {
+    optional int32 next_rest_time = 1;
+}
+
+//兑换佣兵
+message GetMercenary {
+    required string mercenary_id = 1;   //佣兵ID
+    required ShopType shop_id = 2;        //商城ID
+}
+ 
+message GetMercenaryRet {
+    required Result result = 1;  
+    optional string mercenary_id = 2;   //佣兵ID
+    required ShopType shop_id = 3;        //商城ID
+}
+//获取活动结束时间
+message GetCarnivalTimeInfo {
+}
+//返回活动结束的时间
+message GetCarnivalTimeInfoRet {
+    required int32 begin_time = 1;   //开始时间
+    required int32 end_time = 2;    //结束时间
+}

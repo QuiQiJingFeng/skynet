@@ -1,0 +1,56 @@
+package msg.bag;
+
+enum Result {
+	success = 0;
+	daily_limit = 1;
+	reach_max_level = 2;
+	not_enough_resource = 3;
+	item_not_found = 4;
+	event_take = 5;
+	not_enough_mercenary_space = 6;
+	mining_time_limit = 7;
+	mining_collect_first = 8;
+	temple_today_cant_recruit = 9;
+	mining_not_enough_golem_lv = 10;
+}
+
+message ItemInfo {
+	required int32 item_id = 1;
+	required int32 template_id = 2;
+	required int32 count = 3;
+	required uint32 create_time = 4;
+}
+
+message Query {
+}
+
+
+message QueryRet {
+	required int32 level = 1;
+	required int32 max_count = 2;
+	repeated ItemInfo item_list = 3;
+	required int32 item_id_generator = 4;
+}
+
+message UseItem {
+	required int32 item_id = 1;
+	optional int32 golem_lv = 2;
+}
+
+message UseItemRet {
+	required Result result = 1;
+	required int32 item_id = 2;
+	optional int32 extra_num = 3;
+}
+
+message NewItem {
+	repeated ItemInfo item_list = 1;
+}
+
+message UpgradeBag {
+}
+
+message UpgradeBagRet {
+	required Result result = 1;
+	optional int32 new_level = 2;
+}

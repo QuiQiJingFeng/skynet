@@ -1,0 +1,38 @@
+package msg.cultivation;
+
+enum Result {
+    success = 0;
+    failure = 1;
+    resource_not_enough = 2;  //资源不足
+    already_top = 3;   //当前已修炼到最高等级
+    cultivation_type_err = 4;   //修炼类型错误
+}
+
+message CultivationItem
+{
+    optional int32 coefficient1 = 1;
+    optional int32 coefficient2 = 2;
+}
+
+message Query
+{
+}
+//{   [1] = {[1] = state,[2] = state} , [2]  = {[1] = state,[2] = state}  
+//    修炼类型         加成        抵抗                         阶段
+message QueryRet
+{
+    repeated CultivationItem cultivation_states = 1; //修炼记录
+}
+
+message Cultivate
+{
+    required int32 cultivation_type = 1; //修炼类型
+    required string coefficient_type = 2; //coefficient1 加成 coefficient2 抵抗
+}
+
+message CultivateRet
+{
+    required Result result = 1;  
+    optional int32 cur_state = 2;
+}
+ 

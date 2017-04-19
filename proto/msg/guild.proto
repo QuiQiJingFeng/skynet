@@ -1,0 +1,515 @@
+package msg.guild;
+
+enum Result {
+    success = 0;                            // 成功
+    guild_repeat_name = 1;
+    guild_is_null = 2;
+    to_user_not_staff = 3;
+    guild_chairman_not_exit = 4;
+    executor_not_chairman = 5;
+    guild_repeat_member = 6;
+    guild_member_not_dismiss = 7;
+    guild_member_max = 8;
+    guild_chairman_not_fire = 9;
+    guild_chairman_not_transfer = 10;
+    guild_create_error = 11;
+    guild_chairman_not_vip = 12;
+    guild_req_battle_point_less = 13;
+    guild_daily_join_limit = 14;
+    guild_name_in_keywords = 15;
+    failure = 16;
+    already_bought_buff = 17;
+    member_is_null = 18;
+    not_enough_resource = 19;
+    member_is_in_warfield = 20;
+    has_no_permission = 21;
+    not_alloc_all_bouns = 22;
+    guild_scout_wrong_status = 23;
+    bag_full = 24;
+    not_exist_good_id = 25;
+    good_id_buy_limit = 26;
+    not_exist_boss = 27;
+    boss_is_dead = 28;
+    buy_ticket_limit = 29;
+    guild_boss_not_open = 30;
+}
+
+message Query {
+}
+
+// 公会记录
+message NoticeInfo {
+    required int32 notice_type = 1; //记录类型
+    optional string name = 2;     //名字
+    optional int32 template_id = 3;     // 头像
+    optional uint32 create_time = 4; // 记录时间
+    optional string param1 = 5; // 其他
+}
+
+// 会员信息
+message MemberInfo {
+    required string user_id = 1; // 用户ID
+    required string leader_name = 2; // 用户名称
+    required int32  template_id = 3; // 用户头像
+    required int32  grade_type = 4; // 用户权限
+    required uint32 last_login_time = 5; // 最后一次登录时间
+    required uint32 join_guild_time = 6; // 加入公会时间
+    required uint32 war_field = 7; // 据点
+    required int32  bp = 8; //历史战力
+    required int32  season_score = 9; //累计积分
+    required int32  win_num = 10; //本赛季胜场
+    required int32  battle_num = 11; //本赛季出场
+    required int32  buff_info = 12;
+    required int32  alloc_num = 13;
+    required string  genre_nums = 14; //阵容中各流派人数
+    required int32 battle_round = 15; //本赛季参战数
+    required int32 contribution = 16;
+}
+
+message RivalInfo {
+    required string vs_guild_id = 1;
+    required string vs_guild_name = 2;
+    required int32  vs_guild_server_id = 3;
+    required int32  vs_war_score = 4;   
+}
+
+message QueryRivalInfoRet {
+    required Result result = 1;
+    required RivalInfo rival_info = 2;
+}
+
+// 公会信息
+message GuildInfo {
+    optional string guild_id = 1;
+    optional string guild_name = 2;
+    optional int32 bp_limit_idx = 3;
+    repeated int32 war_season_info = 4;
+    optional int32 war_score = 5;
+    repeated MemberInfo member_list = 6;
+    repeated NoticeInfo notice_list = 7;
+    optional RivalInfo rival_info = 8;
+    optional int32 alloc_bonus = 9;
+    optional int32 allocated = 10;
+}
+
+message QueryRet {
+    required Result result = 1;
+    optional GuildInfo guild_info = 2;
+}
+
+message CreateGuild {
+    required string guild_name = 1;
+    required int32 bp_limit_idx = 2;
+}
+
+message SearchGuild {
+    required string guild_id = 1;
+}
+
+message SearchGuildRet {
+    required Result result = 1;
+    optional string guild_name = 2;
+    optional int32 template_id = 3;
+    optional int32 member_num = 4;
+    optional int32 bp_limit_idx = 5;
+    optional int32 join_count = 6;
+}
+
+message JoinGuild {
+    required string guild_id = 1;
+}
+
+message GuildResult {
+    required Result result = 1;
+}
+
+message GuildMemberUpdate {
+    repeated string del_member_list = 1;
+    repeated MemberInfo update_member_list = 2;
+    repeated MemberInfo add_member_list = 3;
+}
+
+message GuildNoticeNew {
+    repeated NoticeInfo add_notice_list = 1;
+}
+
+message GuildMemberCommand {
+    required string user_id = 1;
+}
+
+message GuildNoticeTips {
+    required bool is_tips = 1;
+}
+
+message GuildSetting {
+    optional int32 bp_limit_idx = 1;
+}
+
+message GuildAppointMember {
+    required string member_user_id = 1;
+    required int32 grade_type = 2;
+}
+
+message GuildAppointMemberRet {
+    required Result result = 1;
+    required string member_user_id = 2;
+    required int32 grade_type = 3;
+}
+
+message SeasonConfig {
+    required string season_id = 1;
+    required int32 round = 2;
+    required string season_key = 3;
+    required string season_name = 4;
+    repeated int32 bonus_genre = 5;
+    repeated int32 bonus_factor = 6;
+    required uint32 start_time = 7;
+    required uint32 ready_end_time = 8;
+    required uint32 enter_end_time = 9;
+    required uint32 set_troop_end_time = 10;
+    required uint32 match_end_time = 11;
+    required uint32 fight_end_time = 12;
+    required uint32 end_time = 13;
+}
+
+message GuildSeasonConfigQuery {
+
+}
+
+message GuildSeasonConfigQueryRet {
+    required Result result = 1;
+    repeated SeasonConfig season_config_list = 2;
+}
+
+message GuildEnterFor {
+}
+
+message GuildEnterForRet {
+    required Result result = 1;
+    repeated int32 war_season_info = 2;
+}
+
+message GuildUpdateWarfield {
+    required string user_id = 1;
+    required int32 war_field = 2;
+}
+
+message GuildUpdateWarfieldRet {
+    required Result result = 1;
+    required string user_id = 2;
+    required int32  war_field = 3;
+}
+
+message PlayerInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    repeated int32 template_id_list = 3;
+}
+
+message SingleRecord {
+    repeated int32 battle_record = 1;
+    required string battle_property = 2;
+    required PlayerInfo player1 = 3;
+    required PlayerInfo player2 = 4;
+    required string win_user_id = 5;
+    required int32 self_mirror_win = 6;
+}
+
+message QueryGuildWarRecord {
+    required string user_id = 1;//需要查询成员ID
+}
+
+message QueryGuildWarRecordRet {
+    required Result result = 1;
+    required string user_id = 2;
+    repeated SingleRecord record_list = 3;
+}
+
+//成员参战信息
+message MemberWarInfo
+{
+    required string user_id = 1;
+    required string leader_name = 2;
+    required int32 win_num = 3;//胜场
+    required int32 battle_num = 4;//战斗次数
+    required int32 war_field = 5;
+    required int32 battle_round = 6;
+    required int32 base_score = 7;
+    required int32 round_score = 8;
+    required int32 field_score = 9;
+    required int32 kill_score = 10;
+    required int32 score = 11;
+}
+
+message WarResult {
+    repeated string win_guild_id_list = 1;//每个据点的胜利帮会ID
+    repeated int32 self_mirror_win_list = 2;
+    repeated MemberWarInfo war_member_list = 3;
+    required int32 old_war_score = 4;
+    required int32 war_score = 5;
+    repeated int32 vs_troop_nums = 6;
+    repeated int32 remain_troop_nums = 7;
+    repeated int32 vs_remain_troop_nums = 8;
+}
+
+message GuildWarResultRet {
+    required Result result = 1;
+    required RivalInfo rival_info = 2;
+    required WarResult war_result = 5;
+}
+
+message BuyBuff {
+    required string user_id = 1;
+    required int32 buff_type = 2;
+}
+
+message BuyBuffRet {
+    required Result result = 1;
+    optional string user_id = 2;
+    optional int32 buff_type = 3;
+}
+
+message Reward
+{
+    required int32 reward_type = 1;
+    required int32 param1  = 2;
+    required int32 param2 = 3;
+}
+
+message RewardRule
+{
+    required int32 id = 1;
+    required int32 count = 2;
+    required int32 limit = 3;
+    required int32 need_num = 4; //需要赛点数量
+    required int32 need_tier = 5;//需要的公会段位
+    repeated Reward rewards = 6;
+}
+
+
+message QueryRewardRet{
+    repeated RewardRule reward_list = 1;    //奖励兑换列表
+}
+
+
+
+message ExchangeReward
+{
+    required int32 reward_id = 1;
+    required int32 exchange_num = 2;
+}
+
+message ExchangeRewardRet
+{
+    required Result result = 1;
+    optional int32 reward_id = 2;
+    optional int32 exchange_num = 3;
+}
+
+message RuneProperty {
+    required int32 defense = 1;
+    required int32 dodge = 2;
+    required int32 speed = 3;
+    required int32 authority = 4;
+}
+
+message TroopInfo {
+    required int32 battle_point = 1;
+    required int32 defense = 2;
+    required int32 dodge = 3;
+    required int32 speed = 4;
+    required int32 authority = 5;
+    repeated int32 template_id_list = 6;
+}
+
+message TroopList {
+    required string user_id = 1;
+    required string leader_name = 2;
+    required int32 battle_point = 3;
+    required int32 buff_info = 4;
+    required int32 template_id = 5;
+}
+
+message FieldTroop {
+    repeated TroopList troop_list = 1;
+}
+
+message GuildScoutInfo {
+    required Result result = 1;
+    repeated string scouter_list = 2;
+    repeated int32 troop_nums = 3;
+    repeated FieldTroop field_troop = 4;
+    optional string scouter_id = 5;
+}
+
+message ScoutRival {
+    required int32 scout_level = 1;
+}
+
+message ScoutTroop {
+    required string target_id = 1;
+    required int32 show_type = 2;
+}
+
+message ScoutTroopRet {
+    required Result result = 1;
+    required string target_id = 2;
+    required TroopInfo troop_info = 3;
+    required int32 show_type = 4;
+}
+
+message GuildRankInfo {
+    required string guild_name = 1;
+    required int32 war_score = 2;    
+}
+
+message RankListRet {
+    required Result result = 1;
+    repeated GuildRankInfo rank_list = 2;
+}
+
+message GuildAllocInfo {
+    required string user_id = 1; // 用户ID
+    required int32 alloc_num = 2;
+}
+
+message GuildAllocUpdate {
+    required int32 alloc_bonus = 1;
+    required int32 allocated = 2;
+    repeated GuildAllocInfo alloc_list = 3;
+}
+
+message GuildAllocBonus {
+    repeated GuildAllocInfo alloc_list = 1;
+}
+
+message GuildAllocBonusRet {
+    required Result result = 1;
+}
+message GetGuildShowList{
+    
+}
+message GuildShowList{
+    optional string guild_name = 1;//工会名字
+    optional int32   guild_num  = 2;//工会人数
+    optional string guild_id   = 3;//工会ID
+}
+message GetGuildShowListRet{
+    required Result result = 1;
+    repeated GuildShowList guild_show_list = 2;
+}
+message SettlementInfo {
+    required string user_id = 1; // 用户ID
+    required int32 season_score = 2; //累计积分
+    required int32 win_num = 3; //本赛季胜场
+    required int32 battle_num = 4; //本赛季出场
+    required int32 battle_round = 5; //本赛季参战数
+}
+
+message GuildWarSettlementRet {
+    repeated SettlementInfo settlement_info_list = 1;
+}
+
+message QueryGuildBossReward {
+    
+}
+
+message UseResource {
+    required int32 id = 1;
+    required int32 count = 2;
+    
+}
+message RewardInfo {
+    required int32 reward_type = 1;
+    required int32 param1 = 2;
+    required int32 param2 = 3;
+}
+message GuildRewardInfo {
+    required int32 good_id = 1;
+    repeated RewardInfo reward_list = 2;
+    repeated UseResource use_list = 3;
+    required int32 buy_limit = 4;
+    required int32 count = 5;
+}
+message QueryGuildBossRewardRet {
+    repeated GuildRewardInfo reward_list = 1;
+}
+
+message GuildBossExchange {
+    required int32  good_id = 1;
+    required int32  exchange_num = 2;
+}
+message GuildBossExchangeRet {
+    required Result result = 1;
+    required int32  good_id = 2;
+    required int32  cur_exchange_count = 3;
+}
+
+message GuildBossRank {
+
+}
+message BossRankInfo {
+    required string guild_name = 1;
+    required int32 kill_boss_count = 2;
+    required int64 kill_boss_all_damage = 3;
+}
+message GuildBossRankRet {
+    repeated BossRankInfo rank_list = 1;
+}
+
+message QueryGuildBossInfo {
+    
+}
+message RewardListChests {
+    repeated RewardInfo reward_list = 1;    
+}
+
+message QueryGuildBossInfoRet {
+    required Result result = 1;
+    required int32 kill_boss_count = 2;
+    required int64 cur_boss_hp = 3;
+    required int32 boss_id = 4;
+    required int32 boss_reset_time = 5;
+    required int32 buy_count = 6;
+    repeated int32 kill_boss_record = 7;
+    repeated int32 reward_state_list = 8;
+    repeated RewardListChests chests_list = 9;
+    optional int32 attack_count = 10;
+    required int64 sum_boss_hp = 11;
+}
+
+message GuildBossBuyTicket {
+    required int32 count = 1;
+}
+message GuildBossBuyTicketRet {
+    required Result result = 1;
+    required int32 buy_count = 2;
+}
+
+message GuildBossHpUpdateRet {
+    required int64 cur_boss_bp = 1;
+    required int32 boss_id = 2;
+    required int32 kill_boss_id = 3;
+}
+
+message GuildBossChallenge {
+    required int32 boss_id = 1;
+}
+message GuildBossChallengeRet {
+    required Result result = 1;
+    optional int32 boss_id = 2;
+    optional int64 boss_bp = 3;
+    repeated int32 battle_record = 4;
+    optional string battle_property = 5;
+    optional int32 attack_count = 6;
+}
+
+message GuildBossReward {
+    required int32 boss_id = 1;
+}
+
+message GuildBossRewardRet {
+    required Result result = 1;
+    required int32 boss_id = 2;
+}
+

@@ -1,0 +1,196 @@
+package msg.escort;
+
+enum Result {
+    success = 0;                            // 成功
+    failure = 1;
+    not_enough_resource = 2;
+    status_is_not_ready = 3;
+    in_refresh_target_cd = 4;
+    target_be_robbed_to_much_times = 5;
+    target_is_not_escorting = 6;
+    has_robbed_this_target = 7;
+    no_target_troop_info = 8;
+    no_troop_info = 9;
+    no_rob_times = 10;
+    status_is_not_finish = 11;
+    already_specify_tramcar = 12;
+    has_buy_too_much_rob_times = 13;
+    has_buy_too_much_escort_times = 14;
+    need_refresh_tramcar = 15;
+}
+
+enum RefreshTramcarType {
+    random = 0;
+    specify = 1;
+    auto = 2;
+}
+
+enum RefreshRobTargetListType {
+    normal = 0;
+    immediately = 1;
+}
+
+message Query {
+}
+
+// 运送矿车信息
+message EscortInfo {
+    required string user_id = 1;
+    required int32 status = 2;
+    required int32 tramcar_id = 3;
+    required uint32 escort_beg_time = 4;
+    required uint32 escort_end_time = 5;
+    required uint32 refresh_rob_target_time = 6;
+    required int32 auto_refresh_tramcar = 7;
+    repeated BeRobbedInfo be_robbed_list = 8;
+}
+
+
+// 运送矿车相关次数信息
+message EscortTimes {
+    required int32 remain_escort = 1;
+    required int32 remain_rob = 2;
+    required int32 refresh_tramcar = 3;
+    required int32 refresh_rob_target = 4;
+    required int32 buy_specify_tramcar = 5;
+    required int32 buy_escort = 6;
+    required int32 buy_rob = 7;
+}
+
+message QueryEscortInfoRet {
+    required EscortInfo escort_info = 1;
+}
+
+message QueryEscortTimesRet {
+    required EscortTimes escort_times = 1;
+}
+
+message BeRobbedInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    required int32 result = 3;
+    required uint32 be_robbed_time = 4;
+}
+
+message RobTargetInfo {
+    required int32 pos = 1;
+    required string user_id = 2;
+    required string leader_name = 3;
+    required int32 tramcar_id = 4;
+    required int32 battle_point = 5;
+    required int32 template_id = 6;
+    required int32 is_robot = 7;
+    required uint32 escort_beg_time = 8;
+    required uint32 escort_end_time = 9;
+    repeated BeRobbedInfo be_robbed_list = 10;
+}
+
+message Reward
+{
+    required int32 reward_type = 1;
+    required int32 param1  = 2;
+    required int32 param2 = 3;
+}
+
+message TramcarInfo
+{
+    required int32 id = 1;
+    repeated Reward rewards = 2;
+}
+
+message QueryTramcarListRet{
+    repeated TramcarInfo tramcar_list = 1;
+}
+
+message QueryRobTargetListRet {
+    repeated RobTargetInfo rob_target_list = 1;
+}
+
+message RefreshTramcar {
+    required RefreshTramcarType refresh_type = 1;
+}
+
+message RefreshTramcarRet {
+    required Result result = 1;
+    required RefreshTramcarType refresh_type = 2;
+    optional int32 tramcar_id = 3;
+}
+
+message RefreshRobTargetList {
+    required RefreshRobTargetListType refresh_type = 1;
+}
+
+message RefreshRobTargetListRet {
+    required Result result = 1;
+    required RefreshRobTargetListType refresh_type = 2;
+    repeated RobTargetInfo rob_target_list = 3;
+    optional int32 refresh_rob_target_time = 4;
+}
+
+message UpdateRobTargetListRet {
+    repeated RobTargetInfo rob_target_list = 2;
+}
+
+message EscortStart {
+}
+
+message EscortStartRet {
+    required Result result = 1;
+    optional EscortInfo escort_info = 2;
+}
+
+message UpdateBeRobbedListRet {
+    required string rob_target_user_id = 1;
+    repeated BeRobbedInfo be_robbed_list = 2;
+}
+
+message BuyRobTimes {
+    required int32 times = 1;
+}
+
+message BuyRobTimesRet {
+    required Result result = 1;
+    optional int32 remain_rob = 2;
+    optional int32 buy_rob = 3;
+}
+
+message BuyEscortTimes {
+    required int32 times = 1;
+}
+
+message BuyEscortTimesRet {
+    required Result result = 1;
+    optional int32 remain_escort = 2;
+    optional int32 buy_escort = 3;
+}
+
+message EscortRobTarget {
+    required string target_user_id = 1;
+}
+
+message PlayerInfo {
+    required string user_id = 1;
+    required string leader_name = 2;
+    repeated int32 template_id_list = 3;
+}
+
+message EscortRobTargetRet {
+    required Result result = 1;
+    required string target_user_id = 2;
+    optional bool is_winner = 3;
+    optional string battle_property = 4;
+    repeated int32 battle_record = 5;
+    optional PlayerInfo target_info = 6;
+}
+
+message EscortFinishRet {
+    required EscortInfo escort_info = 1;
+}
+
+message EscortReceiveReward {
+}
+
+message EscortReceiveRewardRet {
+    required Result result = 1;
+    optional EscortInfo escort_info = 2;
+}

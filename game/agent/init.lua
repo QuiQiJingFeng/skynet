@@ -1,8 +1,7 @@
-local shield = require "shield"
-local pbc = require "protobuf"
+local skynet = require "skynet"
+local protobuf = require "protobuf"
 local netpack = require "netpack"
 local socket = require "socket"
-local cjson = require "cjson"
 local md5 = require "md5"
 local cls = require "skynet.queue"
 local queue = cls()
@@ -15,7 +14,7 @@ local constants
 local CMD = {}
 local AGENT_OP = {}
 
-local TIME_ZONE = tonumber(shield.getenv("time_zone"))
+local TIME_ZONE = tonumber(skynet.getenv("time_zone"))
 
 local gate
 
@@ -36,9 +35,9 @@ setmetatable(AGENT_OP, {
 -- gate will use client protocol for client's data
 skynet.register_protocol( {
     name = "client",
-    id = shield.PTYPE_CLIENT,
+    id = skynet.PTYPE_CLIENT,
     unpack = function (msg, sz)
-        return pbc.decode("C2GS", msg, sz)
+        return protobuf.decode("C2GS", msg, sz)
     end,
 
     dispatch = function (_, _, msg, pbc_error)
@@ -65,50 +64,32 @@ skynet.register_protocol( {
         end
 
         if msg_name == "heart_beat" then
-            local buff, sz = netpack.pack(pbc.encode("GS2C", {session = user_info.session_id, heart_beat_ret = {}}))
+            local buff, sz = netpack.pack(protobuf.encode("GS2C", {session = user_info.session_id, heart_beat_ret = {}}))
             socket.write(user_info.client_fd, buff, sz)
             return
-        end
-
-        local succ, ret = queue(function 
-                local succ, proto, send_msg = xpcall(msg_handler.Dispatch, debug.traceback, msg_handler, msg_name, data)
-
-                if succ and proto then
-                    local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg, true)
-                    if not succ then
-                        shield.error(err)
-                        user_info:ResponseClient("error_ret", {}, true)
-                    end
-                elseif proto then
-                    shield.error(user_info.user_id)
-                    shield.error(proto)
-                    user_info:ResponseClient("error_ret", {}, true)
-                end
-            end)
+        end  
     end
 })
 
 --玩家第一次登录
 function CMD.Start(gate,fd,ip,user_id,login_msg)
     --转发fd的消息到本服务
-    local forward_ret = skynet.call(gate, "lua", "forward", fd)
-    if not forward_ret or not user_id then
-        shield.error("forward error: user_id="..user_id.."ip="..ip.."fd="..fd)
-        return 0
-    end
+    skynet.send(gate, "lua", "forward", fd)
+    gate = gate
     --加载玩家数据
     user_info:LoadFromDb(user_id)
+    user_info:InitData(login_msg,fd, ip)
 
-    user_info:SetSocket(fd, ip)
+    --是否需要创建角色
+    if not user_info:IsNeedCreateRole() then
+        user_info:ResponseClient("login_ret", { result = "create_leader", server_time = skynet.time(),
+                                                user_id = user_id, time_zone = TIME_ZONE ,client_ip = ip}, true)
+    else
+        user_info:ResponseClient("login_ret", { result = "success", server_time = skynet.time(),
+                                                user_id = user_id, time_zone = TIME_ZONE,client_ip = ip}, true)
+    end
 
-    user_info.device_id = login_msg.device_id
-    user_info.locale = login_msg.locale
-    user_info.platform_uid = login_msg.user
-    user_info.platform = login_msg.platform
-
-    gate = gate
-
-    return 1
+    return "success"
 end
 
 
@@ -129,8 +110,12 @@ skynet.start(function()
             skynet.ret(skynet.pack(ret))
         end
     end)
+    protobuf.register_file(skynet.getenv("protobuf"))
 
+    user_info = require "user_info"
+    user_info:Init(tonumber(skynet.getenv("server_id")))
     config_manager = require "config_manager"
+    print("ddddddgggggggggggg")
     config_manager:Init()
 
     constants = config_manager.constants

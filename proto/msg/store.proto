@@ -1,0 +1,43 @@
+package msg.store;
+
+enum Result {
+	success = 0;
+	not_enough_resource = 1;
+	not_sale = 2;
+	failure = 3;
+	not_enough_buy_count = 4;
+}
+
+message GoodsInfo {
+	required int32 id = 1;
+	required int32 type = 2;
+	required string name = 3;
+	required string desc = 4;
+	required string icon = 5;
+	required int32 price = 6;
+	required int32 quality = 7;
+	optional int32 data = 8;
+	optional int32 max_buy_count = 9;
+	optional int32 already_buy_count = 10;
+}
+
+message Query {
+	required int32 time_stamp = 1;
+}
+
+
+message QueryRet {
+	required int32 time_stamp = 1;
+	repeated GoodsInfo goods_list = 2;
+}
+
+message BuyGoods {
+	required int32 goods_id = 1;
+	required int32 num = 2;
+}
+
+message BuyGoodsRet {
+	required Result result = 1;
+	required int32 goods_id = 2;
+	required int32 num = 3;	
+}

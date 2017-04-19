@@ -1,0 +1,345 @@
+package msg.mercenary;
+
+enum Result {
+	success = 0;
+	failure = 1;
+
+	already_in_exploring_list = 2;
+	cant_select_self = 3;
+	exploring_list_is_full = 4;
+
+	cant_forge_weapon = 5;
+	weapon_lv_reach_max = 6;
+	forge_failure = 7;
+
+	wakeup_reach_max = 8;
+
+	is_not_in_exploring_list = 9;
+	must_have_a_mercenary_in_exploring_list = 10;
+
+	cant_fire = 11;
+	cant_fire_a_exploring_mercenary = 12;
+	cant_fire_bag_is_full = 13;
+
+	cant_trans_a_exploring_mercenary = 14;
+	not_enough_resource = 15;
+
+	not_enough_gold_coin = 16;
+	not_enough_blood_diamond = 17;
+
+	wakeup_not_enough_level = 18;
+	fire_num_exceed_max = 19;
+	not_enough_mercenary_space = 20;
+	not_enough_friendship_pt = 21;
+
+	not_in_carnival = 22;
+
+	cant_craft_soul = 23;
+	not_enough_soul = 24;
+	contract_unlock_first = 25;
+
+	recommend_list_capacity = 26;
+
+	illegal_operation = 27;
+	mercenary_num_limit = 28;
+	mercenary_is_mining = 29;
+
+	max_weapon_star_level = 30;
+}
+
+enum OpenType {
+    normal = 0;
+    ticket = 1;
+}
+
+message Mercenary {
+	required int32 template_id = 1;
+	required double exp = 2;
+	required int32 wakeup = 3;
+	required int32 weapon_lv = 4;
+	required bool is_open_artifact = 5;
+	required int32 force_lv = 6;
+	required int32 level = 7;
+	required int32 formation_info = 8;
+	required int32 instance_id = 9;
+	required int32 ex_prop_type = 10;
+	required int32 ex_prop_val = 11;
+	required int32 contract_lv = 12;
+	optional int32 ex_prop_val_temp = 13;
+	optional int32 ex_prop_type_temp = 14;
+	optional int32 expire_time = 15;
+	required int32 artifact_lv = 16;
+}
+
+message FormationInfo
+{
+	repeated int32 formation1 = 1;
+	repeated int32 formation2 = 2;
+	repeated int32 formation3 = 3;
+	repeated int32 formation4 = 4;
+	repeated int32 formation5 = 5;
+	repeated int32 formation32 = 6;
+	repeated int32 formation31 = 7;
+	repeated int32 formation10 = 8;
+	repeated int32 formation11 = 9;
+	repeated int32 formation12 = 10;
+}
+
+message WeaponInfo
+{
+	required int32 weapon1 = 1;
+	required int32 weapon2 = 2;
+	required int32 weapon3 = 3;
+	required int32 weapon4 = 4;
+	required int32 weapon5 = 5;
+	required int32 weapon32 = 6;
+	required int32 weapon31 = 7;
+	required int32 weapon10 = 8;
+	required int32 weapon11 = 9;
+	required int32 weapon12 = 10;
+}
+
+message Query {
+
+}
+
+message ForgeInfo {
+	required int32 mercenary_id = 1;
+	required int32 lucky_num = 2;
+}
+
+message QueryRet {
+	required int32 formation_capacity = 1;
+	repeated Mercenary mercenary_list = 2;
+	required FormationInfo formation_info = 3;
+	repeated int32 library_type_list = 4;
+	repeated int32 library_num_list = 5;
+	required int32 camp_capacity = 6;
+	required int32 cur_formation_id = 7;
+	required int32 mercenary_id_generator = 8;
+	required WeaponInfo weapon_list = 9;
+	repeated string formation_name_list = 10;
+	required ForgeInfo forge_info = 11;	
+}
+
+message AllocExp {
+	required int32 mercenary_id  = 1;
+	required int32 target_level = 2;
+}
+
+message AllocExpRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+	required double exp = 3;
+}
+
+message Rest {
+	required int32 formation_id = 1;
+	required int32 instance_id = 2;
+}
+
+message RestRet {
+	required Result result = 1;
+	required int32 instance_id = 2;
+	required int32 position = 3;
+	required int32 formation_id = 4;
+}
+
+message Fire {
+	repeated int32 mercenary_id_list = 1;
+}
+
+message FireRet {
+	required Result result = 1;
+	repeated int32 mercenary_id_list = 2;
+}
+
+message ForgeWeapon {
+	required int32 mercenary_id = 1;
+	required int32 extra_chance = 2;
+}
+
+message ForgeWeaponRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+}
+
+message UpgradeWakeup {
+	required int32 mercenary_id = 1;
+}
+
+message UpgradeWakeupRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+}
+
+enum Door {
+	ten_mercenary_door  = 1;
+	recruiting_door     = 2;
+	hero_door           = 3;
+	friendship_door     = 4;
+	magic_door          = 5;
+	ten_friendship_door = 6;
+}
+
+message Recruit {
+	required Door door_type = 1;
+}
+
+message NewMercenary {
+	repeated Mercenary mercenary_list = 1;
+}
+
+message RecruitRet {
+	required Result result = 1;
+	optional uint32 recruit_cost = 2;
+	optional Door door_type = 3;
+}
+
+message Transmigrate {
+	required int32 src_mercenary_id = 1;
+	required int32 dest_mercenary_id = 2;
+
+}
+
+message TransmigrateRet {
+	required Result result = 1;
+	required int32 src_mercenary_id = 2;
+	required int32 dest_mercenary_id = 3;
+
+}
+
+message OpenArtifact {
+	required int32 mercenary_id = 1;
+	required OpenType open_type = 2;
+}
+
+message OpenArtifactRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+	required OpenType open_type = 3;
+}
+
+message UpgradeForce {
+	required int32 mercenary_id = 1;
+}
+
+message UpgradeForceRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+	optional int32 force_lv = 3;
+}
+
+//TOTO InsertFormation 和 ExchangeFormationPos 合并为1个协议
+message InsertFormation {
+	required int32 formation_id = 1;
+	required int32 instance_id = 2;
+	required int32 position = 3;
+}
+
+message InsertFormationRet {
+	required Result result = 1;
+	required int32 formation_id = 2;
+	optional int32 instance_id = 3;
+	optional int32 position = 4;
+}
+
+message ExchangeFormationPos {
+	required int32 formation_id = 1;
+	required int32 src_id = 2;
+	required int32 dest_id = 3;
+}
+
+message ExchangeFormationPosRet {
+	required Result result = 1;
+	required int32 formation_id = 2;
+	optional int32 src_id = 3;
+	optional int32 src_pos = 4;
+	optional int32 dest_id = 5;
+	optional int32 dest_pos = 6;
+}
+
+message AdjustMercenaryPosition{
+	required int32 formation_id = 1;
+	repeated int32 mercenary_id_list = 2;
+	required bool  recommend_flag = 3;
+}
+
+message AdjustMercenaryPositionRet{
+	required Result result = 1;
+	required int32 formation_id = 2;
+	repeated int32 mercenary_id_list = 3;
+	required bool  recommend_flag = 4;
+}
+
+message LibraryRecruit{
+	required int32 template_id = 1;
+}
+message LibraryRecruitRet{
+	required Result result = 1;
+	optional int32 template_id = 2;
+	optional int32 soul_count = 3;
+}
+
+message ChangeFormation{
+	required int32 formation_id = 1;
+}
+
+message ChangeFormationRet{
+	required Result result = 1;
+	optional int32 formation_id = 2;
+}
+
+message CraftSoulStone{
+	required int32 template_id = 1;
+}
+
+message CraftSoulStoneRet{
+	required Result result = 1;
+	optional int32 template_id = 2;
+	optional int32 soul_count = 3;
+}
+
+message SignContract {
+	required int32 mercenary_id = 1;
+}
+
+message SignContractRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+}
+
+message ChangeExProperty {
+	required int32 mercenary_id = 1;
+	optional bool is_replace = 2;
+}
+
+message ChangeExPropertyRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+	optional int32 ex_prop_type = 3;
+	optional int32 ex_prop_val = 4;
+	optional int32 ex_prop_val_temp = 5;
+	optional int32 ex_prop_type_temp = 6;
+}
+
+message ChangeFormationName {
+	required uint32 formation_id = 1;
+	required string name = 2;
+}
+
+message ChangeFormationNameRet {
+	required Result result = 1;
+	required uint32 formation_id = 2;
+	required string name = 3;
+}
+
+message UpgradeArtifact {
+	required int32 mercenary_id = 1;
+}
+
+message UpgradeArtifactRet {
+	required Result result = 1;
+	required int32 mercenary_id = 2;
+	required int32 artifact_lv = 3;
+}

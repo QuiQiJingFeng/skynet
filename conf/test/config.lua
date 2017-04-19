@@ -1,5 +1,5 @@
 root = "./"
-luaservice = root.."service/?.lua;"..root.."game/?.lua"
+luaservice = root.."service/?.lua;"..root.."game/?.lua;"..root.."game/?/init.lua"
 lualoader = root .. "lualib/loader.lua"
 lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua"
 lua_cpath = root .. "luaclib/?.so"
@@ -38,5 +38,16 @@ protobuf = "proto/msg.pb"
 
 
 server_id = 1
+
+time_zone = 8
+
+
+
+
+
+
+
+
+
 
 

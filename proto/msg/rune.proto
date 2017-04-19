@@ -1,0 +1,100 @@
+package msg.rune;
+
+enum Result {
+    success = 0;                            // 成功
+    wrong_rune_template_id = 1;
+    rune_bag_full = 2;
+    rune_temporary_bag_full = 3;
+    already_after_area_4 = 4;
+    not_enough_resource = 5;
+    max_rune_bag_level = 6;
+    no_target_rune = 7;
+    no_exp_rune_list = 8;
+    the_rune_has_equipped = 9;
+    not_enough_blood_diamond = 10;
+}
+
+enum DrawType {
+    once = 0;
+    ten_times = 1;
+}
+
+message RuneInfo {
+    required int32 rune_id = 1;
+    required int32 template_id = 2; 
+    required int32 level = 3;
+    required int32 equip_pos = 4;
+    required int32 exp = 5;
+    required uint32 create_time = 6;
+}
+
+message Query {
+}
+
+message QueryRet {
+    required int32 cur_draw_platform_id = 1;
+    required int32 rune_bag_level = 2;
+    repeated RuneInfo rune_list = 3;
+    repeated RuneInfo rune_temporary_list = 4;
+}
+
+message OneKeyReceive {
+    required bool is_auto_compose = 1;
+}
+
+message OneKeyReceiveRet {
+    required Result result = 1;
+    required bool is_auto_compose = 2;
+    required RuneInfo target_rune_info = 3;
+    repeated int32 exp_rune_id_list = 4;
+    repeated int32 move_rune_id_list = 5;
+}
+
+message DrawRecord {
+    required int32 new_platform_id = 1;
+    required RuneInfo rune_info = 2;
+}
+
+message DrawRune {
+    required DrawType draw_type = 1;
+    required bool go_to_area_4 = 2;
+}
+
+message DrawRuneRet {
+    required Result result = 1;
+    required DrawType draw_type = 2;
+    required bool go_to_area_4 = 3;
+    repeated DrawRecord draw_records = 4;
+    required int32 cur_draw_platform_id = 5;
+}
+
+message BuyRuneBugCell {
+    required int32 buy_times = 1;
+}
+
+message BuyRuneBugCellRet {
+    required Result result = 1;
+    required int32 rune_bag_level = 2;
+}
+
+message EquipRune {
+    required int32 rune_id = 1;
+    required int32 equip_pos = 2;
+}
+
+message EquipRuneRet {
+    required Result result = 1;
+    required int32 rune_id = 2;
+    required int32 equip_pos = 3;
+}
+
+message UpgradeRune {
+    required int32 rune_id = 1;
+    repeated int32 exp_rune_id_list = 2;
+}
+
+message UpgradeRuneRet {
+    required Result result = 1;
+    required RuneInfo rune_info = 2;
+    repeated int32 exp_rune_id_list = 3;
+}

@@ -1,0 +1,21 @@
+package msg.blood_replace;
+
+enum Result {
+	success = 0;
+	not_enough_resource = 1;
+	resource_not_found = 2;
+	cant_sourport_replace = 3;
+	resource_not_enough = 4;
+}
+ 
+message BuyResource {
+	required int32 resource_id = 1;
+	required int32 num = 2;
+}
+
+message BuyResourceRet {
+	required Result result = 1;
+	required int32 resource_id = 2;
+	required int32 num = 3;
+}
+ 

@@ -1,0 +1,128 @@
+package msg.social;
+
+enum Result {
+	success = 1;
+	failure = 2;
+	full_friends = 3;
+	not_find = 4;
+	ban = 5;
+	already_invite = 6;
+	full_friendship = 7;
+	dest_full_friends = 8;
+	be_removed = 9;
+}
+
+message SingleInfo {
+	required string user_id = 1;
+	required string name = 2;
+	required uint32 last_online = 3;
+	required int32 leader_mercenary = 4;
+}
+
+message Query {
+}
+
+message QueryRet {
+	repeated SingleInfo friends = 1;
+	repeated SingleInfo invitations = 2;
+	repeated uint32 send_gift_times = 3;
+	required bool ban = 4;
+	repeated string daily_friend_gift = 5;
+	required int32 daily_max_invitation = 6;
+	required int32 daily_friendship_pt = 7;
+	required int32 max_daily_friendship_pt = 8;
+}
+
+message Invite {
+	required string user_id = 1;
+}
+
+message InviteRet {
+	required Result result = 1;
+	required string user_id = 2;
+}
+
+message Accept {
+	required string user_id = 1;
+}
+
+message AcceptRet {
+	required Result result = 1;
+	required string user_id = 2;
+}
+
+message Refuse {
+	required string user_id = 1;
+}
+
+message RefuseRet {
+	required Result result = 1;
+	required string user_id = 2;
+}
+
+message Remove {
+	required string user_id = 1;
+}
+
+message RemoveRet {
+	required Result result = 1;
+	required string user_id = 2;
+}
+
+message SetBan {
+}
+
+message SetBanRet {
+	required bool ban = 1;
+}
+
+message SendGift {
+	required string user_id = 1;
+}
+
+message SendGiftRet {
+	required Result result = 1;
+	required string user_id = 2;
+	optional int32 friendship_pt = 3;
+}
+
+message SearchFriend {
+	required string user_id = 1;
+}
+
+message SearchFriendRet {
+	required Result result = 1;
+	optional SingleInfo friend_info = 2;
+}
+
+message QueryFriendTroop {
+	required string user_id = 1;
+	optional int32 reason = 2;      //辅助客户端界面显示
+}
+
+message QueryFriendTroopRet {
+	required Result result = 1;
+	optional string user_id = 2;
+	repeated int32 template_id_list = 3;
+	optional int32 battle_point = 4;
+	optional int32 speed = 5;
+	optional int32 defense = 6;
+	optional int32 dodge = 7;
+	optional int32 authority = 8;
+	optional int32 leader_skill_id = 9;
+	optional int32 reason = 10;
+}
+
+message ChallengeFriend {
+	required string user_id = 1;
+}
+
+message ChallengeFriendRet {
+	required Result result = 1;
+	optional string user_id = 2;
+	optional string leader_name = 3;
+	repeated int32 template_id_list = 4;
+	optional bool is_winner = 5;
+	optional string battle_property = 6;    //战斗属性
+	repeated int32 battle_record = 7;       //战斗结果
+}

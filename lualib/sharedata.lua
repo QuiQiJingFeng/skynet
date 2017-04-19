@@ -34,6 +34,11 @@ function sharedata.query(name)
 	if cache[name] then
 		return cache[name]
 	end
+	--FYD:TODO 
+	if not service then
+		service = skynet.uniqueservice "sharedatad"
+	end
+
 	local obj = skynet.call(service, "lua", "query", name)
 	local r = sd.box(obj)
 	skynet.send(service, "lua", "confirm" , obj)

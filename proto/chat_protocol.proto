@@ -1,0 +1,15 @@
+import "msg/chat.proto";
+
+message CLIENT2CHAT {
+    optional msg.chat.HeartBeat heart_beat = 1;
+    optional msg.chat.AppendChat append_chat = 2;
+    optional msg.chat.LoginChat login_chat = 3;
+}
+ 
+message CHAT2CILENT{
+    optional msg.chat.HeartBeatRet heart_beat_ret = 1;
+    optional msg.chat.ErrorRet error_ret = 2;
+    optional msg.chat.AppendChatRet append_chat_ret = 3;
+    optional msg.chat.RefreshChatMsg refresh_chat_msg = 4;
+    optional msg.chat.LoginChatRet login_chat_ret = 5;
+}

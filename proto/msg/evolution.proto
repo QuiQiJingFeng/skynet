@@ -1,0 +1,43 @@
+package msg.evolution;
+
+enum Result {
+    success = 0;                            // 成功
+    failure = 1;
+    resource_not_enough = 2;                //资源不足
+    role_need_flash_gold = 3;               //主角未完成闪金,无法进行换装
+    achievement_not_finish = 4;             //成就未达成
+    array_flash_gold = 5;                   //已经完成闪金化,不能进行第二次闪金化
+    error_template_id = 6;                  //错误的template_id
+    array_unlock = 7;                       //已经解锁，无法第二次解锁
+    array_exist = 8;                        //当前已经是该装饰
+}
+ 
+message Query {
+
+}
+
+message QueryRet {
+    repeated int32 template_ids = 1;        //返回已经解锁的形象，未解锁的从表中读取
+}
+//主角闪金
+message FlashGoldLadder{
+    
+}
+
+message FlashGoldLadderRet{
+    required Result result = 1;              
+    optional int32 target_template_id = 2;         //闪金的佣兵ID(闪金成功后返回)
+}
+
+//主角换装
+message Dressing{
+    required int32 target_template_id = 1;             //指定换装的形象
+    optional int32 type = 2;                          //类型  1为换装  2为解锁
+}
+
+message DressingRet{
+    required Result result = 1;
+    optional int32 target_template_id = 2;         //换装后的ID(换装成功后返回)
+    optional int32 type = 3;                      //类型  1为换装  2为解锁 
+}
+
