@@ -4,6 +4,7 @@ local netpack = require "netpack"
 local socket = require "socket"
 local md5 = require "md5"
 local cls = require "skynet.queue"
+local sharedata = require "sharedata"
 local queue = cls()
 local config_manager
 local msg_handler
@@ -115,7 +116,6 @@ skynet.start(function()
     user_info = require "user_info"
     user_info:Init(tonumber(skynet.getenv("server_id")))
     config_manager = require "config_manager"
-    print("ddddddgggggggggggg")
     config_manager:Init()
 
     constants = config_manager.constants

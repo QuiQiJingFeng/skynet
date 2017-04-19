@@ -2,9 +2,10 @@ local skynet = require "skynet"
 local sd = require "sharedata.corelib"
 
 local service
-
+print("init-------begin")
 skynet.init(function()
 	service = skynet.uniqueservice "sharedatad"
+	print("init-------end  ",service)
 end)
 
 local sharedata = {}
@@ -34,11 +35,7 @@ function sharedata.query(name)
 	if cache[name] then
 		return cache[name]
 	end
-	--FYD:TODO 
-	if not service then
-		service = skynet.uniqueservice "sharedatad"
-	end
-
+	
 	local obj = skynet.call(service, "lua", "query", name)
 	local r = sd.box(obj)
 	skynet.send(service, "lua", "confirm" , obj)
