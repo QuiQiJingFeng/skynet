@@ -96,8 +96,41 @@ function CMD.Start(gate,fd,ip,user_id,login_msg)
     return true
 end
 
+function CMD.Kick(reason)
+    user_info:ResponseClient("logout_ret", { reason = reason })
+    return true
+end
+--登出
+function CMD.Logout()
+    user_info:Logout()
+end
+--保存数据
+function CMD.Save()
+ 
+    if user_info.client_fd ~= -1 then
+        skynet.call(gate, "lua", "kick", user_info.client_fd)
+    end
+    local succ, ret = queue(user_info.Save,user_info)
+    if not succ then
+        skynet.error(ret)
+    elseif ret == false then
+        succ = false
+    end
 
+    return succ
+end
 
+function CMD.AsynSave()
+    CMD.Save()
+end
+
+--该agent被回收
+function CMD.Close()
+    user_info:ClearData()
+    --gc
+    collectgarbage "collect"
+    return true
+end
 
 skynet.start(function()
     skynet.dispatch("lua", function(session, service_address, cmd, ...)

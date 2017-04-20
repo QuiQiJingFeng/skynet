@@ -6,7 +6,6 @@ local math_ceil = math.ceil
 local user_info = {}
 
 function user_info:Init(server_id,user_id)
-    self.has_data = nil
     self.session_id = 0
     self.server_id = server_id
     self.user_id = user_id
@@ -14,6 +13,13 @@ function user_info:Init(server_id,user_id)
     self.db_conf = sharedata.query("user_redis_conf")
     self.user_info_key = "info:" .. self.user_id
 end
+--玩家登出后就直接断开连接
+function user_info:Logout()
+    self.user_id = ""
+    self.client_fd = -1
+    skynet.call(gate, "lua", "kick", fd)
+end
+
 --登录成功后记录数据
 function user_info:InitData(data,client_fd, client_ip)
     self.client_fd = client_fd
