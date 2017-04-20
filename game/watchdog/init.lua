@@ -14,14 +14,14 @@ local CMD = {}
 local SOCKET = {}
 local gate
 
-local agents = {}
+local ipaddrs = {}
 local userid_to_agent = {}
 local socket_to_agent = {}
 
 function SOCKET.open(fd, ipaddr)
     local ip = string.match(ipaddr, "([%d.]+):")
     --记录已经连接的fd->states
-    agents[fd] = ip
+    ipaddrs[fd] = ip
     skynet.call(gate, "lua", "accept", fd)
 end
 
@@ -44,8 +44,8 @@ function SOCKET.warning(fd, size)
 end
 
 local function onReceiveData(fd,msg)
-    local ip = agents[fd]
-    agents[fd] = nil
+    local ip = ipaddrs[fd]
+    ipaddrs[fd] = nil
     --数据的解析
     local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
     if not succ or not msg_data or not msg_data["login"] then
