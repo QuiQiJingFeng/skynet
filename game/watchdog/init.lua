@@ -21,23 +21,16 @@ local socket_to_agent = {}
 function SOCKET.open(fd, ipaddr)
     local ip = string.match(ipaddr, "([%d.]+):")
     --记录已经连接的fd->states
-    agents[fd] = {fd = fd, ip = ip}
+    agents[fd] = ip
     skynet.call(gate, "lua", "accept", fd)
 end
 
 local function close_agent(fd)
-    local a = agents[fd]
-    agents[fd] = nil
-    if a then
-        skynet.call(gate, "lua", "kick", fd)
-        -- disconnect never return
-        skynet.send(a, "lua", "disconnect")
-    end
+  
 end
 
 function SOCKET.close(fd)
-    print("socket close",fd)
-    close_agent(fd)
+ 
 end
 
 function SOCKET.error(fd, msg)
@@ -51,7 +44,8 @@ function SOCKET.warning(fd, size)
 end
 
 local function onReceiveData(fd,msg)
-    local ip = agents[fd].ip
+    local ip = agents[fd]
+    agents[fd] = nil
     --数据的解析
     local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
     if not succ or not msg_data or not msg_data["login"] then
@@ -84,7 +78,6 @@ local function onReceiveData(fd,msg)
         skynet.error("=====start error=====",start_ret)
         return false
     end
-    agents[fd].state = SOCKET_STATE.working
 
     agent.user_id = user_id
     agent.fd = fd
