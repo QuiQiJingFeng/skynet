@@ -2,10 +2,8 @@ local skynet = require "skynet"
 local sd = require "sharedata.corelib"
 
 local service
-print("init-------begin")
 skynet.init(function()
 	service = skynet.uniqueservice "sharedatad"
-	print("init-------end  ",service)
 end)
 
 local sharedata = {}

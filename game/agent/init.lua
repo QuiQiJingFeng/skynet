@@ -77,20 +77,23 @@ function CMD.Start(gate,fd,ip,user_id,login_msg)
     --转发fd的消息到本服务
     skynet.send(gate, "lua", "forward", fd)
     gate = gate
-    --加载玩家数据
-    user_info:LoadFromDb(user_id)
-    user_info:InitData(login_msg,fd, ip)
+    --记录登录的数据
+    user_info:InitData(login_msg,fd, ip,user_id)
 
+    --加载玩家数据
+    local has_data = user_info:LoadFromDb()
+
+    local send_msg = {server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
     --是否需要创建角色
-    if not user_info:IsNeedCreateRole() then
-        user_info:ResponseClient("login_ret", { result = "create_leader", server_time = skynet.time(),
-                                                user_id = user_id, time_zone = TIME_ZONE ,client_ip = ip}, true)
+    if not has_data then
+        send_msg.result = "create_leader"
+        user_info:ResponseClient("login_ret", send_msg)
     else
-        user_info:ResponseClient("login_ret", { result = "success", server_time = skynet.time(),
-                                                user_id = user_id, time_zone = TIME_ZONE,client_ip = ip}, true)
+        send_msg.result = "success"
+        user_info:ResponseClient("login_ret",send_msg)
     end
 
-    return "success"
+    return true
 end
 
 

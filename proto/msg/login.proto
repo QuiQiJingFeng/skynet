@@ -36,7 +36,6 @@ message LoginRet {
 	optional uint32 forbidden_time = 4;
 	optional string reconnect_token = 5;
 	optional int32 time_zone = 6;
-	optional string client_ip = 7;
 }
 
 message Logout {

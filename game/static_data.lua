@@ -23,6 +23,13 @@ skynet.start(function()
         db = 0,
         auth = redis_auth
     })
+
+    sharedata.update("user_redis_conf", {
+        host = redis_ip ,
+        port = redis_port,
+        db = 1,
+        auth = redis_auth,
+    })
     --mysql配置
     local mysql_ip = skynet.getenv("mysql_ip")
     local mysql_port = skynet.getenv("mysql_port")

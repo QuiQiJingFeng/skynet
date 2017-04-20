@@ -7,6 +7,7 @@ local redis = require "redis"
 local socket = require "socket"
 local sharedata = require "sharedata"
 local agent_manager = require "agent_manager"
+local utils = require "utils"
 local constant
 local SOCKET_STATE
 local CMD = {}
@@ -51,20 +52,24 @@ end
 
 local function onReceiveData(fd,msg)
     local ip = agents[fd].ip
+    --数据的解析
     local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
-    if not succ or not msg_data then
-        skynet.error("pbc decode error==>", pbc_error)
+    if not succ or not msg_data or not msg_data["login"] then
+        skynet.error("pbc decode pbc_error==>", pbc_error)
+        skynet.error("succ==>", succ)
+        utils:dump(msg_data,"msg_data==>",10)
         return false
     end
 
-    if not msg_data["login"] then
-        skynet.error("error: must have login proto")
-        return false
-    end
-
+    --FYD:
+    --1、socket线程有登录消息过来的时候传到watchdog服务的消息队列
+    --2、一个空闲的工作线程A来处理watchdog的消息队列
+    --3、当在这里进行call调用的时候，当前协程挂起的时候(本次消息阻塞),工作线程A会继续处理下一个消息
+    --4、call传递消息到logind服务的消息队列，空闲的工作线程B开始处理logind的消息队列
+    --5、当logind服务返回时，添加到watchdog的消息队列，协程等待被唤醒
     local success,user_id = skynet.call(".logind","lua","Login",msg_data.login)
     if not success then
-        local send_msg = { session = 0, login_ret = { result = "auth_failure" ,client_ip = ip} }
+        local send_msg = { session = 0, login_ret = { result = "auth_failure"} }
         local buff, sz = netpack.pack(pbc.encode("GS2C", send_msg))
         socket.write(fd, buff, sz)
         return true
@@ -72,19 +77,17 @@ local function onReceiveData(fd,msg)
     
     assert(user_id)
 
-    local agent = agent_manager:create_agent()
+    local agent = agent_manager:dequeue_agent()
     
     local start_ret = skynet.call(agent.service_id, "lua", "Start",gate,fd,ip,user_id,msg_data.login)
-    if start_ret ~= "success" then
+    if not start_ret then
         skynet.error("=====start error=====",start_ret)
         return false
     end
     agents[fd].state = SOCKET_STATE.working
 
     agent.user_id = user_id
-    --绑定新的fd和ip
     agent.fd = fd
-    
     --记录user_id->agent fd->agent映射
     userid_to_agent[user_id] = agent
     socket_to_agent[fd] = agent
