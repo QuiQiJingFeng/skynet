@@ -1,16 +1,17 @@
 local skynet = require "skynet"
 local protobuf = require "protobuf"
 local agent_pool = require "agent_pool"
-local gate
 local AGENT_POLL_TIME = 60  --每60s调度一次
 local AGENT_EXPIRE_TIME = 30*60 --当玩家退出后,保留agent 30 分钟
 local AGENT_SAVE_TIME = 10*60   --玩家数据 每10分钟保存一次
+local gateserver
 
 local agent_manager = {}
 function agent_manager:init(gate)
-    gate = gate
+    gateserver = gate
     self.userid_to_agent = {}
     self.socket_to_agent = {}
+    agent_pool:Init()
 end
 
 --客户端消息处理
@@ -46,13 +47,12 @@ function agent_manager:onReceiveData(fd,msg,ip)
         if agent.fd >= 0 then 
             self.socket_to_agent[agent.fd] = nil
             skynet.call(agent.service_id, "lua", "Kick", "repeated_login")
-            skynet.call(gate, "lua", "kick", agent.fd)
+            skynet.call(gateserver, "lua", "kick", agent.fd)
         end
     else
         agent = agent_pool:Dequeue()
     end
-    
-    local start_ret = skynet.call(agent.service_id, "lua", "Start",gate,fd,ip,user_id,msg_data.login)
+    local start_ret = skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,user_id,msg_data.login)
 
     agent.user_id = user_id
     agent.fd = fd

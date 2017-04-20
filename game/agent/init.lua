@@ -2,16 +2,14 @@ local skynet = require "skynet"
 local protobuf = require "protobuf"
 local netpack = require "netpack"
 local socket = require "socket"
-local md5 = require "md5"
 local cls = require "skynet.queue"
 local sharedata = require "sharedata"
 local queue = cls()
-local config_manager
-local msg_handler
-local user_info
-local reward_center
 
-local constants
+local config_manager
+local user_info
+local event_dispatcher
+
 local CMD = {}
 local AGENT_OP = {}
 
@@ -69,14 +67,30 @@ skynet.register_protocol( {
             socket.write(user_info.client_fd, buff, sz)
             return
         end  
+        print("msg_name ",msg_name)
+        local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, data)
+        
+        if succ and proto then
+            local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg)
+            if not succ then
+                skynet.error(err)
+                user_info:ResponseClient("error_ret", {})
+            end
+        elseif proto then
+            skynet.error(user_info.user_id)
+            skynet.error(proto)
+            user_info:ResponseClient("error_ret", {})
+        end
+
     end
 })
 
 --玩家第一次登录
 function CMD.Start(gate,fd,ip,user_id,login_msg)
     --转发fd的消息到本服务
-    skynet.send(gate, "lua", "forward", fd)
+    skynet.call(gate, "lua", "forward", fd)
     gate = gate
+    user_info:Init(tonumber(skynet.getenv("server_id")),user_id)
     --记录登录的数据
     user_info:InitData(login_msg,fd, ip,user_id)
 
@@ -106,10 +120,6 @@ function CMD.Logout()
 end
 --保存数据
 function CMD.Save()
- 
-    if user_info.client_fd ~= -1 then
-        skynet.call(gate, "lua", "kick", user_info.client_fd)
-    end
     local succ, ret = queue(user_info.Save,user_info)
     if not succ then
         skynet.error(ret)
@@ -150,10 +160,11 @@ skynet.start(function()
     protobuf.register_file(skynet.getenv("protobuf"))
 
     user_info = require "user_info"
-    user_info:Init(tonumber(skynet.getenv("server_id")))
+
     config_manager = require "config_manager"
     config_manager:Init()
 
-    constants = config_manager.constants
+    event_dispatcher = require "event_dispatcher"
+    event_dispatcher:Init(config_manager.msg_files)
 
 end)

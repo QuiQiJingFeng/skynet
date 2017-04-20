@@ -1,5 +1,7 @@
-local skynet = rquire "skynet"
-local AGENT_POOL_NUM = 500      --预留500个agent
+local skynet = require "skynet"
+local cls = require "skynet.queue"
+local queue = cls()
+local AGENT_POOL_NUM = 1      --预留500个agent
 
 local agent_pool = {}
 --预留
@@ -45,8 +47,5 @@ function agent_pool:Push(agent)
     table.insert(self.reclaim_pool,agent)
 end
 
-do
-    agent_pool:Init()
-end
 
 return agent_pool

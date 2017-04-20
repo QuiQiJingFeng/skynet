@@ -27,7 +27,7 @@ function utils:trim(str)
     return string.gsub(str," ", "");
 end
 
-function utils.split(str, delimiter)
+function utils:split(str, delimiter)
     if str==nil or str=='' or delimiter==nil then
         return nil
     end
@@ -37,6 +37,12 @@ function utils.split(str, delimiter)
         table.insert(result, match)
     end
     return result
+end
+
+function utils:handler(obj, method)
+    return function(...)
+        return method(obj, ...)
+    end
 end
 
 --table相关

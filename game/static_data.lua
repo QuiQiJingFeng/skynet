@@ -1,13 +1,23 @@
 local skynet = require "skynet"
 require "skynet.manager"    -- import skynet.register
 local sharedata = require "sharedata"
-
+local utils = require "utils"
 local FUNCTION = {}
+
+local function CreateMsgFilesConfig()
+    local files = io.popen('ls game/agent/msg') 
+    local fileLists = files:read("*all")
+    fileLists = utils:replaceStr(fileLists,".lua","")
+    local msg_files = utils:split(fileLists,"\n")
+    table.remove(msg_files,#msg_files)
+    return msg_files
+end
+
+
 --热更
 function FUNCTION.UpdateConfig(name)
-    if name == "constant" then
-        local constant = require "common.constant"
-        sharedata.update("constant", constant)
+    if name == "msg_files" then
+        sharedata.update("msg_files", CreateMsgFilesConfig())
     end
 end 
 
@@ -44,9 +54,10 @@ skynet.start(function()
         max_packet_size = 1024 * 1024
     })
 
-    --数据配置
-    local constant = require "common.constant"
-    sharedata.update("constant", constant)
+
+    --事件中心配置
+    
+    sharedata.update("msg_files", CreateMsgFilesConfig())
 
 
     skynet.dispatch("lua", function(session, source, cmd, ...)
