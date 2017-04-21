@@ -5,34 +5,28 @@ local protobuf = require "protobuf"
 local sharedata = require "sharedata"
 local redis = require "redis"
 local math_ceil = math.ceil
+
 local user_info = {}
 
-function user_info:Init(server_id,user_id)
+function user_info:Init(server_id,user_id,data,client_fd, client_ip)
     self.session_id = 0
-    self.server_id = server_id
-    self.user_id = user_id
-
-    self.db_conf = sharedata.query("user_redis_conf")
-    self.user_info_key = "info:" .. self.user_id
-
-    self.last_login_time = nil
     self.has_data = false
-end
-
---登录成功后记录数据
-function user_info:InitData(data,client_fd, client_ip)
+    --记录本次登录的时间
+    self.last_login_time = math_ceil(skynet.time())
+    --记录本次登录的数据
+    self.server_id = server_id  
+    self.user_id = user_id
     self.client_fd = client_fd
     self.client_ip = client_ip
     self.device_id = data.device_id
     self.locale = data.locale
     self.platform_uid = data.user
     self.platform = data.platform
-    self.last_login_time = math_ceil(skynet.time())
+    
 end
+
 --玩家登出后就直接断开连接
 function user_info:Logout()
-    skynet.call(gate, "lua", "kick", fd)
-    self.user_id = ""
     self.client_fd = -1
 end
 
@@ -55,7 +49,10 @@ end
 
 --加载玩家数据
 function user_info:LoadFromDb()
-    local db = redis.connect(self.db_conf)
+    local user_info_key = "info:" .. self.user_id
+    local db_conf = sharedata.query("user_redis_conf")
+
+    local db = redis.connect(db_conf)
     if not db:exists(user_info_key) then
         db:disconnect()
         return false

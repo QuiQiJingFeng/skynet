@@ -4,18 +4,18 @@ local netpack = require "netpack"
 local socket = require "socket"
 local cls = require "skynet.queue"
 local sharedata = require "sharedata"
+local user_info = require "user_info"
+
 local queue = cls()
 
 local config_manager
-local user_info
+
 local event_dispatcher
 
 local CMD = {}
 local AGENT_OP = {}
 
 local TIME_ZONE = tonumber(skynet.getenv("time_zone"))
-
-local gate
 
 setmetatable(AGENT_OP, {
     __call = function(t, func_name, ...)
@@ -67,9 +67,9 @@ skynet.register_protocol( {
             socket.write(user_info.client_fd, buff, sz)
             return
         end  
-        print("msg_name ",msg_name)
+
         local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, data)
-        
+        print("succ, proto, send_msg =>",succ, proto, send_msg)
         if succ and proto then
             local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg)
             if not succ then
@@ -87,12 +87,11 @@ skynet.register_protocol( {
 
 --玩家第一次登录
 function CMD.Start(gate,fd,ip,user_id,login_msg)
-    --转发fd的消息到本服务
+    --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
-    gate = gate
-    user_info:Init(tonumber(skynet.getenv("server_id")),user_id)
-    --记录登录的数据
-    user_info:InitData(login_msg,fd, ip,user_id)
+    
+    --初始化user的数据
+    user_info:Init(login_msg.server_id,user_id,login_msg,fd, ip,user_id)
 
     --加载玩家数据
     local has_data = user_info:LoadFromDb()
@@ -159,7 +158,7 @@ skynet.start(function()
     end)
     protobuf.register_file(skynet.getenv("protobuf"))
 
-    user_info = require "user_info"
+    
 
     config_manager = require "config_manager"
     config_manager:Init()

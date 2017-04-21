@@ -3,14 +3,13 @@ require "skynet.manager"    -- import skynet.register
 local redis = require "redis"
 local sharedata = require "sharedata"
 local utils = require "utils"
-local server_id
 local account_redis
 
 local MAX_USER_ID = 4967000
 
 local CMD = {}
 
-local function CreateUserId()
+local function CreateUserId(server_id)
     local max_id = account_redis:incrby("user_id_generator", 1)
     if max_id >= MAX_USER_ID then
         return nil
@@ -22,8 +21,10 @@ end
 --热更
 function CMD.Login(msg)
     local success = false
+    local server_id = msg.server_id
     local user_key = msg.platform .. ":" .. msg.user
     local user_id = account_redis:hget(user_key, server_id)
+
     if not user_id then
         user_id = CreateUserId()
         if not user_id then
@@ -51,13 +52,6 @@ skynet.start(function()
     if not account_redis:exists("user_id_generator") then
         account_redis:set("user_id_generator", 1)
     end
-
-    server_id = tonumber(skynet.getenv("server_id"))
-    if not server_id then
-        print("server_id error")
-        skynet.abort()
-    end
-
 
     skynet.register(".logind") 
 end)

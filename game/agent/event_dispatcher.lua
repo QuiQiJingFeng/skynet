@@ -26,6 +26,10 @@ function event_dispatcher:DispatchEvent(event_name,...)
     if not event_pool then
         return 
     end
+    --如果只有一个方法,返回方法的返回值
+    if #event_pool == 1 then
+        return event_pool[1](...)
+    end
     for _,handle in ipairs(event_pool) do 
         local stop = handle(...)
         if stop then

@@ -17,7 +17,7 @@ end
 function agent_pool:CreateAgent()
     local service_id = skynet.newservice("agent")
     local agent = {}
-    function agent:Init()
+    function agent:Reset()
         self.service_id = service_id
         self.fd = -1
         self.user_id = ""
@@ -28,7 +28,7 @@ function agent_pool:CreateAgent()
         --回收标记,当失效时间过去的时候回收标记被置为true,同时在下一次调度的时候放入回收池
         self.can_be_reclaim = false
     end
-    agent:Init()
+    agent:Reset()
 
     return agent
 end
@@ -43,7 +43,7 @@ end
 
 --将agent放入重用池
 function agent_pool:Push(agent)
-    agent:Init()
+    agent:Reset()
     table.insert(self.reclaim_pool,agent)
 end
 

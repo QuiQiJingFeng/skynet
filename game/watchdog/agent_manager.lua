@@ -82,6 +82,9 @@ function agent_manager:ReclaimAgent(agent)
         self.userid_to_agent[agent.user_id] = nil
     end
     local close_ret = skynet.call(agent.service_id, "lua", "Close")
+    if close_ret then
+        skynet.error("agent close success")
+    end
     agent_pool:Push(agent)
 end
 

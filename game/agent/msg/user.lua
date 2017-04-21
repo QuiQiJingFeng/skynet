@@ -16,7 +16,6 @@ function user:Logout(recv_msg)
 end
 
 function user:CreateLeader(recv_msg)
-    print("456456456")
     user_info:LoadDefaultInfo()
     user_info:CreateLeader(recv_msg.name, recv_msg.channel)
     return "create_leader_ret", { result = "success" , name = recv_msg.name}
@@ -25,7 +24,6 @@ end
 function user:Query(recv_msg)
     local ret = {}
     ret.leader_name = "DDDDEGDAEG"
-    print("DDDDDDIHJIEQIORAKSDFJAISJDFKLEJI")
     return "query_user_base_info_ret",ret
 end
 
