@@ -1,74 +1,63 @@
 package msg.login;
 
-enum Result {
-	success = 0;
-	create_leader = 1;
-	invalid_pwd = 2;
-	pwd_too_short = 3;
-	account_exist = 4;
-	register_first = 5;
-	invalid_char = 6;
-	auth_failure = 7;
-	version_too_low = 8;
-	server_is_busy = 9;
-	reconnect_failure = 10;
-	forbidden_login = 11;
-	forbidden_create = 12;
+enum LoginResult {
+    success = 0;            //成功
+    auth_failure = 1;       //登录失败
+    invalid_pwd = 2;        //密码无效
+    account_not_exist = 3;  //账户不存在
+    error_pwd = 4;          //密码不正确
+    version_too_low = 5;    //当前版本太低,请升级版本
+    server_is_busy = 6;     //系统繁忙
 }
-
+//-------------------
+//      登录        
+//-------------------
 message Login {
-	required string user = 1;
-	required string password = 2;
-	required string platform = 3;
-	required string version = 4;
-	required int32 server_id = 5;
-	required string device_id = 6;
-	required string channel = 7;
-	required string locale = 8;
-	optional int32 net_mode = 9;
-	optional int32 device_platform = 10;
+    required string account = 1;            //账户  如果是平台登录的话 account = union_id 
+    required string password = 2;           //密码  如果是平台登录的话 password = access_token 
+    required string platform = 3;           //发布平台  appstore/google/360商店/应用宝...
+    required string version = 4;            //当前客户端版本号  1.0.0
+    required int32 server_id = 5;           //选择的服务器ID
+    required string device_id = 6;          //设备ID
+    required string channel = 7;            //登录渠道  gamecenter/facebook/google/weichat...
+    required string locale = 8;             //当前语言类型
+    required string net_mode = 9;           //网络状态 2G/3G/WIFI
+    required int32 device_platform = 10;    //设备平台 ios/android
 }
 
 message LoginRet {
-	required Result result = 1; // 登陆的结果
-	optional uint32 server_time = 2;
-	optional string user_id = 3;
-	optional uint32 forbidden_time = 4;
-	optional string reconnect_token = 5;
-	optional int32 time_zone = 6;
+    required LoginResult result = 1;             //登录结果
+    optional uint32 server_time = 2;        //服务器时间
+    optional string user_id = 3;            //用户ID
+    optional string reconnect_token = 4;    //重连token
+    optional int32 time_zone = 5;           //时区
 }
 
-message Logout {
-}
-
-message Register {
-	required string user = 1;
-	required string password = 2;
-	required string version = 3;
-}
-
-message RegisterRet {
-	required Result result = 1; // 登陆的结果
-}
-
-message LogoutRet {
-	enum Reason {
-		success = 0;
-		repeated_login = 1;
-		kick = 2;
-	}
-
-	required Reason reason = 1;
-}
-
+//-------------------
+//      重连 
+//-------------------
 message Reconnect {
-	required string user_id = 1;
-	required string reconnect_token = 2;
+    required string user_id = 1;            //用户ID
+    required string reconnect_token = 2;    //重连token
 }
 
 message ReconnectRet {
-	required Result result = 1;
-	optional uint32 server_time = 2;
-	optional int32 time_zone = 3;
+    required Result result = 1;             //重连结果
+    optional uint32 server_time = 2;        //服务器时间
+    optional int32 time_zone = 3;           //时区
+}
+
+//-------------------
+//      登出
+//-------------------
+enum Reason {
+    success = 0;        //成功
+    repeated_login = 1; //重复登录
+}
+message Logout {
+}
+
+message LogoutRet {
+    required Reason reason = 1;
 }
 
