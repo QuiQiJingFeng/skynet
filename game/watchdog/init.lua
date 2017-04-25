@@ -34,7 +34,6 @@ function SOCKET.data(fd, msg)
     if not agent_manager:onReceiveData(fd, msg,ipaddrs[fd]) then
         skynet.call(gate, "lua", "kick", fd)
     end
-    ipaddrs[fd] = nil
 end
 
 --开启gate网关服务,监控外部网络连接
