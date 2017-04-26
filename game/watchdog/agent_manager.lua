@@ -7,23 +7,59 @@ local AGENT_SAVE_TIME = 10*60   --玩家数据 每10分钟保存一次
 local gateserver
 
 local agent_manager = {}
-function agent_manager:init(gate)
+function agent_manager:Init(gate)
+    --网关服务地址
     gateserver = gate
+    --user_id=>agent的映射
     self.userid_to_agent = {}
+    --socket=>agent的映射
     self.socket_to_agent = {}
+    --重用池
     agent_pool:Init()
+    self.online_num = 0
 end
 
---客户端消息处理
-function agent_manager:onReceiveData(fd,msg,ip)
-    --数据的解析
-    local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
-    if not succ or not msg_data or not msg_data["login"] then
-        skynet.error("pbc decode pbc_error==>", pbc_error)
-        skynet.error("succ==>", succ)
-        utils:dump(msg_data,"msg_data==>",10)
+
+function agent_manager:Reconnect(msg_data, fd, ip)
+
+    local user_id = msg_data.reconnect.user_id
+    if not user_id then
         return false
     end
+    local session_id = msg_data.session
+    local reconnect_token = msg_data.reconnect.reconnect_token
+
+    local agent = self.user_to_agent_map[user_id]
+    if not agent or not reconnect_token then
+        return false
+    end
+
+    local ret = skynet.call(agent.service_id, "lua", "Reconnect", gateserver, session_id, fd, ip, reconnect_token)
+    if ret ~= 1 then
+        agent.lock = false
+        return false, ret .. user_id
+    end
+
+    --绑定新的fd和ip
+    if not self:SetSocketState(fd, SOCKET_STATE.working) then
+        agent.lock = false
+        return false, ret
+    end
+
+    if agent.fd ~= -1 then
+        self.socket_to_agent_map[agent.fd] = nil
+        self.socket_status_list[agent.fd] = nil
+        skynet.call(gateserver, "lua", "kick", agent.fd)
+    end
+
+    agent.fd = fd
+    agent.expire_time = 0
+    agent.can_be_reclaim = false
+ 
+    self.socket_to_agent_map[fd] = agent
+
+    return true
+end
 ---------------------------------------------------------------------------------------
     --FYD:
     --1、socket线程有登录消息过来的时候传到watchdog服务的消息队列
@@ -32,14 +68,38 @@ function agent_manager:onReceiveData(fd,msg,ip)
     --4、call传递消息到logind服务的消息队列，空闲的工作线程B开始处理logind的消息队列
     --5、当logind服务返回时，添加到watchdog的消息队列，协程等待被唤醒
 ---------------------------------------------------------------------------------------
-    local success,user_id = skynet.call(".logind","lua","Login",msg_data.login)
-    if not success then
-        local send_msg = { session = 0, login_ret = { result = "auth_failure"} }
-        local buff, sz = netpack.pack(pbc.encode("GS2C", send_msg))
-        socket.write(fd, buff, sz)
-        return true
+--处理接收到的数据
+function agent_manager:ProcessData(msg)
+    --数据的解析
+    local succ, msg_data, pbc_error = pcall(protobuf.decode, "C2GS", msg)
+    if not succ then
+        skynet.error("decode error ==> agent_manager:ProcessData")
+        return false
+    elseif not msg_data then
+        skynet.error(pbc_error)
+        return false
     end
-    
+
+    if not msg_data["login"] and not msg_data["reconnect"] then
+        skynet.error("msg_data error")
+        return false
+    end
+
+    return msg_data
+end 
+
+function agent_manager:SendToClient(send_msg)
+    local buff, sz = netpack.pack(protobuf.encode("GS2C", send_msg))
+    socket.write(fd, buff, sz)
+end
+
+function agent_manager:ProcessLogin(fd,data,ip)
+    local err,user_id = skynet.call(".logind","lua","Login",data)
+    if err then
+        send_msg = { session = 0, login_ret = { result = err} }
+        self:SendToClient(send_msg)
+        return true
+    end 
     assert(user_id)
     --检测重复登录
     local agent = self.userid_to_agent[user_id]
@@ -52,13 +112,43 @@ function agent_manager:onReceiveData(fd,msg,ip)
     else
         agent = agent_pool:Dequeue()
     end
-    local start_ret = skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,user_id,msg_data.login)
-
+    skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,user_id,data)
     agent.user_id = user_id
     agent.fd = fd
-    --记录user_id->agent fd->agent映射
+
     self.userid_to_agent[user_id] = agent
     self.socket_to_agent[fd] = agent
+
+    return true
+end
+
+function agent_manager:ProcessReconnect(data)
+    --断线重连
+    local succ, err, reason = pcall(self.Reconnect, self, msg_data, fd, ip)
+
+    if not succ or not err then
+        send_msg = { session = 0, reconnect_ret = { result = "reconnect_failure" } }
+    else
+        return true
+    end
+end
+
+--客户端消息处理
+function agent_manager:OnReceiveData(fd,msg,ip)
+    
+    local recv_data = self:ProcessData(msg)
+    if not recv_data then
+        return false
+    end
+
+    local send_msg,user_id
+    if recv_data.login then
+       return self:ProcessLogin(fd,recv_data.login,ip)
+    elseif recv_data.reconnect then
+        
+    end
+
+    
 
     return true
 end
@@ -105,7 +195,7 @@ local function SaveTimer()
             if not agent.can_be_reclaim then
                 agent.save_time = t_now + AGENT_SAVE_TIME
                 --存储
-                skynet.send(agent.service_id, "lua", "AsynSave")
+                skynet.send(agent.service_id, "lua", "Save")
                 --标记可重用
                 if agent.expire_time > 0 then
                     agent.can_be_reclaim = true
@@ -121,9 +211,12 @@ local function SaveTimer()
     end
     --对标记过的佣兵加入重用池
     for user_id, agent in pairs(tmp_agent_map) do
-        agent_manager:ReclaimAgent(agent)
+        --当agent正在进行某些操作而加锁的时候,不要将其放入回收池
+        if not agent.lock then
+            agent_manager:ReclaimAgent(agent)
+        end
     end
-
+    self.online_num = online_num
     --TODO:添加online记录
 end
 

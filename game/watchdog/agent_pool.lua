@@ -18,7 +18,7 @@ function agent_pool:CreateAgent()
     local service_id = skynet.newservice("agent")
     local agent = {}
     function agent:Reset()
-        self.service_id = service_id
+        self.service_id = -1
         self.fd = -1
         self.user_id = ""
         --下一次保存的时间点
@@ -27,8 +27,11 @@ function agent_pool:CreateAgent()
         self.expire_time = 0
         --回收标记,当失效时间过去的时候回收标记被置为true,同时在下一次调度的时候放入回收池
         self.can_be_reclaim = false
+        --是否加锁,当对agent操作的时候,避免正好被重用
+        self.lock = false
     end
     agent:Reset()
+    agent.service_id = service_id
 
     return agent
 end

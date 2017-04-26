@@ -86,25 +86,15 @@ skynet.register_protocol( {
 })
 
 --玩家第一次登录
-function CMD.Start(gate,fd,ip,user_id,login_msg)
+function CMD.Start(gate,fd,ip,user_id,data)
     --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
     
     --初始化user的数据
-    user_info:Init(login_msg.server_id,user_id,login_msg,fd, ip,user_id)
+    user_info:Init(user_id,data,fd, ip)
 
-    --加载玩家数据
-    local has_data = user_info:LoadFromDb()
-
-    local send_msg = {server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
-    --是否需要创建角色
-    if not has_data then
-        send_msg.result = "create_leader"
-        user_info:ResponseClient("login_ret", send_msg)
-    else
-        send_msg.result = "success"
-        user_info:ResponseClient("login_ret",send_msg)
-    end
+    local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
+    user_info:ResponseClient("login_ret",send_msg)
 
     return true
 end
@@ -135,7 +125,7 @@ end
 
 --该agent被回收
 function CMD.Close()
-    user_info:ClearData()
+    user_info:Close()
     --gc
     collectgarbage "collect"
     return true

@@ -18,22 +18,22 @@ local function CreateUserId(server_id)
     return utils:convertTo32(user_id)
 end
 
---热更
+--登录，如果账户不存在则新建一个
 function CMD.Login(msg)
-    local success = false
+    local err = nil
     local server_id = msg.server_id
     local user_key = msg.platform .. ":" .. msg.user
+    --检查用户名和密码是否符合规则
     local user_id = account_redis:hget(user_key, server_id)
 
     if not user_id then
         user_id = CreateUserId()
         if not user_id then
-            return success
+            return user_id
         end
         account_redis:hset(user_key, server_id, user_id)
     end
-    success = true
-    return success,user_id
+    return err,user_id
 end 
 
 skynet.start(function()

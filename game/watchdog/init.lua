@@ -31,7 +31,7 @@ function SOCKET.warning(fd, size)
 end
 
 function SOCKET.data(fd, msg)
-    if not agent_manager:onReceiveData(fd, msg,ipaddrs[fd]) then
+    if not agent_manager:OnReceiveData(fd, msg,ipaddrs[fd]) then
         skynet.call(gate, "lua", "kick", fd)
     end
 end
@@ -54,7 +54,7 @@ skynet.start(function()
     end)
     protobuf.register_file(skynet.getenv("protobuf"))
     gate = skynet.newservice("gate")
-    agent_manager:init(gate)
+    agent_manager:Init(gate)
 
     skynet.register(".watchdog")
 end)
