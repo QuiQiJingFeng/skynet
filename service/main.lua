@@ -11,9 +11,10 @@ skynet.start(function()
     --登录校验服务
     skynet.uniqueservice("logind")
     
-    --debug服务
-    skynet.newservice("debug_console",8000)
+    --mysqllog服务
+    skynet.newservice("mysqllog")
 
+    skynet.newservice("debug_console",8000)
     
     local game_port = skynet.getenv("game_port")
     local max_client = skynet.getenv("max_client")

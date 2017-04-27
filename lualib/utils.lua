@@ -513,5 +513,28 @@ function utils:convertTo32(number)
     return unin_id
 end
 
+function convertSql(log_name,data,is_quote)
+    local query = string.format("insert into `%s` ",log_name)
+    local fileds = {}
+    local values = {}
+    for field,value in pairs(data) do
+        if type(field) ~= "string" then
+            return "filed must be string"
+        end
+         table.insert(fileds,field)
+
+         local temp_value = string.gsub(value," ", ""); 
+         if type(value) == 'string' then
+            if value ~= "now()" then
+                temp_value = string.format("'%s'",temp_value)
+            end
+         end
+         table.insert(values,temp_value)
+    end
+
+    query = query .."("..table.concat(fileds,",")..") values("..table.concat(values,",")..");"
+    return query
+end
+
 return utils;
  
