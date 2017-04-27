@@ -80,16 +80,9 @@ function agent_manager:ProcessLogin(fd,data,ip)
 
     return true
 end
-
+--TODO
 function agent_manager:ProcessReconnect(data)
     --断线重连
-    local succ, err, reason = pcall(self.Reconnect, self, msg_data, fd, ip)
-
-    if not succ or not err then
-        send_msg = { session = 0, reconnect_ret = { result = "reconnect_failure" } }
-    else
-        return true
-    end
 end
 
 --客户端消息处理
@@ -104,7 +97,7 @@ function agent_manager:OnReceiveData(fd,msg,ip)
     if recv_data.login then
        return self:ProcessLogin(fd,recv_data.login,ip)
     elseif recv_data.reconnect then
-        
+        return self:ProcessReconnect(recv_data.reconnect)
     end
 
     
@@ -175,7 +168,7 @@ local function SaveTimer()
             agent_manager:ReclaimAgent(agent)
         end
     end
-    self.online_num = online_num
+    agent_manager.online_num = online_num
     --TODO:添加online记录
 end
 

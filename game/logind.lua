@@ -22,7 +22,7 @@ end
 function CMD.Login(msg)
     local err = nil
     local server_id = msg.server_id
-    local user_key = msg.platform .. ":" .. msg.user
+    local user_key = msg.platform .. ":" .. msg.account
     --检查用户名和密码是否符合规则
     local user_id = account_redis:hget(user_key, server_id)
 
