@@ -5,8 +5,8 @@ local utils = require "utils"
 local gamedb 
 local CMD = {}
 local manager = {}
-
-local MINUTE_NUM = 100000
+--100W进行分表
+local MINUTE_NUM = 1000000
 --------------------
 --初始化  创建所有需要的数据库以及表
 --------------------
