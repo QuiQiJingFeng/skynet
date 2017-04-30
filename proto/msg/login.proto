@@ -19,10 +19,11 @@ message Login {
     required string version = 4;            //当前客户端版本号  1.0.0
     required int32 server_id = 5;           //选择的服务器ID
     required string device_id = 6;          //设备ID
-    required string channel = 7;            //登录渠道  gamecenter/facebook/google/weichat...
-    required string locale = 8;             //当前语言类型
-    required string net_mode = 9;           //网络状态 2G/3G/WIFI
-    required int32 device_platform = 10;    //设备平台 ios/android
+    required string device_type = 7;        //设备型号
+    required string channel = 8;            //登录渠道  gamecenter/facebook/google/weichat...
+    required string locale = 9;             //当前语言类型
+    required string net_mode = 10;           //网络状态 2G/3G/WIFI
+    required int32 device_platform = 11;    //设备平台 ios/android
 }
 
 message LoginRet {

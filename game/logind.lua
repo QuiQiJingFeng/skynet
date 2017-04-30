@@ -19,11 +19,15 @@ local function CreateUserId(server_id)
 end
 
 --登录，如果账户不存在则新建一个
-function CMD.Login(msg)
+function CMD.Login(data,ip)
     local err = nil
-    local server_id = msg.server_id
-    local user_key = msg.platform .. ":" .. msg.account
-    --检查用户名和密码是否符合规则
+    -----登录校验------------
+    
+
+    -----登录校验完毕---------
+    
+    local server_id = data.server_id
+    local user_key = data.platform .. ":" .. data.account
     local user_id = account_redis:hget(user_key, server_id)
 
     if not user_id then
@@ -32,6 +36,16 @@ function CMD.Login(msg)
             return user_id
         end
         account_redis:hset(user_key, server_id, user_id)
+
+        local register_msg = {  
+                                user_id = user_id,server_id = data.server_id,
+                                account = data.account,ip = ip,
+                                platform = data.platform,channel = data.channel,
+                                net_mode = data.net_mode,device_id = data.device_id,
+                                device_type = data.device_type,time = "NOW()"
+                             }
+        --注册日志
+        skynet.send(".mysqllog","lua","InsertLog","register_log",register_msg)
     end
     return err,user_id
 end 

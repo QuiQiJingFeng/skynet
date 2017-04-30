@@ -22,18 +22,39 @@ function manager:Init()
     local selectdb = "use game;"
     table.insert(tables,selectdb)    
 
+
+    local register_log = [[
+                                CREATE TABLE IF NOT EXISTS register_log (
+                                id INT NOT NULL AUTO_INCREMENT,
+                                server_id INT NOT NULL,
+                                user_id   VARCHAR(16) NOT NULL,
+                                account   VARCHAR(32) NOT NULL, 
+                                ip  VARCHAR(16) NOT NULL,  
+                                platform  VARCHAR(16) DEFAULT '', 
+                                channel   VARCHAR(16) DEFAULT '',  
+                                net_mode   VARCHAR(16) DEFAULT '',
+                                device_id VARCHAR(32) DEFAULT '',
+                                device_type VARCHAR(32) DEFAULT '',
+                                time DATETIME, 
+                                PRIMARY KEY (id),
+                                key(user_id,server_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                         ]]
+    table.insert(tables,register_log)
     local login_log = [[
                             CREATE TABLE IF NOT EXISTS `login_log`(
                                     id INT NOT NULL AUTO_INCREMENT,
+                                    server_id INT NOT NULL,
                                     user_id   VARCHAR(16) NOT NULL,
-                                    account   VARCHAR(32) NOT NULL,  
-                                    login_ip  VARCHAR(16) NOT NULL,  
-                                    platform  VARCHAR(16) NOT NULL, 
-                                    channel   VARCHAR(16) NOT NULL,  
-                                    netmode   VARCHAR(16) DEFAULT '',
+                                    account   VARCHAR(32) NOT NULL, 
+                                    ip  VARCHAR(16) NOT NULL,  
+                                    platform  VARCHAR(16) DEFAULT '', 
+                                    channel   VARCHAR(16) DEFAULT '',  
+                                    net_mode   VARCHAR(16) DEFAULT '',
                                     device_id VARCHAR(32) DEFAULT '',
-                                    login_time DATETIME,
-                                    PRIMARY KEY (id)
+                                    device_type VARCHAR(32) DEFAULT '',
+                                    time DATETIME,
+                                    PRIMARY KEY (id),
+                                    KEY(user_id,server_id)
                             )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                       ]]
     table.insert(tables,login_log)
@@ -146,4 +167,6 @@ skynet.start(function()
         })
 
     manager:Init()
+
+    skynet.register(".mysqllog")
 end)

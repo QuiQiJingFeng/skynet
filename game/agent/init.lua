@@ -96,6 +96,16 @@ function CMD.Start(gate,fd,ip,user_id,data)
     local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
     user_info:ResponseClient("login_ret",send_msg)
 
+    local log_msg = {  
+                        user_id = user_id,server_id = data.server_id,
+                        account = data.account,ip = ip,
+                        platform = data.platform,channel = data.channel,
+                        net_mode = data.net_mode,device_id = data.device_id,
+                        device_type = data.device_type,time = "NOW()"
+                    }
+    --登录日志
+    skynet.send(".mysqllog","lua","InsertLog","login_log",log_msg)
+
     return true
 end
 

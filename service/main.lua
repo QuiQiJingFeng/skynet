@@ -14,14 +14,6 @@ skynet.start(function()
     --mysqllog服务
     skynet.newservice("mysqllog")
 
-    skynet.newservice("mysqllog")
-
-    skynet.newservice("mysqllog")
-
-    skynet.newservice("mysqllog")
-
-    skynet.newservice("mysqllog")
-
     skynet.newservice("debug_console",8000)
     
     local game_port = skynet.getenv("game_port")

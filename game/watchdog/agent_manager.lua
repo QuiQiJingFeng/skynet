@@ -53,7 +53,7 @@ function agent_manager:SendToClient(send_msg)
 end
 
 function agent_manager:ProcessLogin(fd,data,ip)
-    local err,user_id = skynet.call(".logind","lua","Login",data)
+    local err,user_id = skynet.call(".logind","lua","Login",data,ip)
     if err then
         send_msg = { session = 0, login_ret = { result = err} }
         self:SendToClient(send_msg)
