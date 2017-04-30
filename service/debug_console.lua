@@ -158,16 +158,7 @@ function COMMAND.help()
         shrtbl = "Show shared short string table info",
         ping = "ping address",
         call = "call address ...",
-        test = "test mysqllog"
     }
-end
-
-function COMMAND.test(...)
-    local arg = {...}
-    for _,service_id in ipairs(arg) do
-        print(service_id)
-        skynet.send(service_id,"lua","TEST")
-    end
 end
 
 function COMMAND.clearcache()

@@ -14,7 +14,7 @@ function manager:Init()
     local tables = {}
     local databases = [[
                             create database if not exists `game`;
-                            create database if not exists `history_log`;
+                            create database if not exists `history`;
                       ]] 
 
     table.insert(tables,databases)
@@ -24,24 +24,28 @@ function manager:Init()
 
     local login_log = [[
                             CREATE TABLE IF NOT EXISTS `login_log`(
+                                    id INT NOT NULL AUTO_INCREMENT,
                                     user_id   VARCHAR(16) NOT NULL,
                                     account   VARCHAR(32) NOT NULL,  
                                     login_ip  VARCHAR(16) NOT NULL,  
                                     platform  VARCHAR(16) NOT NULL, 
                                     channel   VARCHAR(16) NOT NULL,  
-                                    netmode   VARCHAR(16) DEFAULT '', 
+                                    netmode   VARCHAR(16) DEFAULT '',
                                     device_id VARCHAR(32) DEFAULT '',
-                                    login_time DATETIME
+                                    login_time DATETIME,
+                                    PRIMARY KEY (id)
                             )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                       ]]
     table.insert(tables,login_log)
 
     local resource_log = [[
                         CREATE TABLE IF NOT EXISTS `resource_log`(
+                                id              INT NOT NULL AUTO_INCREMENT,
                                 user_id         VARCHAR(16) NOT NULL,
                                 resource_type   VARCHAR(16) NOT NULL,  
                                 count           double DEFAULT 0,
-                                time            DATETIME
+                                time            DATETIME,
+                                PRIMARY KEY (id)
                         )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
                   ]]
     table.insert(tables,resource_log)
@@ -83,7 +87,7 @@ end
 --分表操作
 ---------------------------
 function manager:MinuteTable(origin_name,new_name)
-    new_name = "history_log."..new_name
+    new_name = "history."..new_name
     local createnewtable = string.format("create table if not exists %s like %s;",new_name,origin_name)
     local locktable = "LOCK TABLES "..origin_name.." WRITE,"..new_name.." WRITE;"
     local renametable = string.format("INSERT INTO %s SELECT * FROM %s;",new_name,origin_name)
@@ -118,33 +122,10 @@ function CMD.InsertLog(log_name,data,is_quote)
      local ret = manager:DoQuery(sql)
      --大于100W进行分表  如果没有自增的ID的话 insert_id始终为0,所以如果需要自动分表,则必须有自增的ID
      if ret.insert_id ~= 0 and ret.insert_id % MINUTE_NUM == 0 then 
-        local new_name = log_name..os.date("%Y_%m_%d_H_M",math.ceil(skynet.time()));
+        local new_name = log_name..os.date("%Y_%m_%d_%H_%M_%S",math.ceil(skynet.time()));
         --按日期分表
         manager:MinuteTable(log_name,new_name)
      end
-end
-
-function CMD.TEST()
-    print("test====================")
-
-     local function CreateUserId(max_id,server_id)
-        local user_id = tonumber(string.format("%d%07d", server_id, max_id))
-        return user_id
-    end
-
-    local res = {"GOLD","BLOOD","RUNE","MAGIC","EXP","VIP","MAGIC_CORE"}
-    local data = {}
-    for i=1,10000000 do
-        data.user_id = CreateUserId(i,1)
-        local idx = math.ceil(math.random(1,7))
-        data.resource_type = res[idx]
-        local num = math.ceil(math.random(0,100000))
-        data.count = num
-        data.time = "NOW()"
-
-        CMD.InsertLog("resource_log",data)
-    end
-    print("test1====================end")
 end
 
 skynet.start(function()
