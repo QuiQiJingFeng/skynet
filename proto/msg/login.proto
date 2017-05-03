@@ -34,6 +34,11 @@ message LoginRet {
     optional int32 time_zone = 5;           //时区
 }
 
+enum ReconnectResult {
+    success = 0;            //成功
+    reconnect_failure = 1;       //重连失败
+}
+
 //-------------------
 //      重连 
 //-------------------
@@ -43,7 +48,7 @@ message Reconnect {
 }
 
 message ReconnectRet {
-    required Result result = 1;             //重连结果
+    required ReconnectResult result = 1;             //重连结果
     optional uint32 server_time = 2;        //服务器时间
     optional int32 time_zone = 3;           //时区
 }
