@@ -87,6 +87,7 @@ skynet.register_protocol( {
 
 --玩家第一次登录
 function CMD.Start(gate,fd,ip,user_id,data)
+    print("--------------------------------")
     --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
     

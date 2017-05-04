@@ -1,0 +1,194 @@
+{
+  "nested": {
+    "C2GS": {
+      "fields": {
+        "login": {
+          "type": "msg.login.Login",
+          "id": 3
+        },
+        "logout": {
+          "type": "msg.login.Logout",
+          "id": 4
+        },
+        "reconnect": {
+          "type": "msg.login.Reconnect",
+          "id": 5
+        }
+      }
+    },
+    "GS2C": {
+      "fields": {
+        "loginRet": {
+          "type": "msg.login.LoginRet",
+          "id": 3
+        },
+        "logoutRet": {
+          "type": "msg.login.LogoutRet",
+          "id": 4
+        },
+        "reconnectRet": {
+          "type": "msg.login.ReconnectRet",
+          "id": 5
+        }
+      }
+    },
+    "msg": {
+      "nested": {
+        "login": {
+          "nested": {
+            "LoginResult": {
+              "values": {
+                "success": 0,
+                "auth_failure": 1,
+                "invalid_pwd": 2,
+                "account_not_exist": 3,
+                "error_pwd": 4,
+                "version_too_low": 5,
+                "server_is_busy": 6
+              }
+            },
+            "Login": {
+              "fields": {
+                "account": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 1
+                },
+                "password": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 2
+                },
+                "platform": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 3
+                },
+                "version": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 4
+                },
+                "serverId": {
+                  "rule": "required",
+                  "type": "int32",
+                  "id": 5
+                },
+                "deviceId": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 6
+                },
+                "deviceType": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 7
+                },
+                "channel": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 8
+                },
+                "locale": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 9
+                },
+                "netMode": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 10
+                },
+                "devicePlatform": {
+                  "rule": "required",
+                  "type": "int32",
+                  "id": 11
+                }
+              }
+            },
+            "LoginRet": {
+              "fields": {
+                "result": {
+                  "rule": "required",
+                  "type": "LoginResult",
+                  "id": 1
+                },
+                "serverTime": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "userId": {
+                  "type": "string",
+                  "id": 3
+                },
+                "reconnectToken": {
+                  "type": "string",
+                  "id": 4
+                },
+                "timeZone": {
+                  "type": "int32",
+                  "id": 5
+                }
+              }
+            },
+            "ReconnectResult": {
+              "values": {
+                "success": 0,
+                "reconnect_failure": 1
+              }
+            },
+            "Reconnect": {
+              "fields": {
+                "userId": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 1
+                },
+                "reconnectToken": {
+                  "rule": "required",
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            },
+            "ReconnectRet": {
+              "fields": {
+                "result": {
+                  "rule": "required",
+                  "type": "ReconnectResult",
+                  "id": 1
+                },
+                "serverTime": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "timeZone": {
+                  "type": "int32",
+                  "id": 3
+                }
+              }
+            },
+            "Reason": {
+              "values": {
+                "success": 0,
+                "repeated_login": 1
+              }
+            },
+            "Logout": {
+              "fields": {}
+            },
+            "LogoutRet": {
+              "fields": {
+                "reason": {
+                  "rule": "required",
+                  "type": "Reason",
+                  "id": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
