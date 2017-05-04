@@ -1,5 +1,5 @@
 include platform.mk
-#?= 是如果没有被赋值过就赋予等号后面的值
+
 LUA_CLIB_PATH ?= luaclib
 CSERVICE_PATH ?= cservice
 
@@ -9,7 +9,7 @@ CFLAGS = -g -O2 -Wall -I$(LUA_INC) $(MYCFLAGS)
 # CFLAGS += -DUSE_PTHREAD_LOCK
 
 # lua
-#:= 是覆盖之前的值
+
 LUA_STATICLIB := 3rd/lua/liblua.a
 LUA_LIB ?= $(LUA_STATICLIB)
 LUA_INC ?= 3rd/lua
@@ -48,7 +48,7 @@ CSERVICE = snlua logger gate harbor
 LUA_CLIB = skynet socketdriver bson mongo md5 netpack websocketnetpack \
   clientsocket clientwebsocket memory profile multicast \
   cluster crypt sharedata stm sproto lpeg \
-  mysqlaux debugchannel protobuf
+  mysqlaux debugchannel
 
 SKYNET_SRC = skynet_main.c skynet_handle.c skynet_module.c skynet_mq.c \
   skynet_server.c skynet_start.c skynet_timer.c skynet_error.c \
@@ -95,7 +95,7 @@ $(LUA_CLIB_PATH)/netpack.so : lualib-src/lua-netpack.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -Iskynet-src -o $@ 
 
 $(LUA_CLIB_PATH)/websocketnetpack.so : lualib-src/lua-websocketnetpack.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) $^ -Iskynet-src -o $@
+	$(CC) $(CFLAGS) $(SHARED) $^ -Iskynet-src -o $@ 
 
 $(LUA_CLIB_PATH)/clientsocket.so : lualib-src/lua-clientsocket.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) $^ -o $@ -lpthread
@@ -136,30 +136,12 @@ $(LUA_CLIB_PATH)/mysqlaux.so : lualib-src/lua-mysqlaux.c | $(LUA_CLIB_PATH)
 $(LUA_CLIB_PATH)/debugchannel.so : lualib-src/lua-debugchannel.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -Iskynet-src $^ -o $@	
 
-PROTOBUFSRC = \
-  3rd/pbc/context.c \
-  3rd/pbc/varint.c \
-  3rd/pbc/array.c \
-  3rd/pbc/pattern.c \
-  3rd/pbc/register.c \
-  3rd/pbc/proto.c \
-  3rd/pbc/map.c \
-  3rd/pbc/alloc.c \
-  3rd/pbc/rmessage.c \
-  3rd/pbc/wmessage.c \
-  3rd/pbc/bootstrap.c \
-  3rd/pbc/stringpool.c \
-  3rd/pbc/decode.c
-
-$(LUA_CLIB_PATH)/protobuf.so : $(PROTOBUFSRC) 3rd/pbc/pbc-lua.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) -I3rd/pbc $^ -o $@	
-
 clean :
 	rm -f $(SKYNET_BUILD_PATH)/skynet $(CSERVICE_PATH)/*.so $(LUA_CLIB_PATH)/*.so
 
 cleanall: clean
 ifneq (,$(wildcard 3rd/jemalloc/Makefile))
-	cd 3rd/jemalloc && $(MAKE) clean && rm Makefile
+	cd 3rd/jemalloc && $(MAKE) clean
 endif
 	cd 3rd/lua && $(MAKE) clean
 	rm -f $(LUA_STATICLIB)
