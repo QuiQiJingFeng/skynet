@@ -1,7 +1,6 @@
 local skynet = require "skynet"
 local protobuf = require "protobuf"
-local webnetpack = require "websocketnetpack"
-local netpack = require "netpack"
+local netpack = require "websocketnetpack"
 local socket = require "socket"
 local cls = require "skynet.queue"
 local sharedata = require "sharedata"
@@ -65,7 +64,6 @@ skynet.register_protocol( {
 
         if msg_name == "heart_beat" then
             local buff, sz = netpack.pack(protobuf.encode("GS2C", {session = user_info.session_id, heart_beat_ret = {}}))
-            buff, sz = webnetpack.pack(buff,sz)
             socket.write(user_info.client_fd, buff, sz)
             return
         end  

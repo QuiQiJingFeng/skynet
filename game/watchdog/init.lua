@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 require "skynet.manager"    -- import skynet.register
-local netpack = require "netpack"
+local netpack = require "websocketnetpack"
 local sharedata = require "sharedata"
 local protobuf = require "protobuf"
 local agent_manager = require "agent_manager"
@@ -16,6 +16,7 @@ function SOCKET.open(fd, ipaddr)
 end
 
 function SOCKET.close(fd)
+	print("SOCKET CLOSE")
     agent_manager:SetExpireTime(fd)
 end
 
@@ -55,6 +56,4 @@ skynet.start(function()
     protobuf.register_file(skynet.getenv("protobuf"))
     gate = skynet.newservice("gate")
     agent_manager:Init(gate)
-
-    skynet.register(".watchdog")
 end)
