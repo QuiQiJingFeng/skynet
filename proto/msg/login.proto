@@ -1,6 +1,6 @@
 package msg.login;
 
-enum LoginResult {
+enum Result {
     success = 0;            //成功
     auth_failure = 1;       //登录失败
     invalid_pwd = 2;        //密码无效
@@ -8,6 +8,8 @@ enum LoginResult {
     error_pwd = 4;          //密码不正确
     version_too_low = 5;    //当前版本太低,请升级版本
     server_is_busy = 6;     //系统繁忙
+    reconnect_failure = 7;  //重连失败
+    repeated_login = 8;     //重复登录
 }
 //-------------------
 //      登录        
@@ -23,20 +25,15 @@ message Login {
     required string channel = 8;            //登录渠道  gamecenter/facebook/google/weichat...
     required string locale = 9;             //当前语言类型
     required string net_mode = 10;           //网络状态 2G/3G/WIFI
-    required int32 device_platform = 11;    //设备平台 ios/android
+    required string device_platform = 11;    //设备平台 ios/android
 }
 
 message LoginRet {
-    required LoginResult result = 1;             //登录结果
+    required Result result = 1;             //登录结果
     optional uint32 server_time = 2;        //服务器时间
     optional string user_id = 3;            //用户ID
     optional string reconnect_token = 4;    //重连token
     optional int32 time_zone = 5;           //时区
-}
-
-enum ReconnectResult {
-    success = 0;            //成功
-    reconnect_failure = 1;       //重连失败
 }
 
 //-------------------
@@ -48,7 +45,7 @@ message Reconnect {
 }
 
 message ReconnectRet {
-    required ReconnectResult result = 1;             //重连结果
+    required Result result = 1;             //重连结果
     optional uint32 server_time = 2;        //服务器时间
     optional int32 time_zone = 3;           //时区
 }
@@ -56,14 +53,10 @@ message ReconnectRet {
 //-------------------
 //      登出
 //-------------------
-enum Reason {
-    success = 0;        //成功
-    repeated_login = 1; //重复登录
-}
 message Logout {
 }
 
 message LogoutRet {
-    required Reason reason = 1;
+    required Result reason = 1;
 }
 

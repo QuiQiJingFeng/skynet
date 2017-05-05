@@ -33,7 +33,6 @@ function SOCKET.warning(fd, size)
 end
 
 function SOCKET.data(fd, msg)
-	print("SOCKET DATA",msg)
     if not agent_manager:OnReceiveData(fd, msg,ipaddrs[fd]) then
         skynet.call(gate, "lua", "kick", fd)
     end

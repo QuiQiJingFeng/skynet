@@ -22,16 +22,14 @@ end
 function CMD.Login(data,ip)
     local err = nil
     -----登录校验------------
-    
 
     -----登录校验完毕---------
-    
     local server_id = data.server_id
     local user_key = data.platform .. ":" .. data.account
     local user_id = account_redis:hget(user_key, server_id)
 
     if not user_id then
-        user_id = CreateUserId()
+        user_id = CreateUserId(server_id)
         if not user_id then
             return user_id
         end

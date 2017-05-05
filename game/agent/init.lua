@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local protobuf = require "protobuf"
+local webnetpack = require "websocketnetpack"
 local netpack = require "netpack"
 local socket = require "socket"
 local cls = require "skynet.queue"
@@ -64,6 +65,7 @@ skynet.register_protocol( {
 
         if msg_name == "heart_beat" then
             local buff, sz = netpack.pack(protobuf.encode("GS2C", {session = user_info.session_id, heart_beat_ret = {}}))
+            buff, sz = webnetpack.pack(buff,sz)
             socket.write(user_info.client_fd, buff, sz)
             return
         end  
@@ -87,7 +89,6 @@ skynet.register_protocol( {
 
 --玩家第一次登录
 function CMD.Start(gate,fd,ip,user_id,data)
-    print("--------------------------------")
     --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
     

@@ -85,8 +85,8 @@ local function checkwebsocket_valid(header, check_origin, check_origin_ok)
 
     local protocol = header["sec-websocket-protocol"] 
     if protocol then
-        --local i = protocol:find(",", 1, true)
-        --protocol = "Sec-WebSocket-Protocol: " .. protocol:sub(1, i or i-1)
+        local i = protocol:find(",", 1, true)
+        protocol = "Sec-WebSocket-Protocol: " .. protocol:sub(1, i or i-1)
     end
 
     return nil, getwebsocket_response(key, protocol)

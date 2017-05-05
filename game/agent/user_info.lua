@@ -1,6 +1,8 @@
 local socket = require "socket"
+local webnetpack = require "websocketnetpack"
 local netpack = require "netpack"
 local skynet = require "skynet"
+
 local protobuf = require "protobuf"
 local sharedata = require "sharedata"
 local redis = require "redis"
@@ -84,11 +86,13 @@ function user_info:ResponseClient(msg_name, content)
     if self.client_fd == -1 then
         return 
     end
-    self.session_id = self.session_id + 1
-    local send_msg = { session = self.session_id }
+    local send_msg = {}
     send_msg[msg_name] = content
-    local buff, sz = netpack.pack(protobuf.encode("GS2C", send_msg))
-    socket.write(self.client_fd, buff, sz)
+    --需要先用netpack添加包头
+    local buff, size = netpack.pack(protobuf.encode("GS2C", send_msg))
+    --再用webnetpack 添加frame 这样才能最终被websocket识别
+    buff, size = webnetpack.pack(buff,size)
+    local ret = socket.write(self.client_fd,buff, size)
 end
 
 return user_info
