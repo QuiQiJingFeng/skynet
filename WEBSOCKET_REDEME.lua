@@ -1,0 +1,7 @@
+总结:
+websocket 模块
+
+gateserver中添加了websocket握手协议的处理
+netpacakge中添加了websocket的打包处理(因为websocket的打包跟框架自带的打包机制不一样,但本质上都是添加一个头部来确认包体的长度，解决TCP粘包、断包问题)
+
+其他的都跟原来框架中一样了
