@@ -35,7 +35,7 @@ function agent_manager:ProcessData(msg)
         skynet.error("decode error ==> agent_manager:ProcessData")
         return false
     elseif not msg_data then
-        skynet.error(pbc_error)
+        skynet.error("msg_data=>",pbc_error)
         return false
     end
 

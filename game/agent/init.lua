@@ -42,7 +42,7 @@ skynet.register_protocol( {
     dispatch = function (_, _, msg, pbc_error)
 
         if pbc_error or not msg then
-            print(pbc_error)
+            skynet.error("pbc_error=>",pbc_error)
             return
         end
 
@@ -69,15 +69,14 @@ skynet.register_protocol( {
         end  
 
         local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, data)
-        print("succ, proto, send_msg =>",succ, proto, send_msg)
         if succ and proto then
             local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg)
             if not succ then
-                skynet.error(err)
+                skynet.error("response msg error:",err)
                 user_info:ResponseClient("error_ret", {})
             end
         elseif proto then
-            skynet.error(user_info.user_id)
+            skynet.error("process msg error:",user_info.user_id)
             skynet.error(proto)
             user_info:ResponseClient("error_ret", {})
         end
@@ -121,9 +120,7 @@ end
 function CMD.Save()
     local succ, ret = queue(user_info.Save,user_info)
     if not succ then
-        skynet.error(ret)
-    elseif ret == false then
-        succ = false
+        skynet.error("save error")
     end
 
     return succ
