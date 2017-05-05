@@ -17,8 +17,8 @@ end
 function agent_pool:CreateAgent()
     local service_id = skynet.newservice("agent")
     local agent = {}
+    agent.service_id = -1
     function agent:Reset()
-        self.service_id = -1
         self.fd = -1
         self.user_id = ""
         --下一次保存的时间点
