@@ -4,6 +4,7 @@ local redis = require "redis"
 local sharedata = require "sharedata"
 local utils = require "utils"
 local httpc = require "http.httpc"
+local cjson = require "cjson"
 local account_redis
 
 local MAX_USER_ID = 4967000
@@ -22,9 +23,10 @@ local function Check(account,password)
     if not success or status ~= 200 then
         return false
     end
-    -- body = utils:decode(body)
+
+    body = cjson.decode(body)
+    body = cjson.decode(body)
     if body.result == "success" then
-        print("success")
         return true
     end
 
@@ -45,7 +47,6 @@ function CMD.Login(data,ip)
     local result = "success"
     local user_id
     -----登录校验------------
-    print("FYD-=---->>>>登录校验")
     local success = Check(data.account,data.password);
     if not success then
         result = "auth_failure"
