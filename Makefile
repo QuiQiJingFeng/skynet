@@ -19,7 +19,7 @@ $(LUA_STATICLIB) :
 
 #添加cjson库
 cjson :
-	cd 3rd/cjson && make
+	cd 3rd/cjson && make clean && make
 	mv 3rd/cjson/cjson.so luaclib/
 
 # jemalloc 

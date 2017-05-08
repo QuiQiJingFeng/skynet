@@ -25,7 +25,6 @@ local function Check(account,password)
     end
 
     body = cjson.decode(body)
-    body = cjson.decode(body)
     if body.result == "success" then
         return true
     end
