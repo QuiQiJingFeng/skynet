@@ -7,8 +7,8 @@ local FUNCTION = {}
 local function CreateMsgFilesConfig()
     local files = io.popen('ls game/agent/msg') 
     local fileLists = files:read("*all")
-    fileLists = utils:replaceStr(fileLists,".lua","")
-    local msg_files = utils:split(fileLists,"\n")
+    fileLists = utils.replaceStr(fileLists,".lua","")
+    local msg_files = utils.split(fileLists,"\n")
     table.remove(msg_files,#msg_files)
     return msg_files
 end

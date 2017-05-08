@@ -3,7 +3,7 @@ local utils = require "utils"
 local user_info = require "user_info"
 local user = {}
 function user:Init()
-    event_dispatcher:RegisterEvent("log_out",utils:handler(self,self.Logout)) 
+    event_dispatcher:RegisterEvent("log_out",utils.handler(self,self.Logout)) 
 end
 
 function user:Logout(recv_msg)

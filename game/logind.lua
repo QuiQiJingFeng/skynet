@@ -38,7 +38,7 @@ local function CreateUserId(server_id)
         return nil
     end
     local user_id = tonumber(string.format("%d%07d", server_id, max_id))
-    return utils:convertTo32(user_id)
+    return utils.convertTo32(user_id)
 end
 
 --登录，如果账户不存在则新建一个
