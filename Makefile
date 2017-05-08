@@ -17,6 +17,11 @@ LUA_INC ?= 3rd/lua
 $(LUA_STATICLIB) :
 	cd 3rd/lua && $(MAKE) CC='$(CC) -std=gnu99' $(PLAT)
 
+#添加cjson库
+cjson :
+	cd 3rd/cjson && make
+	mv 3rd/cjson/cjson.so luaclib/
+
 # jemalloc 
 
 JEMALLOC_STATICLIB := 3rd/jemalloc/lib/libjemalloc_pic.a
