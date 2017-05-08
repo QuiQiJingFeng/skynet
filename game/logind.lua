@@ -3,11 +3,33 @@ require "skynet.manager"    -- import skynet.register
 local redis = require "redis"
 local sharedata = require "sharedata"
 local utils = require "utils"
+local httpc = require "http.httpc"
 local account_redis
 
 local MAX_USER_ID = 4967000
 
 local CMD = {}
+
+local function Check(account,password)
+    local content = {
+        ["action"] = "login",
+        ["account"] = account,
+        ["password"] = password
+    }
+    local recvheader = {}
+    local check_server = "127.0.0.1:3000"
+    local success, status, body = pcall(httpc.post, check_server, "/login", content, recvheader)
+    if not success or status ~= 200 then
+        return false
+    end
+    -- body = utils:decode(body)
+    if body.result == "success" then
+        print("success")
+        return true
+    end
+
+    return false
+end
 
 local function CreateUserId(server_id)
     local max_id = account_redis:incrby("user_id_generator", 1)
@@ -20,18 +42,26 @@ end
 
 --登录，如果账户不存在则新建一个
 function CMD.Login(data,ip)
-    local err = nil
+    local result = "success"
+    local user_id
     -----登录校验------------
+    print("FYD-=---->>>>登录校验")
+    local success = Check(data.account,data.password);
+    if not success then
+        result = "auth_failure"
+        return result,user_id
+    end
 
     -----登录校验完毕---------
     local server_id = data.server_id
     local user_key = data.platform .. ":" .. data.account
-    local user_id = account_redis:hget(user_key, server_id)
+    user_id = account_redis:hget(user_key, server_id)
 
     if not user_id then
         user_id = CreateUserId(server_id)
         if not user_id then
-            return user_id
+            result = "overload_max_id"
+            return result,user_id
         end
         account_redis:hset(user_key, server_id, user_id)
 
@@ -45,7 +75,7 @@ function CMD.Login(data,ip)
         --注册日志
         skynet.send(".mysqllog","lua","InsertLog","register_log",register_msg)
     end
-    return err,user_id
+    return result,user_id
 end 
 
 skynet.start(function()

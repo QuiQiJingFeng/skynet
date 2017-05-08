@@ -1,6 +1,8 @@
 local skynet = require "skynet"
 local protobuf = require "protobuf"
 local agent_pool = require "agent_pool"
+local netpack = require "websocketnetpack"
+local socket = require "socket"
 local AGENT_POLL_TIME = 60  --每60s调度一次
 local AGENT_EXPIRE_TIME = 30*60 --当玩家退出后,保留agent 30 分钟
 local AGENT_SAVE_TIME = 10*60   --玩家数据 每10分钟保存一次
@@ -47,16 +49,16 @@ function agent_manager:ProcessData(msg)
     return msg_data
 end 
 
-function agent_manager:SendToClient(send_msg)
+function agent_manager:SendToClient(fd,send_msg)
     local buff, sz = netpack.pack(protobuf.encode("GS2C", send_msg))
     socket.write(fd, buff, sz)
 end
 
 function agent_manager:ProcessLogin(fd,data,ip)
-    local err,user_id = skynet.call(".logind","lua","Login",data,ip)
-    if err then
-        send_msg = { session = 0, login_ret = { result = err} }
-        self:SendToClient(send_msg)
+    local result,user_id = skynet.call(".logind","lua","Login",data,ip)
+    if result ~= "success" then
+        send_msg = {login_ret = { result = result} }
+        self:SendToClient(fd,send_msg)
         return true
     end 
     assert(user_id)
