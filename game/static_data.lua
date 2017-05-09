@@ -2,6 +2,8 @@ local skynet = require "skynet"
 require "skynet.manager"    -- import skynet.register
 local sharedata = require "sharedata"
 local utils = require "utils"
+local csv = require "csv"
+
 local FUNCTION = {}
 
 local function CreateMsgFilesConfig()
@@ -13,11 +15,39 @@ local function CreateMsgFilesConfig()
     return msg_files
 end
 
+local function CreateResourceConfig()
+    local file = csv.load("data/resource.csv")
+    local config = {}
+    local num = 0
+    for ID,data in ipairs(file) do
+        local temp = {}
+        for k,v in pairs(data) do
+            if k == "ID" or k == "key" then
+                temp[k] = v
+            end
+        end
+        config[data.key] = temp 
+        num = num + 1
+    end
+    config.length = num
+
+    return config
+end
+
+local function LoadDefaultConfig()
+    --事件中心配置
+    sharedata.update("msg_files_config", CreateMsgFilesConfig())
+    --资源
+    sharedata.update("resource_config", CreateResourceConfig())
+    
+end
 
 --热更
 function FUNCTION.UpdateConfig(name)
     if name == "msg_files" then
         sharedata.update("msg_files", CreateMsgFilesConfig())
+    elseif name == "resource_config" then
+        sharedata.update("resource_config", CreateResourceConfig())
     end
 end 
 
@@ -54,10 +84,7 @@ skynet.start(function()
         max_packet_size = 1024 * 1024
     })
 
-
-    --事件中心配置
-    
-    sharedata.update("msg_files", CreateMsgFilesConfig())
+    LoadDefaultConfig()
 
 
     skynet.dispatch("lua", function(session, source, cmd, ...)

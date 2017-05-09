@@ -172,6 +172,6 @@ skynet.start(function()
     config_manager:Init()
 
     event_dispatcher = require "event_dispatcher"
-    event_dispatcher:Init(config_manager.msg_files)
+    event_dispatcher:Init(config_manager.msg_files_config)
 
 end)
