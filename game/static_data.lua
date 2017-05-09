@@ -28,21 +28,11 @@ end
 local function CreateResourceConfig()
     local file = csv.load("data/resource.csv")
     local config = {}
-    local num = 0
     for ID,data in ipairs(file) do
-        local temp = {}
-        for k,v in pairs(data) do
-            if k == "ID" or k == "key" then
-                temp[k] = v
-            end
-        end
-        config[data.key] = temp 
-        num = num + 1
+        config[data.key] = data 
     end
-    config.length = num
 
     return config
-
 end
 
 local function CreateConstantConfig()

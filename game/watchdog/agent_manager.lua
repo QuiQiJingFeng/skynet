@@ -6,9 +6,9 @@ local socket = require "socket"
 local sharedata = require "sharedata"
 local utils = require "utils"
 
-local AGENT_POLL_TIME = 60  --每60s调度一次
-local AGENT_EXPIRE_TIME = 30*60 --当玩家退出后,保留agent 30 分钟
-local AGENT_SAVE_TIME = 10*60   --玩家数据 每10分钟保存一次
+local AGENT_POLL_TIME = 10  --每60s调度一次
+local AGENT_EXPIRE_TIME = 0.3*60 --当玩家退出后,保留agent 30 分钟
+local AGENT_SAVE_TIME = 0.1*60   --玩家数据 每10分钟保存一次
 local gateserver
 
 local agent_manager = {}

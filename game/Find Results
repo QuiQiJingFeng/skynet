@@ -1,0 +1,36 @@
+Searching 11 files for "utils:" (case sensitive)
+
+/Users/jingfeng/PROJECT/skynet/game/logind.lua:
+   39      end
+   40      local user_id = tonumber(string.format("%d%07d", server_id, max_id))
+   41:     return utils:convertTo32(user_id)
+   42  end
+   43  
+
+/Users/jingfeng/PROJECT/skynet/game/static_data.lua:
+    8      local files = io.popen('ls game/agent/msg') 
+    9      local fileLists = files:read("*all")
+   10:     fileLists = utils:replaceStr(fileLists,".lua","")
+   11:     local msg_files = utils:split(fileLists,"\n")
+   12      table.remove(msg_files,#msg_files)
+   13      return msg_files
+
+3 matches across 2 files
+
+
+Searching 11 files for "utils:" (case sensitive)
+
+/Users/jingfeng/PROJECT/skynet/game/static_data.lua:
+    8      local files = io.popen('ls game/agent/msg') 
+    9      local fileLists = files:read("*all")
+   10:     fileLists = utils:replaceStr(fileLists,".lua","")
+   11:     local msg_files = utils:split(fileLists,"\n")
+   12      table.remove(msg_files,#msg_files)
+   13      return msg_files
+
+2 matches in 1 file
+
+
+Searching 11 files for "utils:" (case sensitive)
+
+0 matches

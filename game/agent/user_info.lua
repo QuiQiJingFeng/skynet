@@ -4,24 +4,30 @@ local skynet = require "skynet"
 local protobuf = require "protobuf"
 local sharedata = require "sharedata"
 local config_manager = require "config_manager"
-local math_ceil = math.ceil
-
+local redis = require "redis"
 local user_info = {}
 
 function user_info:Init(user_id,server_id,channel,locale,client_fd, client_ip)
+    self.user_id = user_id
+    self.server_id = server_id
+    self.channel = channel
+    self.locale = locale
 
     self.client_fd = client_fd
     self.client_ip = client_ip
 
+    local config = sharedata.query("user_redis_conf")
+    local db = redis.connect(config)
+    local user_info_key = "info:"..self.user_id
     --初始化逻辑处理模块
     self.logic_modules = {}
     for _,file_name in ipairs(config_manager.logic_files_config) do
         local module = require("logic/"..file_name)
-        module:Init()
+        module:Init(db,user_info_key)
         self.logic_modules[file_name] = module
     end
+    db:disconnect()
 
-    self.logic_modules["user_center"]:SetLoginInfo(user_id,server_id,channel,locale)
 end
 
 -------------------------
@@ -30,9 +36,15 @@ end
 --
 --------------------------
 function user_info:Save()
+    local user_info_key = "info:"..self.user_id
+    local config = sharedata.query("user_redis_conf")
+    local db = redis.connect(config)
+    db:multi()
     for _,module in pairs(self.logic_modules) do
-        module:Save()
+        module:Save(db,user_info_key)
     end
+    db:exec()
+    db:disconnect()
 end
 
 --重用agent的时候需要重置lua vm中的用户数据
