@@ -4,6 +4,7 @@ local agent_pool = require "agent_pool"
 local netpack = require "websocketnetpack"
 local socket = require "socket"
 local sharedata = require "sharedata"
+local utils = require "utils"
 
 local AGENT_POLL_TIME = 60  --每60s调度一次
 local AGENT_EXPIRE_TIME = 30*60 --当玩家退出后,保留agent 30 分钟

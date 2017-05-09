@@ -40,12 +40,19 @@ function utils.split(str, delimiter)
 end
 --比较版本号
 function utils.greaterVersion(version1,version2)
-    local temp = self.split(version1,'.')
-    version1 = temp[1] * 1000 + temp[2] * 100 + temp[3] 
-    temp = self.split(version2)
-    version2 = temp[1] * 1000 + temp[2] * 100 + temp[3] 
+    local a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
+    local v1 = a* 1000 + b*100 + c
+    a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
+    local v2 = a* 1000 + b*100 + c
     return version1 >= version2
 end
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7
+function utils.getWDay(time)
+    local num = tonumber(os.date("%w",time))
+    num = (num == 0) and 7 or num
+    return num
+end
+
 
 function utils.handler(obj, method)
     return function(...)
@@ -70,7 +77,7 @@ end
 --删除数组中指定的元素
 ---------------------------
 function utils.remove(array,item)
-    local index=self:indexOf(array,item);
+    local index=utils:indexOf(array,item);
     if (index>=1) then
         table.remove(array,index);
         return true

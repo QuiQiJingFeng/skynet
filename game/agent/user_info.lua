@@ -3,7 +3,6 @@ local netpack = require "websocketnetpack"
 local skynet = require "skynet"
 local protobuf = require "protobuf"
 local sharedata = require "sharedata"
-local redis = require "redis"
 local config_manager = require "config_manager"
 local math_ceil = math.ceil
 
@@ -17,13 +16,12 @@ function user_info:Init(user_id,server_id,channel,locale,client_fd, client_ip)
     --初始化逻辑处理模块
     self.logic_modules = {}
     for _,file_name in ipairs(config_manager.logic_files_config) do
-        local module = require("msg/"..file_name)
+        local module = require("logic/"..file_name)
         module:Init()
-        local key = string.sub(file_name,1,-5)  
-        self.logic_modouls[key] = module
+        self.logic_modules[file_name] = module
     end
 
-    self.logic_modouls["user_center"]:SetLoginInfo(user_id,server_id,channel,locale)
+    self.logic_modules["user_center"]:SetLoginInfo(user_id,server_id,channel,locale)
 end
 
 -------------------------
@@ -35,7 +33,6 @@ function user_info:Save()
     for _,module in pairs(self.logic_modules) do
         module:Save()
     end
-    return true
 end
 
 --重用agent的时候需要重置lua vm中的用户数据
