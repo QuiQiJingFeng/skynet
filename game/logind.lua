@@ -42,40 +42,31 @@ local function CreateUserId(server_id)
 end
 
 --登录，如果账户不存在则新建一个
-function CMD.Login(data,ip)
+function CMD.Login(data)
     local result = "success"
-    local user_id
+    
     -----登录校验------------
     local success = Check(data.account,data.password);
     if not success then
         result = "auth_failure"
-        return result,user_id
+        return result,nil,nil
     end
 
     -----登录校验完毕---------
     local server_id = data.server_id
     local user_key = data.platform .. ":" .. data.account
-    user_id = account_redis:hget(user_key, server_id)
-
+    local user_id = account_redis:hget(user_key, server_id)
+    local is_new = false
     if not user_id then
         user_id = CreateUserId(server_id)
         if not user_id then
-            result = "overload_max_id"
-            return result,user_id
+            skynet.error("ERROR:USERID_GENERATOR TOP!!!!")
+            assert(user_id)
         end
         account_redis:hset(user_key, server_id, user_id)
-
-        local register_msg = {  
-                                user_id = user_id,server_id = data.server_id,
-                                account = data.account,ip = ip,
-                                platform = data.platform,channel = data.channel,
-                                net_mode = data.net_mode,device_id = data.device_id,
-                                device_type = data.device_type,time = "NOW()"
-                             }
-        --注册日志
-        skynet.send(".mysqllog","lua","InsertLog","register_log",register_msg)
+        is_new = true
     end
-    return result,user_id
+    return result,user_id,is_new
 end 
 
 skynet.start(function()

@@ -89,9 +89,8 @@ skynet.register_protocol( {
 function CMD.Start(gate,fd,ip,user_id,data)
     --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
-    
-    --初始化user的数据
-    user_info:Init(user_id,data,fd, ip)
+     
+    user_info:Init(user_id,data.server_id,data.channel,data.locale,fd,ip)
 
     local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
     user_info:ResponseClient("login_ret",send_msg)

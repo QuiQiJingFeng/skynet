@@ -158,6 +158,7 @@ function COMMAND.help()
         shrtbl = "Show shared short string table info",
         ping = "ping address",
         call = "call address ...",
+        updateconfig = "updateconfig ..."
     }
 end
 
@@ -347,4 +348,8 @@ function COMMANDX.call(cmd)
     end
     local rets = table.pack(skynet.call(address, "lua", table.unpack(args, 2, args.n)))
     return rets
+end
+
+function COMMAND.updateconfig(type)
+    skynet.send(".static_data","lua","UpdateConfig",type);
 end

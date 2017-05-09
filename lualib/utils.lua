@@ -38,6 +38,14 @@ function utils.split(str, delimiter)
     end
     return result
 end
+--比较版本号
+function utils.greaterVersion(version1,version2)
+    local temp = self.split(version1,'.')
+    version1 = temp[1] * 1000 + temp[2] * 100 + temp[3] 
+    temp = self.split(version2)
+    version2 = temp[1] * 1000 + temp[2] * 100 + temp[3] 
+    return version1 >= version2
+end
 
 function utils.handler(obj, method)
     return function(...)

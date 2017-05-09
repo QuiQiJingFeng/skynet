@@ -3,6 +3,8 @@ local protobuf = require "protobuf"
 local agent_pool = require "agent_pool"
 local netpack = require "websocketnetpack"
 local socket = require "socket"
+local sharedata = require "sharedata"
+
 local AGENT_POLL_TIME = 60  --每60s调度一次
 local AGENT_EXPIRE_TIME = 30*60 --当玩家退出后,保留agent 30 分钟
 local AGENT_SAVE_TIME = 10*60   --玩家数据 每10分钟保存一次
@@ -55,13 +57,37 @@ function agent_manager:SendToClient(fd,send_msg)
 end
 
 function agent_manager:ProcessLogin(fd,data,ip)
-    local result,user_id = skynet.call(".logind","lua","Login",data,ip)
+    --检查版本号是否过低
+    
+    local limit_version = sharedata.query("constants_config")["LIMIT_VERSION"]
+    local greater = utils.greaterVersion(data.version,limit_version)
+    if not greater then
+        send_msg = {login_ret = { result = "version_too_low"} }
+        self:SendToClient(fd,send_msg)
+        return false
+    end
+    --登录校验
+    local result,user_id,is_new = skynet.call(".logind","lua","Login",data)
     if result ~= "success" then
         send_msg = {login_ret = { result = result} }
         self:SendToClient(fd,send_msg)
         return true
     end 
+
     assert(user_id)
+
+    if is_new then
+        local register_msg = {  
+                        user_id = user_id,server_id = data.server_id,
+                        account = data.account,ip = ip,
+                        platform = data.platform,channel = data.channel,
+                        net_mode = data.net_mode,device_id = data.device_id,
+                        device_type = data.device_type,time = "NOW()"
+                     }
+        --注册日志
+        skynet.send(".mysqllog","lua","InsertLog","register_log",register_msg)
+    end
+
     --检测重复登录
     local agent = self.userid_to_agent[user_id]
     if agent then

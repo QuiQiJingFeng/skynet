@@ -3,6 +3,7 @@ require "skynet.manager"    -- import skynet.register
 local sharedata = require "sharedata"
 local utils = require "utils"
 local csv = require "csv"
+local constants = require "constants"
 
 local FUNCTION = {}
 
@@ -13,6 +14,15 @@ local function CreateMsgFilesConfig()
     local msg_files = utils.split(fileLists,"\n")
     table.remove(msg_files,#msg_files)
     return msg_files
+end
+
+local function CreateLogicFilesConfig()
+    local files = io.popen('ls game/agent/logic')
+    local fileLists = files:read("*all")
+    fileLists = utils.replaceStr(fileLists,".lua","")
+    local msg_files = utils.split(fileLists,"\n")
+    table.remove(msg_files,#msg_files)
+    return msg_files    
 end
 
 local function CreateResourceConfig()
@@ -32,11 +42,25 @@ local function CreateResourceConfig()
     config.length = num
 
     return config
+
+end
+
+local function CreateConstantConfig()
+    local file = io.open("lualib/constants.lua","r")
+    local data = file:read("*a")
+    file:close()
+    return load(data)()
 end
 
 local function LoadDefaultConfig()
     --事件中心配置
     sharedata.update("msg_files_config", CreateMsgFilesConfig())
+    --逻辑中心配置
+    sharedata.update("logic_files_config", CreateLogicFilesConfig())
+    
+    
+    --常量
+    sharedata.update("constants_config", CreateConstantConfig())
     --资源
     sharedata.update("resource_config", CreateResourceConfig())
     
@@ -44,8 +68,8 @@ end
 
 --热更
 function FUNCTION.UpdateConfig(name)
-    if name == "msg_files" then
-        sharedata.update("msg_files", CreateMsgFilesConfig())
+    if name == "constants_config" then
+        sharedata.update("constants_config", CreateConstantConfig())
     elseif name == "resource_config" then
         sharedata.update("resource_config", CreateResourceConfig())
     end
