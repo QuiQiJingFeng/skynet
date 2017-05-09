@@ -12,6 +12,10 @@ local config_manager
 
 local event_dispatcher
 
+local save_flag = false
+local session_processing = false
+
+
 local CMD = {}
 local AGENT_OP = {}
 
@@ -19,9 +23,13 @@ local TIME_ZONE = tonumber(skynet.getenv("time_zone"))
 
 setmetatable(AGENT_OP, {
     __call = function(t, func_name, ...)
-         
+        while save_flag or session_processing do
+            skynet.yield()
+        end
+        session_processing = true
         local func = AGENT_OP[func_name]
-        local succ, ret = queue(func,...)
+        local succ, ret = pcall(func,...)
+        session_processing = false
         --执行错误在此结束协程, 阻止ret返回
         if not succ then
             assert(false)
@@ -46,28 +54,21 @@ skynet.register_protocol( {
             return
         end
 
-        local session
-        local msg_name, data
-
-        for k, v in pairs(msg) do
-            if k == "session" then
-                session = v
-            else
-                msg_name = k
-                data = v
-            end
-        end
-
-        if not msg_name then
-            return
-        end
+        local msg_name, data = next(msg)
 
         if msg_name == "heart_beat" then
-            local buff, sz = netpack.pack(protobuf.encode("GS2C", {session = user_info.session_id, heart_beat_ret = {}}))
+            local buff, sz = netpack.pack(protobuf.encode("GS2C", {heart_beat_ret = {}}))
             socket.write(user_info.client_fd, buff, sz)
             return
         end  
-
+        --客户端接到回应后才能发第二条消息
+        if session_processing then
+            return
+        end
+        session_processing = true
+        while save_flag do
+            skynet.yield()
+        end
         local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, data)
         if succ and proto then
             local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg)
@@ -80,7 +81,7 @@ skynet.register_protocol( {
             skynet.error(proto)
             user_info:ResponseClient("error_ret", {})
         end
-
+        session_processing = false
     end
 })
 
@@ -118,11 +119,20 @@ function CMD.Logout()
 end
 --保存数据
 function CMD.Save()
-    local succ, ret = queue(user_info.Save,user_info)
-    if not succ then
-        skynet.error("save error")
+    if save_flag then
+        return true
     end
-
+    while session_processing do
+        skynet.yield()
+    end
+    save_flag = true
+    local succ, ret = xpcall(user_info.Save, debug.traceback, user_info)
+    if not succ then
+        skynet.error(ret)
+    elseif ret == false then
+        succ = false
+    end
+    save_flag = false
     return succ
 end
 
@@ -133,8 +143,9 @@ end
 --该agent被回收
 function CMD.Close()
     user_info:Close()
-    --gc
+    session_processing = false
     collectgarbage "collect"
+
     return true
 end
 

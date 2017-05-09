@@ -63,7 +63,7 @@ end
 --------------------------
 
 function user_info:Save()
-
+    return true
 end
 
 --玩家登出后设置fd为-1,避免登出后仍向该客户端发送数据
