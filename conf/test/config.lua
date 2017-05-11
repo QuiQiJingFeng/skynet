@@ -25,7 +25,7 @@ maxclient = 8192
 --redis config
 game_redis_host = "127.0.0.1" 
 game_redis_port = 6379
--- game_redis_auth = ""
+game_redis_auth = "aamm77"
 
 -- mysql config
 mysql_ip = "127.0.0.1"

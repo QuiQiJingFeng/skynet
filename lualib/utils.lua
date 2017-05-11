@@ -38,7 +38,11 @@ function utils.split(str, delimiter)
     end
     return result
 end
-
+--[[
+    aa周二分解☺😀
+    ☺=>3个字节emoji
+    😀=>4个字节emoji
+]]
 function utils.checkEmoji(str)
     local has_emoji = false
     for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
