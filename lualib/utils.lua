@@ -38,6 +38,22 @@ function utils.split(str, delimiter)
     end
     return result
 end
+
+function utils.checkEmoji(str)
+    local has_emoji = false
+    for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
+        local len = string.len(uchar)
+        if string.find(v, "[\226][\132-\173]") or string.find(v, "[\227][\128\138]") then
+            has_emoji = true
+            break
+        elseif len >= 4 then
+            has_emoji = true
+            break            
+        end
+    end
+    return has_emoji
+end
+
 --比较版本号
 function utils.greaterVersion(version1,version2)
     local a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
@@ -209,7 +225,7 @@ end
 local CONVERT = { [10] = "A", [11] = "B", [12] = "C", [13] = "D", [14] = "E", [15] = "F", [16] = "G",
 [17] = "H", [18] = "I", [19] = "J", [20] = "K", [21] = "L", [22] = "M", [23] = "N", [24] = "O", [25] = "P",
 [26] = "Q", [27] = "R", [28] = "S", [29] = "T",[30] = "U", [31] = "V",[32] = "W",[33] = "X", [34] = "Y", [35] = "Z" }
-
+--转换成32进制
 function utils.convertTo32(number)
     local unin_id = ""
     local multiple = 0
