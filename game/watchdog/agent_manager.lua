@@ -109,11 +109,6 @@ function agent_manager:ProcessLogin(fd,data,ip)
 
     return true
 end
---TODO
-function agent_manager:ProcessReconnect(data)
-    --断线重连
-end
-
 --客户端消息处理
 function agent_manager:OnReceiveData(fd,msg,ip)
     
@@ -125,11 +120,7 @@ function agent_manager:OnReceiveData(fd,msg,ip)
     local send_msg,user_id
     if recv_data.login then
        return self:ProcessLogin(fd,recv_data.login,ip)
-    elseif recv_data.reconnect then
-        return self:ProcessReconnect(recv_data.reconnect)
     end
-
-    
 
     return true
 end

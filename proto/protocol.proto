@@ -3,11 +3,9 @@ import "msg/login.proto";
 message C2GS {
 	optional msg.login.Login login = 3;						//登录
 	optional msg.login.Logout logout = 4;					//登出					
-	optional msg.login.Reconnect reconnect = 5;				//重连
 }
 
 message GS2C {
 	optional msg.login.LoginRet login_ret = 3;				//登录
 	optional msg.login.LogoutRet logout_ret = 4;			//登出	
-	optional msg.login.ReconnectRet reconnect_ret = 5;		//重连
 }
