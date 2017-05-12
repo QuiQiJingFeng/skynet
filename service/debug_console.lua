@@ -158,7 +158,7 @@ function COMMAND.help()
         shrtbl = "Show shared short string table info",
         ping = "ping address",
         call = "call address ...",
-        updateconfig = "updateconfig ..."
+        UpdateConfig = "UpdateConfig ..."
     }
 end
 
@@ -350,6 +350,15 @@ function COMMANDX.call(cmd)
     return rets
 end
 
-function COMMAND.updateconfig(type)
-    skynet.send(".static_data","lua","UpdateConfig",type);
+function COMMAND.UpdateConfig(type)
+    skynet.send(".static_data","lua","UpdateConfig",type)
+end
+
+function COMMAND.DebugProto(user_id, msg_name, msg_data)
+    local address = skynet.call(".watchdog","lua","GetAgentByUserId",user_id)
+    if not address then
+        return "user not online"
+    else
+        return skynet.call(address, "lua", "DebugProto", msg_name, msg_data)
+    end
 end

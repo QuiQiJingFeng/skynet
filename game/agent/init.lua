@@ -5,7 +5,7 @@ local socket = require "socket"
 local cls = require "skynet.queue"
 local sharedata = require "sharedata"
 local user_info = require "user_info"
-
+local utils = require "utils"
 local queue = cls()
 
 local config_manager
@@ -146,6 +146,26 @@ function CMD.Close()
     collectgarbage "collect"
 
     return true
+end
+
+
+--------------------CUSTOM-------------
+function DebugProtocol(msg_name, data)
+    -- body
+    
+    local table_data = load("return " .. data)
+    local recv_msg = table_data()
+
+    print("-------receive client msg-------\n",msg_name)
+    utils.dump(recv_msg,"-------",10)
+    print("-------proto--receive---end---------")
+
+    local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, recv_msg)
+    print("-------response client msg-------\n",proto)
+    utils.dump(send_msg,"---------",10)
+    print("-------proto--response---end---------")
+
+    return "OK"
 end
 
 skynet.start(function()

@@ -42,6 +42,12 @@ function CMD.start(conf)
     skynet.call(gate, "lua", "open" , conf)
 end
 
+----------CUSTOM-------------
+
+function CMD.GetAgentByUserId(user_id)
+    return agent_manager:GetAgentByUserId(user_id)
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(session, source, cmd, subcmd, ...)
         if cmd == "socket" then
@@ -56,4 +62,5 @@ skynet.start(function()
     protobuf.register_file(skynet.getenv("protobuf"))
     gate = skynet.newservice("gate")
     agent_manager:Init(gate)
+    skynet.register(".watchdog")
 end)

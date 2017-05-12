@@ -159,6 +159,15 @@ function agent_manager:ReclaimAgent(agent)
     agent_pool:Push(agent)
 end
 
+--获取玩家的agent
+function agent_manager:GetAgentByUserId(user_id)
+    local agent = self.userid_to_agent[user_id]
+    if agent then
+        return agent.service_id
+    end
+    return 
+end
+
 --循环检测失效的agent 以及定时agent的数据
 local function SaveTimer()
     skynet.timeout(AGENT_POLL_TIME * 100, SaveTimer)
