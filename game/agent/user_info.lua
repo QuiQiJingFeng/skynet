@@ -22,7 +22,7 @@ function user_info:Init(user_id,server_id,channel,locale,client_fd, client_ip)
     --初始化逻辑处理模块
     self.logic_modules = {}
     for _,file_name in ipairs(config_manager.logic_files_config) do
-        local module = require("logic/"..file_name)
+        local module = require("module/"..file_name)
         module:Init(db,user_info_key)
         self.logic_modules[file_name] = module
     end

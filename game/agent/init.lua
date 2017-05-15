@@ -89,7 +89,7 @@ skynet.register_protocol( {
 function CMD.Start(gate,fd,ip,user_id,data)
     --请求socket=>fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
-     
+    print("FYD=",user_id)
     user_info:Init(user_id,data.server_id,data.channel,data.locale,fd,ip)
 
     local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
@@ -150,20 +150,19 @@ end
 
 
 --------------------CUSTOM-------------
-function DebugProtocol(msg_name, data)
+function AGENT_OP.DebugProto(msg_name, data)
     -- body
     
     local table_data = load("return " .. data)
     local recv_msg = table_data()
 
-    print("-------receive client msg-------\n",msg_name)
-    utils.dump(recv_msg,"-------",10)
-    print("-------proto--receive---end---------")
+    print("-------receive client msg-------",msg_name)
+    utils:dump(recv_msg,"-------",10)
+    print("\n\n")
 
     local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, recv_msg)
-    print("-------response client msg-------\n",proto)
-    utils.dump(send_msg,"---------",10)
-    print("-------proto--response---end---------")
+    print("-------response client msg-------",proto)
+    utils:dump(send_msg,"---------",10)
 
     return "OK"
 end

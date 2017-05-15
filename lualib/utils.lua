@@ -1,33 +1,31 @@
-local skynet = require "skynet"
-local print = skynet.error
 local utils = {} 
 
 --将秒数转换成日期
-function utils.convertToDate(seconds)
+function utils:convertToDate(seconds)
   return os.date("%Y/%m/%d %H:%M:%S",math.ceil(seconds));
 end
 
 --字符串操作相关
-function utils.replaceStr(str,origin,target)
+function utils:replaceStr(str,origin,target)
     return string.gsub(str, origin, target)
 end
 
 --字符串截取  闭区间
-function utils.getSubString(str,startPos,endPos)
+function utils:getSubString(str,startPos,endPos)
     return string.sub(str,startPos,endPos)  
 end
 
 --获取字符串的长度
-function utils.getStrLength(str)
+function utils:getStrLength(str)
   return string.len(str)  -- 获取字符串的长度
 end 
 
 --字符串替换  将字符串中的空格去掉
-function utils.trim(str)
+function utils:trim(str)
     return string.gsub(str," ", "");
 end
 
-function utils.split(str, delimiter)
+function utils:split(str, delimiter)
     if str==nil or str=='' or delimiter==nil then
         return nil
     end
@@ -38,28 +36,85 @@ function utils.split(str, delimiter)
     end
     return result
 end
---[[
-    aa周二分解☺😀
-    ☺=>3个字节emoji
-    😀=>4个字节emoji
-]]
-function utils.checkEmoji(str)
-    local has_emoji = false
+
+---------------------------
+--将字符串分解成一个个字符
+---------------------------
+function utils:strSplit(str)
+    local strList = {}
+
     for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
-        local len = string.len(uchar)
-        if string.find(v, "[\226][\132-\173]") or string.find(v, "[\227][\128\138]") then
-            has_emoji = true
-            break
-        elseif len >= 4 then
-            has_emoji = true
-            break            
+        strList[#strList+1] = uchar;
+    end
+
+    return strList
+end
+
+---------------------------
+--判断是否为中文(emoji不算在中文中)
+---------------------------
+function utils:isChinese(str)
+    for uchar in string.gmatch(str, "[%z\194-\244][\128-\191]*") do
+        return self:checkEmoji(uchar) and true
+    end
+
+    return false
+end
+
+--检查某个字符是否是emoji
+function utils:isEmoji(unicode)
+    --16进制转10进制
+    if unicode >= 0x1F601 and unicode <= 0x1F64F then
+        return true
+    elseif unicode >= 0x2702 and unicode <= 0x27B0 then
+        return true
+    elseif unicode >= 0x1F680 and unicode <= 0x1F6C0 then
+        return true
+    elseif unicode >= 0x1F170 and unicode <= 0x1F251 then
+        return true
+    elseif unicode >= 0x1F600 and unicode <= 0x1F636 then
+        return true
+    elseif unicode >= 0x1F681 and unicode <= 0x1F6C5 then
+        return true
+    elseif unicode >= 0x1F30D and unicode <= 0x1F567 then
+        return true 
+    end
+    return false
+end
+
+--检查字符串中是否包含emoji
+function utils:checkEmoji(str)
+    for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
+        if self:isEmoji(uchar) then
+            return true
         end
     end
-    return has_emoji
+    return false
+end
+
+function utils:utf8to32(utf8str)
+    assert(type(utf8str) == "string")
+    local res, seq, val = {}, 0, nil
+    for i = 1, #utf8str do
+        local c = string.byte(utf8str, i)
+        if seq == 0 then
+            table.insert(res, val)
+            seq = c < 0x80 and 1 or c < 0xE0 and 2 or c < 0xF0 and 3 or
+            c < 0xF8 and 4 or --c < 0xFC and 5 or c < 0xFE and 6 or
+            error("invalid UTF-8 character sequence")
+            val = c & (2^(8-seq) - 1)
+        else
+            val = (val << 6) | (c & 0x3F)
+        end
+        seq = seq - 1
+    end
+    table.insert(res, val)
+    table.insert(res, 0)
+    return res
 end
 
 --比较版本号
-function utils.greaterVersion(version1,version2)
+function utils:greaterVersion(version1,version2)
     local a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
     local v1 = a* 1000 + b*100 + c
     a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
@@ -67,24 +122,41 @@ function utils.greaterVersion(version1,version2)
     return version1 >= version2
 end
 --获取当前是周几  周日返回的是0,所以这里处理下让其返回7
-function utils.getWDay(time)
+function utils:getWDay(time)
     local num = tonumber(os.date("%w",time))
     num = (num == 0) and 7 or num
     return num
 end
 
 
-function utils.handler(obj, method)
+function utils:handler(obj, method)
     return function(...)
         return method(obj, ...)
     end
+end
+
+---------------------------
+--通过一个字段对数组排序，可以指定是否升序。默认为升
+--比如要通过id对数组进行排序  {{id=3},{id=2}}
+---------------------------
+function utils:sortByField(tab,field,isAsc)
+    if(isAsc==nil or isAsc==true) then
+        table.sort(tab,function(v1,v2)
+            return v2[field]>v1[field];
+        end)
+    else
+        table.sort(tab,function(v1,v2)
+            return v2[field]<v1[field];
+        end)
+    end
+    return tab;
 end
 
 --table相关
 ---------------------------
 --查询指定元素在数组中的位置
 ---------------------------
-function utils.indexOf(array,item)
+function utils:indexOf(array,item)
     for key, var in pairs(array) do
         if (var == item) then
             return key;
@@ -96,7 +168,7 @@ end
 ---------------------------
 --删除数组中指定的元素
 ---------------------------
-function utils.remove(array,item)
+function utils:remove(array,item)
     local index=utils:indexOf(array,item);
     if (index>=1) then
         table.remove(array,index);
@@ -108,7 +180,7 @@ end
 ---------------------------
 --获取指定key满足某数据的数组key
 ---------------------------
-function utils.indexOfByKey(array, key, cond)
+function utils:indexOfByKey(array, key, cond)
     for k, var in ipairs(array) do
         if (tostring(var[key]) == tostring(cond)) then
             return k;
@@ -121,7 +193,7 @@ end
 ---------------------------
 --数组合并,返回新的数组
 ---------------------------
-function utils.merge(array1, array2)
+function utils:merge(array1, array2)
     local newList = {};
     if array1 ~= nil then
         for key, var in pairs(array1) do
@@ -139,13 +211,13 @@ end
 ---------------------------
 --给数组的每一项都加一个属性
 ---------------------------
-function utils.tableAddAttr(tab, key, value)
+function utils:tableAddAttr(tab, key, value)
     for _, var in pairs(tab) do
         var[key] = value;
     end
 end
  
-function utils.dump(value, desciption, nesting)
+function utils:dump(value, desciption, nesting)
     local function dump_value_(v)
         if type(v) == "string" then
             v = "\"" .. v .. "\""
@@ -230,7 +302,7 @@ local CONVERT = { [10] = "A", [11] = "B", [12] = "C", [13] = "D", [14] = "E", [1
 [17] = "H", [18] = "I", [19] = "J", [20] = "K", [21] = "L", [22] = "M", [23] = "N", [24] = "O", [25] = "P",
 [26] = "Q", [27] = "R", [28] = "S", [29] = "T",[30] = "U", [31] = "V",[32] = "W",[33] = "X", [34] = "Y", [35] = "Z" }
 --转换成32进制
-function utils.convertTo32(number)
+function utils:convertTo32(number)
     local unin_id = ""
     local multiple = 0
     while number > 0 do

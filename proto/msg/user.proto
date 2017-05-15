@@ -1,0 +1,19 @@
+package msg.user;
+
+enum Result {
+    success = 0;            //成功
+    failure = 1;            //失败
+    has_emoji = 2;          //名称中包含emoji
+    max_num_char = 3;       //超过最大字符数量
+}
+//-------------------
+//      创建角色名        
+//-------------------
+message CreateName {
+    required string user_name = 1;            //角色名
+}
+
+message CreateNameRet {
+    required Result result = 1;             
+}
+

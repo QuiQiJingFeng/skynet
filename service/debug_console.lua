@@ -158,7 +158,8 @@ function COMMAND.help()
         shrtbl = "Show shared short string table info",
         ping = "ping address",
         call = "call address ...",
-        UpdateConfig = "UpdateConfig ..."
+        UpdateConfig = "UpdateConfig ...",
+        DebugProto = "DebugProto user_id msg_name msg_data"
     }
 end
 

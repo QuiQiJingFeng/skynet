@@ -61,7 +61,7 @@ function agent_manager:ProcessLogin(fd,data,ip)
     --检查版本号是否过低
     
     local limit_version = sharedata.query("constants_config")["LIMIT_VERSION"]
-    local greater = utils.greaterVersion(data.version,limit_version)
+    local greater = utils:greaterVersion(data.version,limit_version)
     if not greater then
         send_msg = {login_ret = { result = "version_too_low"} }
         self:SendToClient(fd,send_msg)

@@ -18,7 +18,6 @@ function resource_center:Init(db,user_info_key)
         end
     end
 end
- 
 
 function resource_center:Save(db,user_info_key)
     db:hmset(user_info_key,"resource_list", cjson.encode(self.resource_list))
@@ -34,6 +33,17 @@ function resource_center:UpdateResource(arg)
     for type,value in pairs(arg) do
         self.resource_list[type] = self.resource_list[type] + value
     end
+end
+
+--检查资源是否足够
+function resource_center:CheckResource(arg)
+    for type,value in pairs(arg) do
+        local new_value = self.resource_list[type] + value
+        if new_value < 0 then
+            return false
+        end
+    end
+    return true
 end
 
 
