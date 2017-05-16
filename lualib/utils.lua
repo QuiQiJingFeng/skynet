@@ -5,6 +5,18 @@ function utils:convertToDate(seconds)
   return os.date("%Y/%m/%d %H:%M:%S",math.ceil(seconds));
 end
 
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7
+function utils:getWDay(time)
+    local num = tonumber(os.date("%w",time))
+    num = (num == 0) and 7 or num
+    return num
+end
+--返回当年的第几天
+function utils:getYDay(time)
+    local num = tonumber(os.date("*t",time).yday)
+    return num
+end
+
 --字符串操作相关
 function utils:replaceStr(str,origin,target)
     return string.gsub(str, origin, target)
@@ -38,60 +50,26 @@ function utils:split(str, delimiter)
 end
 
 ---------------------------
---将字符串分解成一个个字符
+--将字符串分解成utf8字符
 ---------------------------
 function utils:strSplit(str)
     local strList = {}
 
-    for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
+    for uchar in string.gmatch(str, utf8.charpattern) do
         strList[#strList+1] = uchar;
     end
 
     return strList
 end
-
 ---------------------------
---判断是否为中文(emoji不算在中文中)
+--判断utf8字符的个数
 ---------------------------
-function utils:isChinese(str)
-    for uchar in string.gmatch(str, "[%z\194-\244][\128-\191]*") do
-        return self:checkEmoji(uchar) and true
-    end
-
-    return false
+function utils:utf8Length(s)
+    return utf8.len(s)
 end
-
---检查某个字符是否是emoji
-function utils:isEmoji(unicode)
-    --16进制转10进制
-    if unicode >= 0x1F601 and unicode <= 0x1F64F then
-        return true
-    elseif unicode >= 0x2702 and unicode <= 0x27B0 then
-        return true
-    elseif unicode >= 0x1F680 and unicode <= 0x1F6C0 then
-        return true
-    elseif unicode >= 0x1F170 and unicode <= 0x1F251 then
-        return true
-    elseif unicode >= 0x1F600 and unicode <= 0x1F636 then
-        return true
-    elseif unicode >= 0x1F681 and unicode <= 0x1F6C5 then
-        return true
-    elseif unicode >= 0x1F30D and unicode <= 0x1F567 then
-        return true 
-    end
-    return false
-end
-
---检查字符串中是否包含emoji
-function utils:checkEmoji(str)
-    for uchar in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
-        if self:isEmoji(uchar) then
-            return true
-        end
-    end
-    return false
-end
-
+---------------------------
+--将字符串分解成unicode(4字节)字符
+---------------------------
 function utils:utf8to32(utf8str)
     assert(type(utf8str) == "string")
     local res, seq, val = {}, 0, nil
@@ -112,6 +90,72 @@ function utils:utf8to32(utf8str)
     table.insert(res, 0)
     return res
 end
+---------------------------
+--判断是否为CJK(无法区分中、日、韩),但可以剔除emoji
+--CJK 是中文（Chinese）、日文（Japanese）、韩文（Korean）三国文字的缩写。
+---------------------------
+function utils:isChinese(str)
+    local uchars = self:utf8to32(str)
+    table.remove(uchars,#uchars)
+    for _,uchar in ipairs(uchars) do
+        --判断CJK字符和中文标点
+        if uchar >= 0x4E00 and uchar <= 0x9FCC then     
+        elseif uchar >= 0xFF00 and uchar <= 0xFFEF then
+        elseif uchar >= 0x2E80 and uchar <= 0x2EFF then
+        elseif uchar >= 0x3000 and uchar <= 0x303F then
+        elseif uchar >= 0x31C0 and uchar <= 0x31EF then
+        elseif uchar >= 0x2F00 and uchar <= 0x2FDF then
+        elseif uchar >= 0x2FF0 and uchar <= 0x2FFF then
+        elseif uchar >= 0x3100 and uchar <= 0x312F then
+        elseif uchar >= 0x31A0 and uchar <= 0x31BF then
+        elseif uchar >= 0x3040 and uchar <= 0x309F then
+        elseif uchar >= 0x30A0 and uchar <= 0x30FF then
+        elseif uchar >= 0x31F0 and uchar <= 0x31FF then
+        elseif uchar >= 0xAC00 and uchar <= 0xD7AF then
+        elseif uchar >= 0x1100 and uchar <= 0x11FF then
+        elseif uchar >= 0x3130 and uchar <= 0x318F then
+        elseif uchar >= 0x4DC0 and uchar <= 0x4DFF then
+        elseif uchar >= 0xA000 and uchar <= 0xA48F then
+        elseif uchar >= 0x2800 and uchar <= 0x28FF then
+        elseif uchar >= 0x3200 and uchar <= 0x32FF then
+        elseif uchar >= 0x3300 and uchar <= 0x33FF then
+        elseif uchar >= 0x2700 and uchar <= 0x27BF then
+        elseif uchar >= 0x2600 and uchar <= 0x26FF then
+        elseif uchar >= 0xFE10 and uchar <= 0xFE1F then
+        elseif uchar >= 0xFE30 and uchar <= 0xFE4F then
+        elseif uchar >= 0x1D300 and uchar <= 0x1D35F then
+        else
+            return false
+        end
+    end
+    return true
+end
+
+--检查某个字符是否是emoji
+function utils:isEmoji(unicode)
+    --16进制转10进制
+    if unicode >= 0x1F601 and unicode <= 0x1F64F then
+    elseif unicode >= 0x2702 and unicode <= 0x27B0 then
+    elseif unicode >= 0x1F680 and unicode <= 0x1F6C0 then
+    elseif unicode >= 0x1F170 and unicode <= 0x1F251 then
+    elseif unicode >= 0x1F600 and unicode <= 0x1F636 then
+    elseif unicode >= 0x1F681 and unicode <= 0x1F6C5 then
+    elseif unicode >= 0x1F30D and unicode <= 0x1F567 then
+    else
+        return false
+    end
+    return true
+end
+
+--检查字符串中是否包含emoji
+function utils:checkEmoji(str)
+    for uchar in self:utf8to32() do
+        if self:isEmoji(uchar) then
+            return true
+        end
+    end
+    return false
+end
 
 --比较版本号
 function utils:greaterVersion(version1,version2)
@@ -121,13 +165,6 @@ function utils:greaterVersion(version1,version2)
     local v2 = a* 1000 + b*100 + c
     return version1 >= version2
 end
---获取当前是周几  周日返回的是0,所以这里处理下让其返回7
-function utils:getWDay(time)
-    local num = tonumber(os.date("%w",time))
-    num = (num == 0) and 7 or num
-    return num
-end
-
 
 function utils:handler(obj, method)
     return function(...)
