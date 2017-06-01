@@ -1,22 +1,5 @@
 local utils = {} 
 
---将秒数转换成日期
-function utils:convertToDate(seconds)
-  return os.date("%Y/%m/%d %H:%M:%S",math.ceil(seconds));
-end
-
---获取当前是周几  周日返回的是0,所以这里处理下让其返回7
-function utils:getWDay(time)
-    local num = tonumber(os.date("%w",time))
-    num = (num == 0) and 7 or num
-    return num
-end
---返回当年的第几天
-function utils:getYDay(time)
-    local num = tonumber(os.date("*t",time).yday)
-    return num
-end
-
 --字符串操作相关
 function utils:replaceStr(str,origin,target)
     return string.gsub(str, origin, target)
@@ -50,17 +33,40 @@ function utils:split(str, delimiter)
 end
 
 ---------------------------
---将字符串分解成utf8字符
+--返回当前时区
 ---------------------------
-function utils:strSplit(str)
-    local strList = {}
-
-    for uchar in string.gmatch(str, utf8.charpattern) do
-        strList[#strList+1] = uchar;
-    end
-
-    return strList
+function utils:getTimeZone()
+    return tonumber(os.date("%z", 0))/100
 end
+---------------------------
+--将格林威治时间转换成日期(本地时区转换)
+---------------------------
+function utils:convertToDate(time)
+  return os.date("%Y/%m/%d %H:%M:%S",time);
+end
+---------------------------
+--将格林威治时间转换成日期(指定时区转换)
+---------------------------
+function utils:convertToDate(time,time_zone)
+  return os.date("!%Y/%m/%d %H:%M:%S",time + time_zone * 3600);
+end
+---------------------------
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7(本地时区转换)
+---------------------------
+function utils:getWDay(time)
+    local num = tonumber(os.date("%w",time))
+    num = (num == 0) and 7 or num
+    return num
+end
+---------------------------
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7(指定时区转换)
+---------------------------
+function utils:getWDay(time,time_zone)
+    local num = tonumber(os.date("!%w",time + time_zone * 3600))
+    num = (num == 0) and 7 or num
+    return num
+end
+
 ---------------------------
 --判断utf8字符的个数
 ---------------------------
@@ -68,35 +74,21 @@ function utils:utf8Length(s)
     return utf8.len(s)
 end
 ---------------------------
---将字符串分解成unicode(4字节)字符
+--将UTF8字符串分割成字符数组
 ---------------------------
-function utils:utf8to32(utf8str)
-    assert(type(utf8str) == "string")
-    local res, seq, val = {}, 0, nil
-    for i = 1, #utf8str do
-        local c = string.byte(utf8str, i)
-        if seq == 0 then
-            table.insert(res, val)
-            seq = c < 0x80 and 1 or c < 0xE0 and 2 or c < 0xF0 and 3 or
-            c < 0xF8 and 4 or --c < 0xFC and 5 or c < 0xFE and 6 or
-            error("invalid UTF-8 character sequence")
-            val = c & (2^(8-seq) - 1)
-        else
-            val = (val << 6) | (c & 0x3F)
-        end
-        seq = seq - 1
+function utils:utf8Chars(utf8str)
+    local chars = {}
+    for p,c in utf8.codes(str) do
+        table.insert(chars,c)
     end
-    table.insert(res, val)
-    table.insert(res, 0)
-    return res
+    return chars
 end
 ---------------------------
 --判断是否为CJK(无法区分中、日、韩),但可以剔除emoji
 --CJK 是中文（Chinese）、日文（Japanese）、韩文（Korean）三国文字的缩写。
 ---------------------------
-function utils:isChinese(str)
-    local uchars = self:utf8to32(str)
-    table.remove(uchars,#uchars)
+function utils:checkChinese(str)
+    local uchars = self:utf8Chars(str)
     for _,uchar in ipairs(uchars) do
         --判断CJK字符和中文标点
         if uchar >= 0x4E00 and uchar <= 0x9FCC then     
@@ -149,7 +141,7 @@ end
 
 --检查字符串中是否包含emoji
 function utils:checkEmoji(str)
-    for uchar in self:utf8to32() do
+    for uchar in self:utf8Chars() do
         if self:isEmoji(uchar) then
             return true
         end
