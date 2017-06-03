@@ -22,21 +22,25 @@ void skynet_globalmq_push(struct message_queue * queue);
 struct message_queue * skynet_globalmq_pop(void);
 //创建一个消息队列
 struct message_queue * skynet_mq_create(uint32_t handle);
+//标记一个消息队列销毁
 void skynet_mq_mark_release(struct message_queue *q);
 
 typedef void (*message_drop)(struct skynet_message *, void *);
-
+//销毁一个消息队列
 void skynet_mq_release(struct message_queue *q, message_drop drop_func, void *ud);
+//获取一个消息队列的handle
 uint32_t skynet_mq_handle(struct message_queue *);
-
+//从消息队列中弹出一个消息,0代表弹出成功
 // 0 for success
 int skynet_mq_pop(struct message_queue *q, struct skynet_message *message);
+//压人一个消息队列
 void skynet_mq_push(struct message_queue *q, struct skynet_message *message);
-
+//返回一个消息队列的长度
 // return the length of message queue, for debug
 int skynet_mq_length(struct message_queue *q);
+//检测队列是否超过阈值,如果超过则重置阈值
 int skynet_mq_overload(struct message_queue *q);
-
+//skynet_mq初始化
 void skynet_mq_init();
 
 #endif
