@@ -3,12 +3,12 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-
+//skynet 消息结构体
 struct skynet_message {
-	uint32_t source;
-	int session;
-	void * data;
-	size_t sz;
+	uint32_t source;	//来源
+	int session;		//用来对应请求和回应
+	void * data;		//数据指针
+	size_t sz;			//数据的大小
 };
 
 // type is encoding in skynet_message.sz high 8bit
@@ -16,10 +16,11 @@ struct skynet_message {
 #define MESSAGE_TYPE_SHIFT ((sizeof(size_t)-1) * 8)
 
 struct message_queue;
-
+//将一个消息队列压人全局消息队列中
 void skynet_globalmq_push(struct message_queue * queue);
+//从全局消息队列中弹出一个消息队列
 struct message_queue * skynet_globalmq_pop(void);
-
+//创建一个消息队列
 struct message_queue * skynet_mq_create(uint32_t handle);
 void skynet_mq_mark_release(struct message_queue *q);
 
