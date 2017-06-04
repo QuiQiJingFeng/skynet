@@ -18,7 +18,7 @@ skynet_harbor_send(struct remote_message *rmsg, uint32_t source, int session) {
 	assert(type != PTYPE_SYSTEM && type != PTYPE_HARBOR && REMOTE);
 	skynet_context_send(REMOTE, rmsg, sizeof(*rmsg) , source, type , session);
 }
-
+//给定一个handle判断该服务是否为远端服务
 int 
 skynet_harbor_message_isremote(uint32_t handle) {
 	assert(HARBOR != ~0);

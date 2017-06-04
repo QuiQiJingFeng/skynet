@@ -78,7 +78,7 @@ skynet_globalmq_pop() {
 
 	return mq;
 }
-
+//创建一个消息队列
 struct message_queue * 
 skynet_mq_create(uint32_t handle) {
 	struct message_queue *q = skynet_malloc(sizeof(*q));
