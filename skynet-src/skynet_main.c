@@ -123,16 +123,19 @@ main(int argc, char *argv[]) {
 			"usage: skynet configfilename\n");
 		return 1;
 	}
-
+	//初始化读写锁
 	luaS_initshr();
+	//初始化skynet_node线程
 	skynet_globalinit();
+	//申请内存空间,初始化struct skynet_env、自旋锁、Lua虚拟机
 	skynet_env_init();
-
+	//设置信号处理
 	sigign();
 
 	struct skynet_config config;
-
+	//创建lua虚拟机
 	struct lua_State *L = luaL_newstate();
+	//链接lib库
 	luaL_openlibs(L);	// link lua lib
 
 	int err =  luaL_loadbufferx(L, load_config, strlen(load_config), "=[skynet config]", "t");
@@ -145,6 +148,7 @@ main(int argc, char *argv[]) {
 		lua_close(L);
 		return 1;
 	}
+	//初始化环境变量,通过 skynet_setenv() 将数据注入 skynet_env 中的lua虚拟机主表中
 	_init_env(L);
 
 	config.thread =  optint("thread",8);
