@@ -7,7 +7,7 @@
 #define SPIN_DESTROY(q) spinlock_destroy(&(q)->lock);
 //如果没有定义pthread 锁 那么使用下面的
 #ifndef USE_PTHREAD_LOCK
-
+//自旋锁
 struct spinlock {
 	int lock;
 };

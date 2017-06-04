@@ -52,7 +52,7 @@ struct skynet_context {
 	char result[32];
 	uint32_t handle;
 	int session_id;
-	int ref;
+	int ref;			//引用计数
 	int message_count;
 	bool init;
 	bool endless;
@@ -191,7 +191,7 @@ skynet_context_newsession(struct skynet_context *ctx) {
 	}
 	return session;
 }
-
+//引用计数自加1
 void 
 skynet_context_grab(struct skynet_context *ctx) {
 	ATOM_INC(&ctx->ref);
@@ -216,7 +216,7 @@ delete_context(struct skynet_context *ctx) {
 	skynet_free(ctx);
 	context_dec();
 }
-
+//skynet_context的引用计数减1,如果为0则销毁
 struct skynet_context * 
 skynet_context_release(struct skynet_context *ctx) {
 	if (ATOM_DEC(&ctx->ref) == 0) {
@@ -766,7 +766,7 @@ skynet_sendname(struct skynet_context * context, uint32_t source, const char * a
 
 	return skynet_send(context, source, des, type, session, data, sz);
 }
-
+//返回skynet_context的handle句柄
 uint32_t 
 skynet_context_handle(struct skynet_context *ctx) {
 	return ctx->handle;

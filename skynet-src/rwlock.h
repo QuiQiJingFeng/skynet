@@ -2,7 +2,7 @@
 #define SKYNET_RWLOCK_H
 
 #ifndef USE_PTHREAD_LOCK
-
+//读写锁
 struct rwlock {
 	int write;
 	int read;

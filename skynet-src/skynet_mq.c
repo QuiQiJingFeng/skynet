@@ -8,7 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-
+//消息队列的初始大小
 #define DEFAULT_QUEUE_SIZE 64
 #define MAX_GLOBAL_MQ 0x10000
 

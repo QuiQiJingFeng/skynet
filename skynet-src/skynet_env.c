@@ -1,5 +1,6 @@
 #include "skynet.h"
 #include "skynet_env.h"
+//自旋锁
 #include "spinlock.h"
 
 #include <lua.h>
@@ -9,7 +10,7 @@
 #include <assert.h>
 
 struct skynet_env {
-	struct spinlock lock;
+	struct spinlock lock;		//自旋锁
 	lua_State *L;
 };
 
