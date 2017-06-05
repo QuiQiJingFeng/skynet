@@ -72,6 +72,7 @@ forward_message(int type, bool padding, struct socket_message * result) {
 
 int 
 skynet_socket_poll() {
+	//创建一个socket_server
 	struct socket_server *ss = SOCKET_SERVER;
 	assert(ss);
 	struct socket_message result;
