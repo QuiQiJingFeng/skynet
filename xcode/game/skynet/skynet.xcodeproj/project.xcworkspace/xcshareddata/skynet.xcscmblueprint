@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "5C265DA62C0155D7E4EDC6539AE07EAD0D3FEB13",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "5C265DA62C0155D7E4EDC6539AE07EAD0D3FEB13" : 9223372036854775807,
+    "F64E709DC0A56F30ACEEE43CAE1223FBA4466D6A" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "DD4691A5-1A49-401F-8AD9-DCBF5297D3E4",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "5C265DA62C0155D7E4EDC6539AE07EAD0D3FEB13" : "skynet\/",
+    "F64E709DC0A56F30ACEEE43CAE1223FBA4466D6A" : "skynet\/3rd\/jemalloc\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "skynet",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "xcode\/game\/skynet\/skynet.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/QuiQiJingFeng\/skynet.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5C265DA62C0155D7E4EDC6539AE07EAD0D3FEB13"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jemalloc\/jemalloc.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F64E709DC0A56F30ACEEE43CAE1223FBA4466D6A"
+    }
+  ]
+}
