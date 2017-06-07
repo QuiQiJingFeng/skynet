@@ -94,7 +94,7 @@ struct socket_server {
 	int event_n;
 	int event_index;
 	struct socket_object_interface soi;
-	struct event ev[MAX_EVENT];
+	struct event ev[MAX_EVENT];				//epool 事件列表
 	struct socket slot[MAX_SOCKET];			//socket数组 数量为65536 
 	char buffer[MAX_INFO];
 	uint8_t udpbuffer[MAX_UDP_PACKAGE];
@@ -285,7 +285,11 @@ socket_server_create() {
 		fprintf(stderr, "socket-server: create event pool failed.\n");
 		return NULL;
 	}
-	//创建一个管道,fd[0]为读取端,fd[1]为写入端
+	/*
+		函数原型 int pipe(int fd[2]) 
+		返回值 成功 0 失败 -1
+		创建一个管道,fd[0]为读取端,fd[1]为写入端
+	*/
 	if (pipe(fd)) {
 		sp_release(efd);
 		fprintf(stderr, "socket-server: create socket pair failed.\n");
@@ -309,18 +313,18 @@ socket_server_create() {
 	struct socket_server *ss = MALLOC(sizeof(*ss));
 	//设置epoll fd
 	ss->event_fd = efd;	
-	//设置fd读端
+	//设置socket server 的接收端 为管道读端
 	ss->recvctrl_fd = fd[0]; 
-	//设置fd写端	
+	//设置socket server 的发送端 为管道的写端	
 	ss->sendctrl_fd = fd[1];
-	////控制是否去检查本地从管道写过来的请求
+	//是否检查本地管道写过来的请求
 	ss->checkctrl = 1;
 	//MAX_SOCKET = 65536
 	for (i=0;i<MAX_SOCKET;i++) {
 		struct socket *s = &ss->slot[i];
 		//初始化socket结构体类型为SOCKET_TYPE_INVALID
 		s->type = SOCKET_TYPE_INVALID;
-		//清空write buffer list
+
 		clear_wb_list(&s->high);
 		clear_wb_list(&s->low);
 	}
@@ -328,11 +332,7 @@ socket_server_create() {
 	ss->event_n = 0;
 	ss->event_index = 0;
 	memset(&ss->soi, 0, sizeof(ss->soi));
-	/*
-		FD_ZERO(fd_set *fdset) 将指定的文件描述符集清空，
-		在对文件描述符集合进行设置前，必须对其进行初始化，
-		如果不清空，由于在系统分配内存空间后，通常并不作清空处理，所以结果是不可知的
-	*/
+
 	FD_ZERO(&ss->rfds);
 	assert(ss->recvctrl_fd < FD_SETSIZE);
 
@@ -411,6 +411,7 @@ new_fd(struct socket_server *ss, int id, int fd, int protocol, uintptr_t opaque,
 	s->id = id;
 	s->fd = fd;
 	s->protocol = protocol;
+	//MIN_READ_BUFFER 默认收包大小 64
 	s->p.size = MIN_READ_BUFFER;
 	s->opaque = opaque;
 	s->wb_size = 0;
@@ -791,6 +792,7 @@ listen_socket(struct socket_server *ss, struct request_listen * request, struct 
 	if (s == NULL) {
 		goto _failed;
 	}
+	//更改socket 状态为: SOCKET_TYPE_PLISTEN
 	s->type = SOCKET_TYPE_PLISTEN;
 	return -1;
 _failed:
@@ -830,7 +832,7 @@ close_socket(struct socket_server *ss, struct request_close *request, struct soc
 
 	return -1;
 }
-
+//绑定socket
 static int
 bind_socket(struct socket_server *ss, struct request_bind *request, struct socket_message *result) {
 	int id = request->id;
@@ -842,35 +844,43 @@ bind_socket(struct socket_server *ss, struct request_bind *request, struct socke
 		result->data = "reach skynet socket number limit";
 		return SOCKET_ERROR;
 	}
+	//设置fd为非阻塞
 	sp_nonblocking(request->fd);
+	//更改socket状态为SOCKET_TYPE_BIND
 	s->type = SOCKET_TYPE_BIND;
 	result->data = "binding";
 	return SOCKET_OPEN;
 }
-
+//开始监听或接受连接
 static int
 start_socket(struct socket_server *ss, struct request_start *request, struct socket_message *result) {
 	int id = request->id;
 	result->id = id;
-	result->opaque = request->opaque;
+	result->opaque = request->opaque;  //result->opaque是gate服务的地址
 	result->ud = 0;
 	result->data = NULL;
+	//根据socket_message 的ID 获取对应socket
 	struct socket *s = &ss->slot[HASH_ID(id)];
+	//检查socket 是否可用
 	if (s->type == SOCKET_TYPE_INVALID || s->id !=id) {
 		result->data = "invalid socket";
 		return SOCKET_ERROR;
 	}
+	//如果当前socket状态为 accept 或plisten
 	if (s->type == SOCKET_TYPE_PACCEPT || s->type == SOCKET_TYPE_PLISTEN) {
+		//将socket的描述符加入epoll管理   (event_fd :epoll_fd)
 		if (sp_add(ss->event_fd, s->fd, s)) {
 			force_close(ss, s, result);
 			result->data = strerror(errno);
 			return SOCKET_ERROR;
 		}
+		//更新socket状态  如果是accept则改为connected 如果是plisten则为listen
 		s->type = (s->type == SOCKET_TYPE_PACCEPT) ? SOCKET_TYPE_CONNECTED : SOCKET_TYPE_LISTEN;
 		s->opaque = request->opaque;
 		result->data = "start";
 		return SOCKET_OPEN;
 	} else if (s->type == SOCKET_TYPE_CONNECTED) {
+		//如果状态已经是connected 则发送transfer到gate服务的地址
 		// todo: maybe we should send a message SOCKET_TRANSFER to s->opaque
 		s->opaque = request->opaque;
 		result->data = "transfer";
@@ -894,6 +904,10 @@ setopt_socket(struct socket_server *ss, struct request_setopt *request) {
 static void
 block_readpipe(int pipefd, void *buffer, int sz) {
 	for (;;) {
+		/*
+			成功返回读取的字节数，出错返回-1并设置errno，
+			如果在调read之前已到达文件末尾，则这次read返回0
+		*/
 		int n = read(pipefd, buffer, sz);
 		if (n<0) {
 			if (errno == EINTR)
@@ -969,24 +983,33 @@ set_udp_address(struct socket_server *ss, struct request_setudp *request, struct
 static int
 ctrl_cmd(struct socket_server *ss, struct socket_message *result) {
 	int fd = ss->recvctrl_fd;
+	//uint8_t 占一个字节
 	// the length of message is one byte, so 256+8 buffer size is enough.
 	uint8_t buffer[256];
 	uint8_t header[2];
+	//读取前命令的前两个字节
 	block_readpipe(fd, header, sizeof(header));
-	int type = header[0];
-	int len = header[1];
+	int type = header[0];  //第一个字节为命令的类型
+	printf("TYPE-->%c\n",type);
+	int len = header[1];   //第二个字节为消息的长度
+	//根据消息的长度读取消息到buffer
 	block_readpipe(fd, buffer, len);
 	// ctrl command only exist in local fd, so don't worry about endian.
 	switch (type) {
 	case 'S':
+		//启动socket  //listen与accept后都会调用'S' 返回:SOCKET_ERROR、SOCKET_OPEN
 		return start_socket(ss,(struct request_start *)buffer, result);
 	case 'B':
+		//绑定
 		return bind_socket(ss,(struct request_bind *)buffer, result);
 	case 'L':
+		//监听
 		return listen_socket(ss,(struct request_listen *)buffer, result);
 	case 'K':
+		//关闭Socket
 		return close_socket(ss,(struct request_close *)buffer, result);
 	case 'O':
+		//打开socket
 		return open_socket(ss, (struct request_open *)buffer, result);
 	case 'X':
 		result->opaque = 0;
@@ -995,14 +1018,18 @@ ctrl_cmd(struct socket_server *ss, struct socket_message *result) {
 		result->data = NULL;
 		return SOCKET_EXIT;
 	case 'D':
+		//向socket发送数据
 		return send_socket(ss, (struct request_send *)buffer, result, PRIORITY_HIGH, NULL);
 	case 'P':
+		//向socket发送数据
 		return send_socket(ss, (struct request_send *)buffer, result, PRIORITY_LOW, NULL);
 	case 'A': {
+		//发送UDP数据
 		struct request_send_udp * rsu = (struct request_send_udp *)buffer;
 		return send_socket(ss, &rsu->send, result, PRIORITY_HIGH, rsu->address);
 	}
 	case 'C':
+		//设置UDP地址
 		return set_udp_address(ss, (struct request_setudp *)buffer, result);
 	case 'T':
 		setopt_socket(ss, (struct request_setopt *)buffer);
@@ -1247,7 +1274,7 @@ socket_server_poll(struct socket_server *ss, struct socket_message * result, int
 		}
 		//如果event_index等于event_n，说明已经处理完了
 		if (ss->event_index == ss->event_n) {
-			//等待有事情发生， 返回的是需要处理的事件个数
+			//等待epoll事情发生， 返回的是需要处理的事件个数
 			ss->event_n = sp_wait(ss->event_fd, ss->ev, MAX_EVENT);
 			ss->checkctrl = 1;
 			if (more) {
@@ -1259,6 +1286,7 @@ socket_server_poll(struct socket_server *ss, struct socket_message * result, int
 				return -1;
 			}
 		}
+		//获取epoll事件,获取触发这个事件的socekt
 		struct event *e = &ss->ev[ss->event_index++];
 		struct socket *s = e->s;
 		if (s == NULL) {

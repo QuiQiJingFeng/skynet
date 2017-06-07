@@ -286,6 +286,7 @@ skynet_start(struct skynet_config * config) {
 	skynet_module_init(config->module_path);
 	//初始化timer服务
 	skynet_timer_init();
+	//初始化socket模块
 	skynet_socket_init();
 	skynet_profile_enable(config->profile);
 	//创建并初始化日志服务
