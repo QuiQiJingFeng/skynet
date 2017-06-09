@@ -85,7 +85,7 @@ static void
 context_dec() {
 	ATOM_DEC(&G_NODE.total);
 }
-
+//获取主线程本地存储的ID
 uint32_t 
 skynet_current_handle(void) {
 	if (G_NODE.init) {
@@ -817,10 +817,12 @@ skynet_globalinit(void) {
 	G_NODE.total = 0;
 	G_NODE.monitor_exit = 0;
 	G_NODE.init = 1;
+    //创建一个线程本地存储key,并赋值给G_NODE.handle_key
 	if (pthread_key_create(&G_NODE.handle_key, NULL)) {
 		fprintf(stderr, "pthread_key_create failed");
 		exit(1);
 	}
+    //设置主线程的本地存储
 	// set mainthread's key
 	skynet_initthread(THREAD_MAIN);
 }
@@ -829,7 +831,7 @@ void
 skynet_globalexit(void) {
 	pthread_key_delete(G_NODE.handle_key);
 }
-
+//设置线程ID作为线程的本地存储
 void
 skynet_initthread(int m) {
 	uintptr_t v = (uint32_t)(-m);
