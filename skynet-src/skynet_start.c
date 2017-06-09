@@ -295,7 +295,7 @@ skynet_start(struct skynet_config * config) {
 		fprintf(stderr, "Can't launch %s service\n", config->logservice);
 		exit(1);
 	}
-	//启动日志服务
+	//启动驱动服务
 	bootstrap(ctx, config->bootstrap);
 
 	start(config->thread);
