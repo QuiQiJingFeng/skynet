@@ -112,7 +112,7 @@ static const char * load_config = "\
 	setmetatable(result, nil)\n\
 	return result\n\
 ";
-
+//主函数入口
 int
 main(int argc, char *argv[]) {
 	const char * config_file = NULL ;
@@ -123,30 +123,38 @@ main(int argc, char *argv[]) {
 			"usage: skynet configfilename\n");
 		return 1;
 	}
-
+	//初始化读写锁
 	luaS_initshr();
+	//skynet 全局初始化  设置了主线程本地存储
 	skynet_globalinit();
+	//初始化skynet_env 负责skynet环境变量的设置和获取
 	skynet_env_init();
-
+	//设置信号处理
 	sigign();
-
+    //下面一大坨代码 临时创建了一个虚拟机 加载config文件组装成表压入栈中,然后将表加入skynet_env虚拟机中,然后关闭lua虚拟机
+    /*-----------------------------------------------------------------------------------------*/
 	struct skynet_config config;
-
+	//创建lua虚拟机
 	struct lua_State *L = luaL_newstate();
+	//链接lib库
 	luaL_openlibs(L);	// link lua lib
-
+    
+    //加载load_config代码块
 	int err =  luaL_loadbufferx(L, load_config, strlen(load_config), "=[skynet config]", "t");
 	assert(err == LUA_OK);
+    //压入参数 config文件路径
 	lua_pushstring(L, config_file);
-
+    //执行load_config代码块
+    //将config的变量放入一个表中并放到栈上
 	err = lua_pcall(L, 1, 1, 0);
 	if (err) {
 		fprintf(stderr,"%s\n",lua_tostring(L,-1));
 		lua_close(L);
 		return 1;
 	}
+	//初始化环境变量 遍历栈上的表,将表中的元素全部添加到skynet_env虚拟机中
 	_init_env(L);
-
+    //如果config中没有配置一下变量 则给出默认值
 	config.thread =  optint("thread",8);
 	config.module_path = optstring("cpath","./cservice/?.so");
 	config.harbor = optint("harbor", 1);
@@ -157,8 +165,9 @@ main(int argc, char *argv[]) {
 	config.profile = optboolean("profile", 1);
 
 	lua_close(L);
-
+    /*-----------------------------------------------------------------------------------------*/
 	skynet_start(&config);
+	//删除线程本地存储key
 	skynet_globalexit();
 	luaS_exitshr();
 

@@ -7,14 +7,14 @@ typedef void * (*skynet_dl_create)(void);
 typedef int (*skynet_dl_init)(void * inst, struct skynet_context *, const char * parm);
 typedef void (*skynet_dl_release)(void * inst);
 typedef void (*skynet_dl_signal)(void * inst, int signal);
-
+//skynet模块
 struct skynet_module {
-	const char * name;
-	void * module;
-	skynet_dl_create create;
-	skynet_dl_init init;
-	skynet_dl_release release;
-	skynet_dl_signal signal;
+	const char * name;			//模块的名称
+	void * module;				//由dlopen打开动态链接库后返回的指针 动态链接库的句柄	
+	skynet_dl_create create;	//create 方法
+	skynet_dl_init init;		//init方法
+	skynet_dl_release release;	//relese方法
+	skynet_dl_signal signal;	//signal方法  信号
 };
 
 void skynet_module_insert(struct skynet_module *mod);

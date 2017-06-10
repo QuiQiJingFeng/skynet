@@ -217,7 +217,7 @@ dump_c_mem() {
 	}
 	skynet_error(NULL, "+total: %zdkb",total >> 10);
 }
-
+//深拷贝 申请一块空间，将字符串拷贝过来，并返回该空间的地址
 char *
 skynet_strdup(const char *str) {
 	size_t sz = strlen(str);

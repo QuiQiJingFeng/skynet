@@ -72,11 +72,14 @@ forward_message(int type, bool padding, struct socket_message * result) {
 
 int 
 skynet_socket_poll() {
+	//创建一个socket_server
 	struct socket_server *ss = SOCKET_SERVER;
 	assert(ss);
 	struct socket_message result;
 	int more = 1;
+	//获取本次要处理的事件 type result
 	int type = socket_server_poll(ss, &result, &more);
+	//根据事件的不同类型进行不同的处理
 	switch (type) {
 	case SOCKET_EXIT:
 		return 0;

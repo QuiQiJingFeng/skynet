@@ -1,11 +1,4 @@
-local skynet = require "skynet"
-local print = skynet.error
 local utils = {} 
-
---将秒数转换成日期
-function utils:convertToDate(seconds)
-  return os.date("%Y/%m/%d %H:%M:%S",math.ceil(seconds));
-end
 
 --字符串操作相关
 function utils:replaceStr(str,origin,target)
@@ -39,10 +32,153 @@ function utils:split(str, delimiter)
     return result
 end
 
+---------------------------
+--返回当前时区
+---------------------------
+function utils:getTimeZone()
+    return tonumber(os.date("%z", 0))/100
+end
+---------------------------
+--将格林威治时间转换成日期(本地时区转换)
+---------------------------
+function utils:convertToDate(time)
+  return os.date("%Y/%m/%d %H:%M:%S",time);
+end
+---------------------------
+--将格林威治时间转换成日期(指定时区转换)
+---------------------------
+function utils:convertToDate(time,time_zone)
+  return os.date("!%Y/%m/%d %H:%M:%S",time + time_zone * 3600);
+end
+---------------------------
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7(本地时区转换)
+---------------------------
+function utils:getWDay(time)
+    local num = tonumber(os.date("%w",time))
+    num = (num == 0) and 7 or num
+    return num
+end
+---------------------------
+--获取当前是周几  周日返回的是0,所以这里处理下让其返回7(指定时区转换)
+---------------------------
+function utils:getWDay(time,time_zone)
+    local num = tonumber(os.date("!%w",time + time_zone * 3600))
+    num = (num == 0) and 7 or num
+    return num
+end
+
+---------------------------
+--判断utf8字符的个数
+---------------------------
+function utils:utf8Length(s)
+    return utf8.len(s)
+end
+---------------------------
+--将UTF8字符串分割成字符数组
+---------------------------
+function utils:utf8Chars(utf8str)
+    local chars = {}
+    for p,c in utf8.codes(str) do
+        table.insert(chars,c)
+    end
+    return chars
+end
+---------------------------
+--判断是否为CJK(无法区分中、日、韩),但可以剔除emoji
+--CJK 是中文（Chinese）、日文（Japanese）、韩文（Korean）三国文字的缩写。
+---------------------------
+function utils:checkChinese(str)
+    local uchars = self:utf8Chars(str)
+    for _,uchar in ipairs(uchars) do
+        --判断CJK字符和中文标点
+        if uchar >= 0x4E00 and uchar <= 0x9FCC then     
+        elseif uchar >= 0xFF00 and uchar <= 0xFFEF then
+        elseif uchar >= 0x2E80 and uchar <= 0x2EFF then
+        elseif uchar >= 0x3000 and uchar <= 0x303F then
+        elseif uchar >= 0x31C0 and uchar <= 0x31EF then
+        elseif uchar >= 0x2F00 and uchar <= 0x2FDF then
+        elseif uchar >= 0x2FF0 and uchar <= 0x2FFF then
+        elseif uchar >= 0x3100 and uchar <= 0x312F then
+        elseif uchar >= 0x31A0 and uchar <= 0x31BF then
+        elseif uchar >= 0x3040 and uchar <= 0x309F then
+        elseif uchar >= 0x30A0 and uchar <= 0x30FF then
+        elseif uchar >= 0x31F0 and uchar <= 0x31FF then
+        elseif uchar >= 0xAC00 and uchar <= 0xD7AF then
+        elseif uchar >= 0x1100 and uchar <= 0x11FF then
+        elseif uchar >= 0x3130 and uchar <= 0x318F then
+        elseif uchar >= 0x4DC0 and uchar <= 0x4DFF then
+        elseif uchar >= 0xA000 and uchar <= 0xA48F then
+        elseif uchar >= 0x2800 and uchar <= 0x28FF then
+        elseif uchar >= 0x3200 and uchar <= 0x32FF then
+        elseif uchar >= 0x3300 and uchar <= 0x33FF then
+        elseif uchar >= 0x2700 and uchar <= 0x27BF then
+        elseif uchar >= 0x2600 and uchar <= 0x26FF then
+        elseif uchar >= 0xFE10 and uchar <= 0xFE1F then
+        elseif uchar >= 0xFE30 and uchar <= 0xFE4F then
+        elseif uchar >= 0x1D300 and uchar <= 0x1D35F then
+        else
+            return false
+        end
+    end
+    return true
+end
+
+--检查某个字符是否是emoji
+function utils:isEmoji(unicode)
+    --16进制转10进制
+    if unicode >= 0x1F601 and unicode <= 0x1F64F then
+    elseif unicode >= 0x2702 and unicode <= 0x27B0 then
+    elseif unicode >= 0x1F680 and unicode <= 0x1F6C0 then
+    elseif unicode >= 0x1F170 and unicode <= 0x1F251 then
+    elseif unicode >= 0x1F600 and unicode <= 0x1F636 then
+    elseif unicode >= 0x1F681 and unicode <= 0x1F6C5 then
+    elseif unicode >= 0x1F30D and unicode <= 0x1F567 then
+    else
+        return false
+    end
+    return true
+end
+
+--检查字符串中是否包含emoji
+function utils:checkEmoji(str)
+    for uchar in self:utf8Chars() do
+        if self:isEmoji(uchar) then
+            return true
+        end
+    end
+    return false
+end
+
+--比较版本号
+function utils:greaterVersion(version1,version2)
+    local a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
+    local v1 = a* 1000 + b*100 + c
+    a,b,c = string.match(version1, "(%d+).(%d+).(%d+)") 
+    local v2 = a* 1000 + b*100 + c
+    return version1 >= version2
+end
+
 function utils:handler(obj, method)
     return function(...)
         return method(obj, ...)
     end
+end
+
+---------------------------
+--通过一个字段对数组排序，可以指定是否升序。默认为升
+--比如要通过id对数组进行排序  {{id=3},{id=2}}
+---------------------------
+function utils:sortByField(tab,field,isAsc)
+    if(isAsc==nil or isAsc==true) then
+        table.sort(tab,function(v1,v2)
+            return v2[field]>v1[field];
+        end)
+    else
+        table.sort(tab,function(v1,v2)
+            return v2[field]<v1[field];
+        end)
+    end
+    return tab;
 end
 
 --table相关
@@ -62,7 +198,7 @@ end
 --删除数组中指定的元素
 ---------------------------
 function utils:remove(array,item)
-    local index=self:indexOf(array,item);
+    local index=utils:indexOf(array,item);
     if (index>=1) then
         table.remove(array,index);
         return true
@@ -108,161 +244,6 @@ function utils:tableAddAttr(tab, key, value)
     for _, var in pairs(tab) do
         var[key] = value;
     end
-end
-
-
----------------------------
---XML解析
--- 1.2 - Created new structure for returned table
--- 1.1 - Fixed base directory issue with the loadFile() function.
---
--- NOTE: This is a modified version of Alexander Makeev's Lua-only XML parser
--- found here: http://lua-users.org/wiki/LuaXml
----------------------------
-function utils:newParser()
-
-    local XmlParser = {};
-
-    function XmlParser:ToXmlString(value)
-        value = string.gsub(value, "&", "&amp;"); -- '&' -> "&amp;"
-        value = string.gsub(value, "<", "&lt;"); -- '<' -> "&lt;"
-        value = string.gsub(value, ">", "&gt;"); -- '>' -> "&gt;"
-        value = string.gsub(value, "\"", "&quot;"); -- '"' -> "&quot;"
-        value = string.gsub(value, "([^%w%&%;%p%\t% ])",
-            function(c)
-                return string.format("&#x%X;", string.byte(c))
-            end);
-        return value;
-    end
-
-    function XmlParser:FromXmlString(value)
-        value = string.gsub(value, "&#x([%x]+)%;",
-            function(h)
-                return string.char(tonumber(h, 16))
-            end);
-        value = string.gsub(value, "&#([0-9]+)%;",
-            function(h)
-                return string.char(tonumber(h, 10))
-            end);
-        value = string.gsub(value, "&quot;", "\"");
-        value = string.gsub(value, "&apos;", "'");
-        value = string.gsub(value, "&gt;", ">");
-        value = string.gsub(value, "&lt;", "<");
-        value = string.gsub(value, "&amp;", "&");
-        return value;
-    end
-
-    function XmlParser:ParseArgs(node, s)
-       local abc = string.gsub(s, "(%w+)=([\"'])(.-)%2", function(w, _, a)
-            node:addProperty(w, self:FromXmlString(a))
-        end)
-    end
-
-    function XmlParser:ParseXmlText(xmlText)
-        local stack = {}
-        local top = self:newNode()  
-        table.insert(stack, top)
-        local ni, c, label, xarg, empty
-        local i, j = 1, 1
-        while true do
-            ni, j, c, label, xarg, empty = string.find(xmlText, "<(%/?)([%w_:]+)(.-)(%/?)>", i)
-            if not ni then break end
-            local text = string.sub(xmlText, i, ni - 1);
-            if not string.find(text, "^%s*$") then
-                local lVal = (top:value() or "") .. self:FromXmlString(text)
-                stack[#stack]:setValue(lVal)
-            end
-            if empty == "/" then -- empty element tag
-                local lNode = self:newNode(label)
-                self:ParseArgs(lNode, xarg)
-                top:addChild(lNode)
-            elseif c == "" then -- start tag
-                local lNode = self:newNode(label)
-                self:ParseArgs(lNode, xarg)
-                table.insert(stack, lNode)
-        top = lNode
-            else -- end tag
-                local toclose = table.remove(stack) -- remove top
-
-                top = stack[#stack]
-                if #stack < 1 then
-                    error("XmlParser: nothing to close with " .. label)
-                end
-                if toclose:name() ~= label then
-                    error("XmlParser: trying to close " .. toclose.name .. " with " .. label)
-                end
-                top:addChild(toclose)
-            end
-            i = j + 1
-        end
-        local text = string.sub(xmlText, i);
-        if #stack > 1 then
-            error("XmlParser: unclosed " .. stack[#stack]:name())
-        end
-        return top
-    end
-
-    function XmlParser:loadFile(path)
-        local hFile, err = io.open(path, "r");
-
-        if hFile and not err then
-            local xmlText = hFile:read("*a"); -- read file content
-            io.close(hFile);
-            return self:ParseXmlText(xmlText), nil;
-        else
-            print(err)
-            return nil
-        end
-    end
-
-    return XmlParser
-end
-
-function utils:newNode(name) 
-    local node = {}
-    node.___value = nil
-    node.___name = name
-    node.___children = {}
-    node.___props = {}
-
-    function node:value() return self.___value end
-    function node:setValue(val) self.___value = val end
-    function node:name() return self.___name end
-    function node:setName(name) self.___name = name end
-    function node:children() return self.___children end
-    function node:numChildren() return #self.___children end
-    function node:addChild(child)
-        if self[child:name()] ~= nil then
-            if type(self[child:name()].name) == "function" then
-                local tempTable = {}
-                table.insert(tempTable, self[child:name()])
-                self[child:name()] = tempTable
-            end
-            table.insert(self[child:name()], child)
-        else
-            self[child:name()] = child
-        end
-        table.insert(self.___children, child)
-    end
-
-    function node:properties() return self.___props end
-    function node:numProperties() return #self.___props end
-    function node:addProperty(name, value)
-        local lName = "@" .. name
-        if self[lName] ~= nil then
-            if type(self[lName]) == "string" then
-                local tempTable = {}
-                table.insert(tempTable, self[lName])
-                self[lName] = tempTable
-            end
-            table.insert(self[lName], value)
-        else
-            self[lName] = value
-        end
-        table.insert(self.___props, { name = name, value = self[name] })
-    end
-
-    return node
 end
  
 function utils:dump(value, desciption, nesting)
@@ -346,160 +327,10 @@ function utils:dump(value, desciption, nesting)
     end
 end
 
-function utils:decode(s,startPos) 
-    function decode_scanWhitespace(s,startPos)
-      local whitespace=" \n\r\t"
-      local stringLen = string.len(s)
-      while ( string.find(whitespace, string.sub(s,startPos,startPos), 1, true)  and startPos <= stringLen) do
-        startPos = startPos + 1
-      end
-      return startPos
-    end
-    function decode_scanObject(s,startPos)
-      local object = {}
-      local stringLen = string.len(s)
-      local key, value
-      assert(string.sub(s,startPos,startPos)=='{','decode_scanObject called but object does not start at position ' .. startPos .. ' in string:\n' .. s)
-      startPos = startPos + 1
-      repeat
-        startPos = decode_scanWhitespace(s,startPos)
-        assert(startPos<=stringLen, 'JSON string ended unexpectedly while scanning object.')
-        local curChar = string.sub(s,startPos,startPos)
-        if (curChar=='}') then
-          return object,startPos+1
-        end
-        if (curChar==',') then
-          startPos = decode_scanWhitespace(s,startPos+1)
-        end
-        assert(startPos<=stringLen, 'JSON string ended unexpectedly scanning object.')
-        -- Scan the key
-        key, startPos = self:decode(s,startPos)
-        assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
-        startPos = decode_scanWhitespace(s,startPos)
-        assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
-        assert(string.sub(s,startPos,startPos)==':','JSON object key-value assignment mal-formed at ' .. startPos)
-        startPos = decode_scanWhitespace(s,startPos+1)
-        assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
-        value, startPos = self:decode(s,startPos)
-        object[key]=value
-      until false   -- infinite loop while key-value pairs are found
-    end
-    function decode_scanArray(s,startPos)
-      local array = {}  -- The return value
-      local stringLen = string.len(s)
-      assert(string.sub(s,startPos,startPos)=='[','decode_scanArray called but array does not start at position ' .. startPos .. ' in string:\n'..s )
-      startPos = startPos + 1
-      -- Infinite loop for array elements
-      repeat
-        startPos = decode_scanWhitespace(s,startPos)
-        assert(startPos<=stringLen,'JSON String ended unexpectedly scanning array.')
-        local curChar = string.sub(s,startPos,startPos)
-        if (curChar==']') then
-          return array, startPos+1
-        end
-        if (curChar==',') then
-          startPos = decode_scanWhitespace(s,startPos+1)
-        end
-        assert(startPos<=stringLen, 'JSON String ended unexpectedly scanning array.')
-        object, startPos = decode(s,startPos)
-        table.insert(array,object)
-      until false
-    end
-
-    function decode_scanNumber(s,startPos)
-      local endPos = startPos+1
-      local stringLen = string.len(s)
-      local acceptableChars = "+-0123456789.e"
-      while (string.find(acceptableChars, string.sub(s,endPos,endPos), 1, true)
-        and endPos<=stringLen
-        ) do
-        endPos = endPos + 1
-      end
-      local stringValue = 'return ' .. string.sub(s,startPos, endPos-1)
-      local stringEval = loadstring(stringValue)
-       assert(stringEval, 'Failed to scan number [ ' .. stringValue .. '] in JSON string at position ' .. startPos .. ' : ' .. endPos)
-      return stringEval(), endPos
-    end
-    function decode_scanString(s,startPos)
-      assert(startPos, 'decode_scanString(..) called without start position')
-      local startChar = string.sub(s,startPos,startPos)
-      assert(startChar==[[']] or startChar==[["]],'decode_scanString called for a non-string')
-      local escaped = false
-      local endPos = startPos + 1
-      local bEnded = false
-      local stringLen = string.len(s)
-      repeat
-        local curChar = string.sub(s,endPos,endPos)
-        if not escaped then
-          if curChar==[[\]] then
-            escaped = true
-          else
-            bEnded = curChar==startChar
-          end
-        else
-          -- If we're escaped, we accept the current character come what may
-          escaped = false
-        end
-        endPos = endPos + 1
-        assert(endPos <= stringLen+1, "String decoding failed: unterminated string at position " .. endPos)
-      until bEnded
-      local stringValue = 'return ' .. string.sub(s, startPos, endPos-1)
-      local stringEval = loadstring(stringValue)
-      assert(stringEval, 'Failed to load string [ ' .. stringValue .. '] in JSON4Lua.decode_scanString at position ' .. startPos .. ' : ' .. endPos)
-      return stringEval(), endPos
-    end
-    function decode_scanComment(s, startPos)
-      assert( string.sub(s,startPos,startPos+1)=='/*', "decode_scanComment called but comment does not start at position " .. startPos)
-      local endPos = string.find(s,'*/',startPos+2)
-      assert(endPos~=nil, "Unterminated comment in string at " .. startPos)
-      return endPos+2
-    end
-    function decode_scanConstant(s, startPos)
-      local consts = { ["true"] = true, ["false"] = false, ["null"] = nil }
-      local constNames = {"true","false","null"}
-
-      for i,k in pairs(constNames) do
-        --print ("[" .. string.sub(s,startPos, startPos + string.len(k) -1) .."]", k)
-        if string.sub(s,startPos, startPos + string.len(k) -1 )==k then
-          return consts[k], startPos + string.len(k)
-        end
-      end
-      assert(nil, 'Failed to scan constant from string ' .. s .. ' at starting position ' .. startPos)
-    end
-
-
-
-      startPos = startPos and startPos or 1
-      startPos = decode_scanWhitespace(s,startPos)
-      assert(startPos<=string.len(s), 'Unterminated JSON encoded object found at position in [' .. s .. ']')
-      local curChar = string.sub(s,startPos,startPos)
-      -- Object
-      if curChar=='{' then
-        return decode_scanObject(s,startPos)
-      end
-      -- Array
-      if curChar=='[' then
-        return decode_scanArray(s,startPos)
-      end
-      -- Number
-      if string.find("+-0123456789.e", curChar, 1, true) then
-        return decode_scanNumber(s,startPos)
-      end
-      -- String
-      if curChar==[["]] or curChar==[[']] then
-        return decode_scanString(s,startPos)
-      end
-      if string.sub(s,startPos,startPos+1)=='/*' then
-        return self:decode(s, decode_scanComment(s,startPos))
-      end
-      -- Otherwise, it must be a constant
-      return decode_scanConstant(s,startPos)
-end
-
 local CONVERT = { [10] = "A", [11] = "B", [12] = "C", [13] = "D", [14] = "E", [15] = "F", [16] = "G",
 [17] = "H", [18] = "I", [19] = "J", [20] = "K", [21] = "L", [22] = "M", [23] = "N", [24] = "O", [25] = "P",
 [26] = "Q", [27] = "R", [28] = "S", [29] = "T",[30] = "U", [31] = "V",[32] = "W",[33] = "X", [34] = "Y", [35] = "Z" }
-
+--转换成32进制
 function utils:convertTo32(number)
     local unin_id = ""
     local multiple = 0
@@ -511,29 +342,6 @@ function utils:convertTo32(number)
         multiple = multiple + 1
     end
     return unin_id
-end
-
-function convertSql(log_name,data,is_quote)
-    local query = string.format("insert into `%s` ",log_name)
-    local fileds = {}
-    local values = {}
-    for field,value in pairs(data) do
-        if type(field) ~= "string" then
-            return "filed must be string"
-        end
-         table.insert(fileds,field)
-
-         local temp_value = string.gsub(value," ", ""); 
-         if type(value) == 'string' then
-            if value ~= "now()" then
-                temp_value = string.format("'%s'",temp_value)
-            end
-         end
-         table.insert(values,temp_value)
-    end
-
-    query = query .."("..table.concat(fileds,",")..") values("..table.concat(values,",")..");"
-    return query
 end
 
 return utils;

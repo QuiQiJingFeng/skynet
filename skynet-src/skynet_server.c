@@ -41,26 +41,26 @@
 #endif
 
 struct skynet_context {
-	void * instance;
-	struct skynet_module * mod;
+	void * instance;						//实例的地址
+	struct skynet_module * mod;				//模块的地址
 	void * cb_ud;
 	skynet_cb cb;
-	struct message_queue *queue;
+	struct message_queue *queue;			//消息队列
 	FILE * logfile;
 	uint64_t cpu_cost;	// in microsec
 	uint64_t cpu_start;	// in microsec
 	char result[32];
-	uint32_t handle;
+	uint32_t handle;						//服务的句柄
 	int session_id;
-	int ref;
-	int message_count;
-	bool init;
+	int ref;								//引用计数
+	int message_count;						//消息的数量
+	bool init;								//标记是否初始化过了
 	bool endless;
 	bool profile;
 
-	CHECKCALLING_DECL
+	CHECKCALLING_DECL						//自旋锁
 };
-
+//skynet 结点
 struct skynet_node {
 	int total;
 	int init;
@@ -75,17 +75,17 @@ int
 skynet_context_total() {
 	return G_NODE.total;
 }
-
+//total+1 并返回+1后的值
 static void
 context_inc() {
 	ATOM_INC(&G_NODE.total);
 }
-
+//对total数量-1
 static void
 context_dec() {
 	ATOM_DEC(&G_NODE.total);
 }
-
+//获取主线程本地存储的ID
 uint32_t 
 skynet_current_handle(void) {
 	if (G_NODE.init) {
@@ -96,7 +96,7 @@ skynet_current_handle(void) {
 		return v;
 	}
 }
-
+//将10进制转数换成16进制的字符串
 static void
 id_to_hex(char * str, uint32_t id) {
 	int i;
@@ -121,22 +121,27 @@ drop_message(struct skynet_message *msg, void *ud) {
 	// report error to the message source
 	skynet_send(NULL, source, msg->source, PTYPE_ERROR, 0, NULL, 0);
 }
-
+//创建一个skynet_context
 struct skynet_context * 
 skynet_context_new(const char * name, const char *param) {
+	//查询name模块,如果不存在则创建
 	struct skynet_module * mod = skynet_module_query(name);
 
 	if (mod == NULL)
 		return NULL;
-
+	//调用.so模块的create方法
 	void *inst = skynet_module_instance_create(mod);
 	if (inst == NULL)
 		return NULL;
+	//创建skynet_context
 	struct skynet_context * ctx = skynet_malloc(sizeof(*ctx));
+	//初始化自旋锁
 	CHECKCALLING_INIT(ctx)
-
+	//记录模块的地址
 	ctx->mod = mod;
+	//记录模块的实例地址
 	ctx->instance = inst;
+	//设置引用计数为2
 	ctx->ref = 2;
 	ctx->cb = NULL;
 	ctx->cb_ud = NULL;
@@ -148,23 +153,31 @@ skynet_context_new(const char * name, const char *param) {
 
 	ctx->cpu_cost = 0;
 	ctx->cpu_start = 0;
+	//初始化消息数量为0
 	ctx->message_count = 0;
 	ctx->profile = G_NODE.profile;
 	// Should set to 0 first to avoid skynet_handle_retireall get an uninitialized handle
 	ctx->handle = 0;	
+	//分配一个空闲的handle
 	ctx->handle = skynet_handle_register(ctx);
+	//根据分配的handle创建一个消息队列
 	struct message_queue * queue = ctx->queue = skynet_mq_create(ctx->handle);
 	// init function maybe use ctx->handle, so it must init at last
 	context_inc();
-
+	//对ctx加自旋锁
 	CHECKCALLING_BEGIN(ctx)
+	//调用so模块的init方法初始化
 	int r = skynet_module_instance_init(mod, inst, ctx, param);
+	//对ctx解锁
 	CHECKCALLING_END(ctx)
+	//r==0代表初始化成功
 	if (r == 0) {
+		//release 去掉一个引用计数  此时引用计数剩余1
 		struct skynet_context * ret = skynet_context_release(ctx);
 		if (ret) {
-			ctx->init = true;
+			ctx->init = true;  //标记初始化完毕
 		}
+		//将消息队列添加到全局消息队列中
 		skynet_globalmq_push(queue);
 		if (ret) {
 			skynet_error(ret, "LAUNCH %s %s", name, param ? param : "");
@@ -180,7 +193,7 @@ skynet_context_new(const char * name, const char *param) {
 		return NULL;
 	}
 }
-
+//返回一个新的可用的session号
 int
 skynet_context_newsession(struct skynet_context *ctx) {
 	// session always be a positive number
@@ -191,7 +204,7 @@ skynet_context_newsession(struct skynet_context *ctx) {
 	}
 	return session;
 }
-
+//引用计数自加1
 void 
 skynet_context_grab(struct skynet_context *ctx) {
 	ATOM_INC(&ctx->ref);
@@ -204,7 +217,7 @@ skynet_context_reserve(struct skynet_context *ctx) {
 	// the reserved context will be release at last.
 	context_dec();
 }
-
+//销毁skynet_context
 static void 
 delete_context(struct skynet_context *ctx) {
 	if (ctx->logfile) {
@@ -216,7 +229,7 @@ delete_context(struct skynet_context *ctx) {
 	skynet_free(ctx);
 	context_dec();
 }
-
+//skynet_context的引用计数减1,如果为0则销毁
 struct skynet_context * 
 skynet_context_release(struct skynet_context *ctx) {
 	if (ATOM_DEC(&ctx->ref) == 0) {
@@ -225,7 +238,7 @@ skynet_context_release(struct skynet_context *ctx) {
 	}
 	return ctx;
 }
-
+//将一条消息放入handle服务的消息队列中
 int
 skynet_context_push(uint32_t handle, struct skynet_message *message) {
 	struct skynet_context * ctx = skynet_handle_grab(handle);
@@ -233,6 +246,7 @@ skynet_context_push(uint32_t handle, struct skynet_message *message) {
 		return -1;
 	}
 	skynet_mq_push(ctx->queue, message);
+	//将ctx的引用计数-1  TODO:这里有些迷惑 为什么push还要release
 	skynet_context_release(ctx);
 
 	return 0;
@@ -247,7 +261,7 @@ skynet_context_endless(uint32_t handle) {
 	ctx->endless = true;
 	skynet_context_release(ctx);
 }
-
+//是否是远端的服务
 int 
 skynet_isremote(struct skynet_context * ctx, uint32_t handle, int * harbor) {
 	int ret = skynet_harbor_message_isremote(handle);
@@ -260,15 +274,20 @@ skynet_isremote(struct skynet_context * ctx, uint32_t handle, int * harbor) {
 static void
 dispatch_message(struct skynet_context *ctx, struct skynet_message *msg) {
 	assert(ctx->init);
+	//对ctx加自旋锁
 	CHECKCALLING_BEGIN(ctx)
+	//设置线程私有数据(服务的handle)
 	pthread_setspecific(G_NODE.handle_key, (void *)(uintptr_t)(ctx->handle));
 	int type = msg->sz >> MESSAGE_TYPE_SHIFT;
 	size_t sz = msg->sz & MESSAGE_TYPE_MASK;
+	//如果存在log文件,将本次发送的消息记录到Log文件
 	if (ctx->logfile) {
 		skynet_log_output(ctx->logfile, msg->source, type, msg->session, msg->data, sz);
 	}
+	//消息数量+1
 	++ctx->message_count;
 	int reserve_msg;
+	//如果分析文件存在,则叠加本次消耗的时间
 	if (ctx->profile) {
 		ctx->cpu_start = skynet_thread_time();
 		reserve_msg = ctx->cb(ctx, ctx->cb_ud, type, msg->session, msg->source, msg->data, sz);
@@ -277,12 +296,14 @@ dispatch_message(struct skynet_context *ctx, struct skynet_message *msg) {
 	} else {
 		reserve_msg = ctx->cb(ctx, ctx->cb_ud, type, msg->session, msg->source, msg->data, sz);
 	}
+	//如果reserve_msg(是否保留消息)为0,则销毁掉数据
 	if (!reserve_msg) {
 		skynet_free(msg->data);
 	}
+	//解开自旋锁
 	CHECKCALLING_END(ctx)
 }
-
+//分发消息队列中的所有消息,直到分发完毕
 void 
 skynet_context_dispatchall(struct skynet_context * ctx) {
 	// for skynet_error
@@ -323,6 +344,7 @@ skynet_context_message_dispatch(struct skynet_monitor *sm, struct message_queue 
 		}
 		int overload = skynet_mq_overload(q);
 		if (overload) {
+			//如果超过阈值则输出警告
 			skynet_error(ctx, "May overload, message queue length = %d", overload);
 		}
 
@@ -714,6 +736,7 @@ skynet_send(struct skynet_context * context, uint32_t source, uint32_t destinati
 	if (destination == 0) {
 		return session;
 	}
+	//如果是向远端服务发送的消息  则复制消息并调用harbor发送过去
 	if (skynet_harbor_message_isremote(destination)) {
 		struct remote_message * rmsg = skynet_malloc(sizeof(*rmsg));
 		rmsg->destination.handle = destination;
@@ -766,7 +789,7 @@ skynet_sendname(struct skynet_context * context, uint32_t source, const char * a
 
 	return skynet_send(context, source, des, type, session, data, sz);
 }
-
+//返回skynet_context的handle句柄
 uint32_t 
 skynet_context_handle(struct skynet_context *ctx) {
 	return ctx->handle;
@@ -785,7 +808,7 @@ skynet_context_send(struct skynet_context * ctx, void * msg, size_t sz, uint32_t
 	smsg.session = session;
 	smsg.data = msg;
 	smsg.sz = sz | (size_t)type << MESSAGE_TYPE_SHIFT;
-
+	//将消息加入队列
 	skynet_mq_push(ctx->queue, &smsg);
 }
 
@@ -794,10 +817,12 @@ skynet_globalinit(void) {
 	G_NODE.total = 0;
 	G_NODE.monitor_exit = 0;
 	G_NODE.init = 1;
+    //创建一个线程本地存储key,并赋值给G_NODE.handle_key
 	if (pthread_key_create(&G_NODE.handle_key, NULL)) {
 		fprintf(stderr, "pthread_key_create failed");
 		exit(1);
 	}
+    //设置主线程的本地存储
 	// set mainthread's key
 	skynet_initthread(THREAD_MAIN);
 }
@@ -806,7 +831,13 @@ void
 skynet_globalexit(void) {
 	pthread_key_delete(G_NODE.handle_key);
 }
-
+//设置线程ID作为线程的本地存储
+/*
+	你可以这样认为，
+	set是把一个变量的地址告诉key，get会把这个地址读出来，
+	比如线程a,b,c set同样的key，分别get得到的地址会是之前各自传进去的值。
+	这样做的意义在于，可以写一份线程代码，通过key的方式多线程操作不同的数据。
+*/
 void
 skynet_initthread(int m) {
 	uintptr_t v = (uint32_t)(-m);

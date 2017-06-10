@@ -14,17 +14,44 @@ static bool
 sp_invalid(int efd) {
 	return efd == -1;
 }
-
+/*
+	int epoll_create(int size)
+	创建一个epoll的句柄，size用来告诉内核这个监听的数目一共有多大。
+	当创建好epoll句柄后，它本身也会占用一个fd值
+*/
 static int
 sp_create() {
 	return epoll_create(1024);
 }
-
+//关闭epoll句柄
 static void
 sp_release(int efd) {
 	close(efd);
 }
+/*
+	int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+	epoll的事件注册函数在这里先注册要监听的事件类型
+	参数1: epoll句柄
+	参数2: 动作，用三个宏来表示：
+		EPOLL_CTL_ADD: 注册新的fd到epfd中；
+		EPOLL_CTL_MOD: 修改已经注册的fd的监听事件；
+		EPOLL_CTL_DEL: 从epfd中删除一个fd
+	参数3: 是需要监听的fd
+	参数4: 是告诉内核需要监听什么事
+		struct epoll_event {
+			__uint32_t events; // Epoll events 
+			epoll_data_t data; // User data variable 
+		};
+		events可以是以下几个宏的集合：
+		EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）；
+		EPOLLOUT：表示对应的文件描述符可以写；
+		EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）；
+		EPOLLERR：表示对应的文件描述符发生错误；
+		EPOLLHUP：表示对应的文件描述符被挂断；
+		EPOLLET： 将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来说的。
+		EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到EPOLL队列里。
 
+*/
 static int 
 sp_add(int efd, int sock, void *ud) {
 	struct epoll_event ev;
@@ -48,7 +75,13 @@ sp_write(int efd, int sock, void *ud, bool enable) {
 	ev.data.ptr = ud;
 	epoll_ctl(efd, EPOLL_CTL_MOD, sock, &ev);
 }
-
+/*
+	int epoll_wait epoll_wait() 可以用于等待IO事件。如果当前没有可用的事件，这个函数会阻塞调用线程。
+	int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout)
+	从内核epoll就绪链表中，拿到就绪的事件集合写入events结构体,如果事件大于maxevents则取maxevents个事件
+	如果小于则全部取出来,如果没有可用事件,则阻塞等待直到有事件或者timeout为止,timeout为-1则永远等待直到
+	有事件为止
+*/
 static int 
 sp_wait(int efd, struct event *e, int max) {
 	struct epoll_event ev[max];
@@ -63,14 +96,20 @@ sp_wait(int efd, struct event *e, int max) {
 
 	return n;
 }
-
+/*
+	int fcntl(int fd, int cmd); 
+	int fcntl(int fd, int cmd, long arg); 
+	int fcntl(int fd, int cmd, struct flock *lock);
+	设置为非阻塞
+*/
 static void
 sp_nonblocking(int fd) {
+	//返回fd的文件描述符
 	int flag = fcntl(fd, F_GETFL, 0);
 	if ( -1 == flag ) {
 		return;
 	}
-
+	//设置为非阻塞 返回复数则表示设置失败 TODO
 	fcntl(fd, F_SETFL, flag | O_NONBLOCK);
 }
 
