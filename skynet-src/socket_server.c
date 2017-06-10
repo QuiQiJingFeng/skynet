@@ -1272,32 +1272,39 @@ socket_server_poll(struct socket_server *ss, struct socket_message * result, int
 				ss->checkctrl = 0;
 			}
 		}
-		//如果event_index等于event_n，说明已经处理完了
+		//如果event_index等于event_n，说明已经处理完了 重新从epoll拿去就绪的事件
 		if (ss->event_index == ss->event_n) {
-			//等待epoll事情发生， 返回的是需要处理的事件个数
+			//获取内核就绪事件 将数据写入ss->ev 并返回事件数量
+			//比如socket读取事件,如果没有读取完的话,这次的事件列表中仍然会有那个socket事件
 			ss->event_n = sp_wait(ss->event_fd, ss->ev, MAX_EVENT);
+			//标记检查写端过来的请求
 			ss->checkctrl = 1;
 			if (more) {
 				*more = 0;
 			}
+			//当前处理事件数量为0
 			ss->event_index = 0;
+			//这里只是一个异常处理,根据epoll_wait时填写的time_out-1，事件数量为0时将不会返回
 			if (ss->event_n <= 0) {
 				ss->event_n = 0;
 				return -1;
 			}
 		}
-		//获取epoll事件,获取触发这个事件的socekt
+		//从事件列表中获取当前处理的事件
 		struct event *e = &ss->ev[ss->event_index++];
+		//获取触发这个事件的socket
 		struct socket *s = e->s;
+		//如果socket为空,则跳过这个事件
 		if (s == NULL) {
 			// dispatch pipe message at beginning
 			continue;
 		}
+		//根据socket的当前状态处理事件
 		switch (s->type) {
-		case SOCKET_TYPE_CONNECTING:// 主动connect得到远端响应
-			return report_connect(ss, s, result); // 正常的话描述符类型为 SOCKET_TYPE_CONNECTED
-		case SOCKET_TYPE_LISTEN: {  //listen完以后管道再接收一个"S"命令状态就变为SOCKET_TYPE_LISTEN了
-			int ok = report_accept(ss, s, result);//accept成功后会大于0
+		case SOCKET_TYPE_CONNECTING:
+			return report_connect(ss, s, result); 
+		case SOCKET_TYPE_LISTEN: {  
+			int ok = report_accept(ss, s, result);
 			if (ok > 0) {		
 				return SOCKET_ACCEPT;
 			} if (ok < 0 ) {
@@ -1310,11 +1317,14 @@ socket_server_poll(struct socket_server *ss, struct socket_message * result, int
 			fprintf(stderr, "socket-server: invalid socket\n");
 			break;
 		default:
-			if (e->read) { //有数据可读,在sp_wait中进行设置
+			//有数据可读
+			if (e->read) { 
 				int type;
+				//如果是tcp的socket
 				if (s->protocol == PROTOCOL_TCP) {
-					type = forward_message_tcp(ss, s, result);  // 正常的话返回 SOCKET_DATA
-				} else {
+					// 正常的话返回 SOCKET_DATA
+					type = forward_message_tcp(ss, s, result);
+				} else { //如果是udp的socket
 					type = forward_message_udp(ss, s, result);
 					if (type == SOCKET_UDP) {
 						// try read again

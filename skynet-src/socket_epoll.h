@@ -78,10 +78,9 @@ sp_write(int efd, int sock, void *ud, bool enable) {
 /*
 	int epoll_wait epoll_wait() 可以用于等待IO事件。如果当前没有可用的事件，这个函数会阻塞调用线程。
 	int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout)
-	参数2: events用来从内核得到事件的集合
-	参数3: maxevents表示每次能处理的最大事件数  maxevents的值不能大于创建epoll_create()时的size
-	参数4: timeout是超时时间（毫秒，0会立即返回，-1将不确定，也有说法说是永久阻塞）。
-	该函数返回需要处理的事件数目，如返回0表示已超时。
+	从内核epoll就绪链表中，拿到就绪的事件集合写入events结构体,如果事件大于maxevents则取maxevents个事件
+	如果小于则全部取出来,如果没有可用事件,则阻塞等待直到有事件或者timeout为止,timeout为-1则永远等待直到
+	有事件为止
 */
 static int 
 sp_wait(int efd, struct event *e, int max) {

@@ -14,14 +14,14 @@ struct skynet_monitor {
 	uint32_t source;		//来源
 	uint32_t destination;	//目标
 };
-
+//创建skynet_monitor并返回
 struct skynet_monitor * 
 skynet_monitor_new() {
 	struct skynet_monitor * ret = skynet_malloc(sizeof(*ret));
 	memset(ret, 0, sizeof(*ret));
 	return ret;
 }
-
+//释放skynet_monitor的内存
 void 
 skynet_monitor_delete(struct skynet_monitor *sm) {
 	skynet_free(sm);

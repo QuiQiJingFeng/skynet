@@ -832,6 +832,12 @@ skynet_globalexit(void) {
 	pthread_key_delete(G_NODE.handle_key);
 }
 //设置线程ID作为线程的本地存储
+/*
+	你可以这样认为，
+	set是把一个变量的地址告诉key，get会把这个地址读出来，
+	比如线程a,b,c set同样的key，分别get得到的地址会是之前各自传进去的值。
+	这样做的意义在于，可以写一份线程代码，通过key的方式多线程操作不同的数据。
+*/
 void
 skynet_initthread(int m) {
 	uintptr_t v = (uint32_t)(-m);

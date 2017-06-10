@@ -43,7 +43,18 @@ handle_hup(int signal) {
 }
 
 #define CHECK_ABORT if (skynet_context_total()==0) break;
-
+/*
+	int pthread_create(pthread_t*restrict tidp,const pthread_attr_t *restrict_attr,
+						void*（*start_rtn)(void*),void *restrict arg);
+	若成功则返回0，否则返回出错编号
+	参数1:tidp 写入新创建线程的线程ID
+	参数2:attr参数用于制定各种不同的线程属性。
+	参数3:线程运行的函数地址
+	参数4:该函数只有一个万能指针参数arg.
+	如果需要向start_rtn函数传递的参数不止一个，
+	那么需要把这些参数放到一个结构中，然后把这个结构的地址作为arg的参数传入。
+*/
+//创建一个线程,并指定接受一个void*参数的函数地址作为线程的入口,并指定函数的参数
 static void
 create_thread(pthread_t *thread, void *(*start_routine) (void *), void *arg) {
 	if (pthread_create(thread,NULL, start_routine, arg)) {
@@ -55,15 +66,21 @@ create_thread(pthread_t *thread, void *(*start_routine) (void *), void *arg) {
 static void
 wakeup(struct monitor *m, int busy) {
 	if (m->sleep >= m->count - busy) {
+		/*
+			pthread_cond_signal函数的作用是发送一个信号给另外一个正在处于阻塞等待状态的线程,
+			使其脱离阻塞状态,继续执行.如果没有线程处在阻塞等待状态,pthread_cond_signal也会成功返回。
+		*/
 		// signal sleep worker, "spurious wakeup" is harmless
 		pthread_cond_signal(&m->cond);
 	}
 }
-
+//socket处理线程处理流程
 static void *
 thread_socket(void *p) {
 	struct monitor * m = p;
+	//标记本线程为 THREAD_SOCKET
 	skynet_initthread(THREAD_SOCKET);
+	//socket 事件处理循环,每次循环会处理一个事件
 	for (;;) {
 		int r = skynet_socket_poll();
 		if (r==0)
@@ -72,6 +89,7 @@ thread_socket(void *p) {
 			CHECK_ABORT
 			continue;
 		}
+		//唤醒监控线程
 		wakeup(m,0);
 	}
 	return NULL;
@@ -148,7 +166,7 @@ thread_timer(void *p) {
 	pthread_mutex_unlock(&m->mutex);
 	return NULL;
 }
-
+//消息处理线程
 static void *
 thread_worker(void *p) {
 	struct worker_parm *wp = p;
@@ -180,44 +198,41 @@ thread_worker(void *p) {
 
 static void
 start(int thread) {
+	/*
+		thread为config中配置的thread数量  +3是因为除了这些消息处理线程外还会创建3个默认线程
+		分别是:监控线程,监控服务的创建和退出
+			  时间线程,用来执行跟时间相关的任务
+			  网络线程,用来接收以及发送网络消息
+	*/
 	pthread_t pid[thread+3];
-	//初始化监控中心
+	//初始化监控结构体
 	struct monitor *m = skynet_malloc(sizeof(*m));
 	memset(m, 0, sizeof(*m));
-	//初始化线程数量
+	//初始化监控的线程数量
 	m->count = thread;
 	m->sleep = 0;
-	//申请监控列表空间
+	//申请一个skynet_monitor数组
 	m->m = skynet_malloc(thread * sizeof(struct skynet_monitor *));
-	//初始化监控列表空间,每个thread配备一个skynet_monitor
 	int i;
 	for (i=0;i<thread;i++) {
 		m->m[i] = skynet_monitor_new();
 	}
-	/*
-		pthread_mutex_init()函数是以动态方式创建互斥锁的，参数attr指定了新建互斥锁的属性。
-		如果参数attr为空，则使用默认的互斥锁属性，默认属性为快速互斥锁 
-	*/
+	//初始化互斥锁
 	if (pthread_mutex_init(&m->mutex, NULL)) {
 		fprintf(stderr, "Init mutex error");
 		exit(1);
 	}
-	/*
-	extern int pthread_cond_init __P ((pthread_cond_t *__cond,__const pthread_condattr_t *__cond_attr));
-		函数pthread_cond_init（）被用来初始化一个条件变量
-		结构pthread_condattr_t是条件变量的属性结构，
-		默认值是PTHREAD_ PROCESS_PRIVATE，即此条件变量被同一进程内的各个线程使用；
-		如果选择为PTHREAD_PROCESS_SHARED则为多个进程间各线程公用。
-		注意初始化条件变量只有未被使用时才能重新初始化或被释放。
-		返回值：函数成功返回0；任何其他返回值都表示错误。
-	*/
+	//初始化线程条件变量  等价于 pthread_cond_t cv = PTHREAD_COND_INITIALIZER;
 	if (pthread_cond_init(&m->cond, NULL)) {
 		fprintf(stderr, "Init cond error");
 		exit(1);
 	}
-	//默认启动三个线程  分别是monitor/timer/socket线程
+	//创建线程 将监控结构体m传入线程函数 并将线程ID 赋值给pid[i]
+	//监控线程
 	create_thread(&pid[0], thread_monitor, m);
+	//时间线程
 	create_thread(&pid[1], thread_timer, m);
+	//socket线程
 	create_thread(&pid[2], thread_socket, m);
 
 	static int weight[] = { 
@@ -234,17 +249,17 @@ start(int thread) {
 		} else {
 			wp[i].weight = 0;
 		}
-		//启动消息处理线程
+		//启动消息处理线程 传入结构体作为线程参数 将线程ID 添加到ipd数组 中
 		create_thread(&pid[i+3], thread_worker, &wp[i]);
 	}
 	/*
-		pthread_join()函数，以阻塞的方式等待thread指定的线程结束。当函数返回时，被等待线程的资源被收回。
-		如果线程已经结束，那么该函数会立即返回。并且thread指定的线程必须是joinable的。
+		如果没有pthread_join主线程会很快结束从而使整个进程结束，从而使创建的线程没有机会开始执行就结束了。
+		加入pthread_join后，主线程会一直等待直到等待的线程结束自己才结束，使创建的线程有机会执行。
 	*/
 	for (i=0;i<thread+3;i++) {
 		pthread_join(pid[i], NULL); 
 	}
-
+	//当所有的线程执行完毕后 释放监控结构体
 	free_monitor(m);
 }
 
