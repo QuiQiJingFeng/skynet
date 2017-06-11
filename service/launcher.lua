@@ -76,6 +76,7 @@ end
 
 local function launch_service(service, ...)
 	local param = table.concat({...}, " ")
+	--创建一个服务并返回服务的地址
 	local inst = skynet.launch(service, param)
 	local response = skynet.response()
 	if inst then

@@ -174,6 +174,7 @@ thread_worker(void *p) {
 	int weight = wp->weight;
 	struct monitor *m = wp->m;
 	struct skynet_monitor *sm = m->m[id];
+	//标记worker线程  为THREAD_WORKER
 	skynet_initthread(THREAD_WORKER);
 	struct message_queue * q = NULL;
 	while (!m->quit) {

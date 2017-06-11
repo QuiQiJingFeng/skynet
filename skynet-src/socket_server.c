@@ -990,7 +990,6 @@ ctrl_cmd(struct socket_server *ss, struct socket_message *result) {
 	//读取前命令的前两个字节
 	block_readpipe(fd, header, sizeof(header));
 	int type = header[0];  //第一个字节为命令的类型
-	printf("TYPE-->%c\n",type);
 	int len = header[1];   //第二个字节为消息的长度
 	//根据消息的长度读取消息到buffer
 	block_readpipe(fd, buffer, len);

@@ -500,7 +500,7 @@ cmd_kill(struct skynet_context * context, const char * param) {
 	}
 	return NULL;
 }
-
+//启动一个服务
 static const char *
 cmd_launch(struct skynet_context * context, const char * param) {
 	size_t sz = strlen(param);
@@ -509,6 +509,7 @@ cmd_launch(struct skynet_context * context, const char * param) {
 	char * args = tmp;
 	char * mod = strsep(&args, " \t\r\n");
 	args = strsep(&args, "\r\n");
+	//为新的服务生成一个skynet_context实例并将这个实例的handle值返回回去
 	struct skynet_context * inst = skynet_context_new(mod,args);
 	if (inst == NULL) {
 		return NULL;
@@ -671,7 +672,7 @@ static struct command_func cmd_funcs[] = {
 	{ "NAME", cmd_name },
 	{ "EXIT", cmd_exit },
 	{ "KILL", cmd_kill },
-	{ "LAUNCH", cmd_launch },
+	{ "LAUNCH", cmd_launch },		//启动服务
 	{ "GETENV", cmd_getenv },
 	{ "SETENV", cmd_setenv },
 	{ "STARTTIME", cmd_starttime },

@@ -397,8 +397,20 @@ luaopen_skynet_core(lua_State *L) {
 	if (ctx == NULL) {
 		return luaL_error(L, "Init skynet context first");
 	}
-
+	/*
+		LUA5.1:
+			1、luaL_register(L, "skynet", l);
+			2、C必须调用luaopen_skynet_core才能注册到lua
+			3、之后 lua=>  skynet.send这样用
+	*/
+	/*
+		LUA5.2:
+		1、luaL_setfuncs(L,l,1);
+		2、lua中必须  require "skynet.core" <==> C中调用luaopen_skynet_core
+		3、之后根据require出来的表直接调用注册的函数
+	*/
+	//luaL_register(被弃用),luaL_setfuncs为新的注册函数
 	luaL_setfuncs(L,l,1);
-
+	printf("注册方法-----\n");
 	return 1;
 }
