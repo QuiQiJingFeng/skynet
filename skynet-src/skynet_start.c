@@ -142,15 +142,17 @@ signal_hup() {
 		skynet_context_push(logger, &smsg);
 	}
 }
-
+//时间线程
 static void *
 thread_timer(void *p) {
 	struct monitor * m = p;
+	//标记时间线程 THREAD_TIMER
 	skynet_initthread(THREAD_TIMER);
 	for (;;) {
 		skynet_updatetime();
 		CHECK_ABORT
 		wakeup(m,m->count-1);
+		//把线程挂起2500微秒(微秒 = 百万分之一秒)
 		usleep(2500);
 		if (SIG) {
 			signal_hup();

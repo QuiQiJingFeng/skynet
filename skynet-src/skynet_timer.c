@@ -170,6 +170,7 @@ timer_execute(struct timer *T) {
 
 static void 
 timer_update(struct timer *T) {
+	//自旋锁
 	SPIN_LOCK(T);
 
 	// try to dispatch timeout 0 (rare condition)
@@ -179,7 +180,7 @@ timer_update(struct timer *T) {
 	timer_shift(T);
 
 	timer_execute(T);
-
+	//解开自旋锁
 	SPIN_UNLOCK(T);
 }
 
@@ -265,6 +266,7 @@ gettime() {
 void
 skynet_updatetime(void) {
 	uint64_t cp = gettime();
+	//如果当前时间 在记录的时间点之前(手动调整过时间) 则会输出time diff 之后记录当前时间点
 	if(cp < TI->current_point) {
 		skynet_error(NULL, "time diff error: change from %lld to %lld", cp, TI->current_point);
 		TI->current_point = cp;
@@ -272,6 +274,7 @@ skynet_updatetime(void) {
 		uint32_t diff = (uint32_t)(cp - TI->current_point);
 		TI->current_point = cp;
 		TI->current += diff;
+		//timer_update的单位是0.01s
 		int i;
 		for (i=0;i<diff;i++) {
 			timer_update(TI);
