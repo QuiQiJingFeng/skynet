@@ -57,7 +57,7 @@
       </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "./conf/test/config.lua"
+            argument = "config/conf/test/config.lua"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
