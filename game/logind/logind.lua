@@ -5,13 +5,13 @@ local sharedata = require "sharedata"
 local utils = require "utils"
 local httpc = require "http.httpc"
 local cjson = require "cjson"
-local account_redis
 
+local account_redis
 local MAX_USER_ID = 4967000
 
-local CMD = {}
+local logind = {}
 
-local function Check(account,password)
+function logind:Check()
     local content = {
         ["action"] = "login",
         ["account"] = account,
@@ -32,7 +32,7 @@ local function Check(account,password)
     return false
 end
 
-local function CreateUserId(server_id)
+function logind:CreateUserId()
     local max_id = account_redis:incrby("user_id_generator", 1)
     if max_id >= MAX_USER_ID then
         return nil
@@ -41,12 +41,24 @@ local function CreateUserId(server_id)
     return utils:convertTo32(user_id)
 end
 
+function logind:LoadDefault()
+    local conf = sharedata.query("account_redis_conf")
+    account_redis = redis.connect(conf)
+
+    if not account_redis:exists("user_id_generator") then
+        account_redis:set("user_id_generator", 1)
+    end
+end
+
+local funcs = {}
+logind.funcs = funcs
+
 --登录，如果账户不存在则新建一个
-function CMD.Login(data)
+function funcs.Login(data)
     local result = "success"
     
     -----登录校验------------
-    local success = Check(data.account,data.password);
+    local success = logind:Check(data.account,data.password);
     if not success then
         result = "auth_failure"
         return result,nil,nil
@@ -58,7 +70,7 @@ function CMD.Login(data)
     local user_id = account_redis:hget(user_key, server_id)
     local is_new = false
     if not user_id then
-        user_id = CreateUserId(server_id)
+        user_id = logind:CreateUserId(server_id)
         if not user_id then
             skynet.error("ERROR:USERID_GENERATOR TOP!!!!")
             assert(user_id)
@@ -69,22 +81,4 @@ function CMD.Login(data)
     return result,user_id,is_new
 end 
 
-skynet.start(function()
-    skynet.dispatch("lua", function(session, source, cmd, ...)
-        local f = assert(CMD[cmd])
-        if session > 0 then
-            skynet.ret(skynet.pack(f(...)))
-        else
-            f(...)
-        end
-    end)
-
-    local conf = sharedata.query("account_redis_conf")
-    account_redis = redis.connect(conf)
-
-    if not account_redis:exists("user_id_generator") then
-        account_redis:set("user_id_generator", 1)
-    end
-
-    skynet.register(".logind") 
-end)
+return logind
