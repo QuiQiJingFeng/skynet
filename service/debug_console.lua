@@ -261,7 +261,9 @@ function COMMAND.hotfix(address, filename,filekey)
     end
     local source = f:read "*a"
     f:close()
-    local ok, output = skynet.call(address, "debug", "HOTFIX", source, filekey)
+ 
+    local msg,sz = skynet.rawcall(address, "debug",skynet.pack("HOTFIX",source,filekey))
+    local ok, output = skynet.unpack(msg,sz)
     if ok == false then
         error(output)
     end

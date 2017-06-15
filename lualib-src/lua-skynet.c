@@ -411,6 +411,5 @@ luaopen_skynet_core(lua_State *L) {
 	*/
 	//luaL_register(被弃用),luaL_setfuncs为新的注册函数
 	luaL_setfuncs(L,l,1);
-	printf("注册方法-----\n");
 	return 1;
 }

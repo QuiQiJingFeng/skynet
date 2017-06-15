@@ -62,9 +62,9 @@ local function init(skynet, export)
 			local success ,err = xpcall(utils.hotfix,debug.traceback,utils,source, filekey)
 			local result = nil
 			if not success then
-				result = "HOTFIX FAIL \n"..err
+				result = string.format("%x",skynet.self()).." HOTFIX FAIL \n"..err
 			else
-				result = "HOTFIX SUCCESS"
+				result = string.format("%x",skynet.self()).." HOTFIX SUCCESS"
 			end
 			skynet.ret(skynet.pack(ok, result))
 		end
