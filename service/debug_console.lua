@@ -253,6 +253,21 @@ function COMMAND.inject(address, filename)
     return output
 end
 
+function COMMAND.hotfix(address, filename,filekey)
+    address = adjust_address(address)
+    local f = io.open(filename, "rb")
+    if not f then
+        return "Can't open " .. filename
+    end
+    local source = f:read "*a"
+    f:close()
+    local ok, output = skynet.call(address, "debug", "HOTFIX", source, filekey)
+    if ok == false then
+        error(output)
+    end
+    return output
+end
+
 function COMMAND.task(address)
     address = adjust_address(address)
     return skynet.call(address,"debug","TASK")

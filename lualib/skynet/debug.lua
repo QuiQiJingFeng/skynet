@@ -57,6 +57,18 @@ local function init(skynet, export)
 			skynet.ret(skynet.pack(ok, table.concat(output, "\n")))
 		end
 
+		function dbgcmd.HOTFIX(source, filekey)
+			local utils = require "utils"
+			local success ,err = xpcall(utils.hotfix,debug.traceback,utils,source, filekey)
+			local result = nil
+			if not success then
+				result = "HOTFIX FAIL \n"..err
+			else
+				result = "HOTFIX SUCCESS"
+			end
+			skynet.ret(skynet.pack(ok, result))
+		end
+
 		function dbgcmd.TERM(service)
 			skynet.term(service)
 		end

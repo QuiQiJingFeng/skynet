@@ -349,5 +349,116 @@ function utils:convertTo32(number)
     return unin_id
 end
 
+function utils:getUpvalueNum(func)
+    local i = 1
+    while true do
+        local name, value = debug.getupvalue(func, i)
+        if name == nil then
+            break
+        end
+        i = i + 1
+    end
+    return i - 1
+end
+
+function utils:funcHotfix(new_func,origin_func,unique)
+    if new_func == origin_func then
+        return
+    end
+    local new_num = self:getUpvalueNum(new_func)
+    local old_num = self:getUpvalueNum(origin_func)
+    if old_num ~= new_num then
+        error("约定:原方法和新方法的upvalue个数必须一致")
+    end 
+    local i = 1
+    while true do
+        local name, value = debug.getupvalue(origin_func, i)
+        local new_name,new_value = debug.getupvalue(new_func, i)
+        if name == nil then
+            return
+        end
+        if name ~= new_name then
+            error("约定:原方法和新方法upvalue的名称和位置必须一致")
+        end
+
+        if type(value) == "table" then
+            if value ~= new_value then
+                if not unique[value] then
+                    unique[value] = true
+                    self:tableHotfix(value,new_value,unique)
+                end
+            end
+        elseif type(value) == 'function' then
+            if value ~= new_value then
+                if not unique[value] then
+                    unique[value] = true
+                    self:funcHotfix(value,new_value,unique)
+                end
+            end
+        else
+            debug.upvaluejoin(new_func,i,origin_func,i)
+        end
+        i = i + 1
+    end
+end
+
+function utils:tableHotfix(newtable,origintable,unique)
+    if newtable == origintable then
+        return
+    end
+
+    for k,v in pairs(origintable) do
+        local tp = type(v)
+        if tp == "table" then
+            if newtable[k] and newtable[k] ~= origintable[k] then
+                if not unique[v] then
+                    unique[v] = true
+                    self:tableHotfix(newtable[k],origintable[k],unique)
+                end
+            end
+        elseif tp == "function" then
+            if newtable[k] and newtable[k] ~= origintable[k] then
+                if not unique[v] then
+                    unique[v] = true
+                    self:funcHotfix(newtable[k],origintable[k],unique)
+                end 
+            end
+        else
+            if newtable[k] then
+                newtable[k] = v
+            end
+        end    
+    end
+end
+
+function utils:hotfix(source,loaded_key)
+    local origintable = package.loaded[loaded_key]
+    if not origintable then
+        error(string.format("%s 不存在,不需要热更",loaded_key))
+    end
+    local func, err = load(source)
+    if not func then
+        error("语法错误\n"..err)
+    end
+    local succ, newtable = xpcall(func, debug.traceback)
+    if not succ then
+        error("语法块执行失败\n"..err)
+    end
+
+    for k,v in pairs(newtable) do
+        if not origintable[k] then
+            error("约定: 待热更的文件key的个数必须跟源文件一致")
+        end
+    end
+
+    local unique = {}
+    self:tableHotfix(newtable,origintable,unique)
+
+    for k,v in pairs(newtable) do
+        origintable[k] = v
+    end
+    collectgarbage "collect"
+end    
+
 return utils;
  
