@@ -290,10 +290,12 @@ dispatch_message(struct skynet_context *ctx, struct skynet_message *msg) {
 	//如果分析文件存在,则叠加本次消耗的时间
 	if (ctx->profile) {
 		ctx->cpu_start = skynet_thread_time();
+		//cb(call_back) 回调lua
 		reserve_msg = ctx->cb(ctx, ctx->cb_ud, type, msg->session, msg->source, msg->data, sz);
 		uint64_t cost_time = skynet_thread_time() - ctx->cpu_start;
 		ctx->cpu_cost += cost_time;
 	} else {
+		//cb(call_back) 回调lua
 		reserve_msg = ctx->cb(ctx, ctx->cb_ud, type, msg->session, msg->source, msg->data, sz);
 	}
 	//如果reserve_msg(是否保留消息)为0,则销毁掉数据
