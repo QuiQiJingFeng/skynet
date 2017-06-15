@@ -229,7 +229,7 @@ end
 function COMMAND.kill(address)
     return skynet.call(".launcher", "lua", "KILL", address)
 end
-
+--对所有的服务进行一次gc
 function COMMAND.gc()
     return skynet.call(".launcher", "lua", "GC")
 end
@@ -252,22 +252,27 @@ function COMMAND.inject(address, filename)
     end
     return output
 end
-
-function COMMAND.hotfix(address, filename,filekey)
-    address = adjust_address(address)
+--对所有的服务进行一次热更(热更指定文件)
+function COMMAND.hotfix(filename,filekey)
     local f = io.open(filename, "rb")
     if not f then
         return "Can't open " .. filename
     end
     local source = f:read "*a"
     f:close()
- 
-    local msg,sz = skynet.rawcall(address, "debug",skynet.pack("HOTFIX",source,filekey))
-    local ok, output = skynet.unpack(msg,sz)
-    if ok == false then
-        error(output)
+    local list = skynet.call(".launcher", "lua", "LIST")
+    local result = {}
+    for address,v in pairs(list) do
+        local msg,sz = skynet.rawcall(address, "debug",skynet.pack("HOTFIX",source,filekey))
+        local ok, output = skynet.unpack(msg,sz)
+        if ok == false then
+            table.insert(result,output)
+        else
+            table.insert(result,output)
+        end
     end
-    return output
+    
+    return table.concat(result,"\n")
 end
 
 function COMMAND.task(address)

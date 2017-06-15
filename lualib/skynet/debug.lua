@@ -59,10 +59,10 @@ local function init(skynet, export)
 
 		function dbgcmd.HOTFIX(source, filekey)
 			local utils = require "utils"
-			local success ,err = xpcall(utils.hotfix,debug.traceback,utils,source, filekey)
+			local success ,err = pcall(utils.hotfix,utils,source, filekey)
 			local result = nil
 			if not success then
-				result = string.format("%x",skynet.self()).." HOTFIX FAIL \n"..err
+				result = string.format("%x",skynet.self()).." HOTFIX FAIL     "..err
 			else
 				result = string.format("%x",skynet.self()).." HOTFIX SUCCESS"
 			end
