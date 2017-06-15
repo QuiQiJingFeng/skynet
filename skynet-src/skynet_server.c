@@ -615,6 +615,7 @@ cmd_logon(struct skynet_context * context, const char * param) {
 		return NULL;
 	FILE *f = NULL;
 	FILE * lastf = ctx->logfile;
+	//只有logfile不存在 logpath才管用
 	if (lastf == NULL) {
 		f = skynet_log_open(context, handle);
 		if (f) {
