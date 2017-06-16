@@ -1,7 +1,7 @@
 root = "./"
 luaservice = root.."service/?.lua;"..root.."game/?.lua;"..root.."game/?/main.lua"
 lualoader = root .. "lualib/loader.lua"
-lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua"
+lua_path = root.."lualib/?.lua;"
 lua_cpath = root .. "luaclib/?.so"
 snax = luaservice
 
@@ -18,8 +18,6 @@ standalone = "0.0.0.0:2013"
 -- snax_interface_g = "snax_g"
 cpath = root.."cservice/?.so"
 -- daemon = "./skynet.pid"
-
-profile = true  --统计每个服务使用了多少 cpu 时间
 
 game_port = 8888
 maxclient = 8192
