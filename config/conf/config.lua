@@ -1,5 +1,5 @@
 root = "./"
-luaservice = root.."service/?.lua;"..root.."game/?.lua;"..root.."game/?/init.lua"
+luaservice = root.."service/?.lua;"..root.."game/?.lua;"..root.."game/?/main.lua"
 lualoader = root .. "lualib/loader.lua"
 lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua"
 lua_cpath = root .. "luaclib/?.so"
@@ -7,7 +7,7 @@ snax = luaservice
 
 -- preload = "./examples/preload.lua"   -- run preload.lua before every lua service run
 thread = 8
-logger = "./config/log/log.lua" --skynet.error 输出文件
+-- logger = "./config/log/log.lua" --skynet.error 输出文件
 logpath = "."  --只有logfile不存在 同时运行时调用logon命令 logpath才管用  
 harbor = 1
 address = "127.0.0.1:2526"

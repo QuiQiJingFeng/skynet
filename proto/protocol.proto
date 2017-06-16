@@ -1,14 +1,14 @@
 import "msg/login.proto";
-import "msg/usr.proto";
+import "msg/user.proto";
 
 message C2GS {
 	optional msg.login.Login login = 3;						//登录
 	optional msg.login.Logout logout = 4;					//登出
-    optional msg.login.CreateName create_name = 5;          //创建用户名称					
+    optional msg.user.CreateName create_name = 5;          //创建用户名称					
 }
 
 message GS2C {
 	optional msg.login.LoginRet login_ret = 3;				//登录
 	optional msg.login.LogoutRet logout_ret = 4;			//登出	
-    optional msg.login.CreateNameRet create_name_ret = 5;          //创建用户名称  
+    optional msg.user.CreateNameRet create_name_ret = 5;          //创建用户名称  
 }

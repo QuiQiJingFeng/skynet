@@ -1,0 +1,409 @@
+[:01000001] LAUNCH logger 
+[:01000002] LAUNCH snlua bootstrap
+[:01000003] LAUNCH snlua launcher
+[:01000004] LAUNCH snlua cmaster
+[:01000004] master listen socket 0.0.0.0:2013
+[:01000005] LAUNCH snlua cslave
+[:01000005] slave connect to master 127.0.0.1:2013
+[:01000006] LAUNCH harbor 1 16777221
+[:01000004] connect from 127.0.0.1:53616 4
+[:01000004] Harbor 1 (fd=4) report 127.0.0.1:2526
+[:01000005] Waiting for 0 harbors
+[:01000005] Shakehand ready
+[:01000007] LAUNCH snlua datacenterd
+[:01000008] LAUNCH snlua service_mgr
+[:01000009] LAUNCH snlua main
+[:01000009] Server start
+[:0100000a] LAUNCH snlua static_data
+[:0100000b] LAUNCH snlua sharedatad
+[:0100000c] LAUNCH snlua logind
+[:0100000d] LAUNCH snlua mysqllog
+[:0100000e] LAUNCH snlua debug_console 8000
+[:0100000e] Start debug console at 127.0.0.1:8000
+[:0100000f] LAUNCH snlua watchdog
+[:01000010] LAUNCH snlua gate
+[:01000011] LAUNCH snlua agent
+[:01000010] Listen on 0.0.0.0:8888
+[:01000009] Watchdog listen on 8888
+[:01000009] KILL self
+[:01000002] KILL self
+[:0100000e] 9 connected
+dump from: ./game/static_data/static_data.lua:97: in local 'f'
+- "FYD===========
+" = {
+-     "SERVICE_NAME"   = "static_data"
+-     "SERVICE_PATH"   = "./game/static_data/"
+-     "_G"             = *REF*
+-     "_VERSION"       = "Lua 5.3"
+-     "assert"         = function: 0x10a6ab9b0
+-     "collectgarbage" = function: 0x10a6aba30
+-     "coroutine" = {
+-         "create"      = function: 0x10a6ac950
+-         "isyieldable" = function: 0x10a6acbe0
+-         "resume"      = function: 0x10a6ac9a0
+-         "running"     = function: 0x10a6aca50
+-         "status"      = function: 0x10a6aca80
+-         "wrap"        = function: 0x10a6acb50
+-         "yield"       = function: 0x10a6acbb0
+-     }
+-     "debug" = {
+-         "debug"        = function: 0x10a6acdc0
+-         "gethook"      = function: 0x10a6acf80
+-         "getinfo"      = function: 0x10a6ad0e0
+-         "getlocal"     = function: 0x10a6ad550
+-         "getmetatable" = function: 0x10a6ad6e0
+-         "getregistry"  = function: 0x10a6ad6c0
+-         "getupvalue"   = function: 0x10a6ad720
+-         "getuservalue" = function: 0x10a6acf40
+-         "sethook"      = function: 0x10a6ad970
+-         "setlocal"     = function: 0x10a6adb80
+-         "setmetatable" = function: 0x10a6adce0
+-         "setupvalue"   = function: 0x10a6add40
+-         "setuservalue" = function: 0x10a6ad920
+-         "traceback"    = function: 0x10a6addc0
+-         "upvalueid"    = function: 0x10a6ad8a0
+-         "upvaluejoin"  = function: 0x10a6ad790
+-     }
+-     "dofile"         = function: 0x10a6abaf0
+-     "error"          = function: 0x10a6abb60
+-     "getmetatable"   = function: 0x10a6abbe0
+-     "io" = {
+-         "close"   = function: 0x10a6ae0d0
+-         "flush"   = function: 0x10a6ae160
+-         "input"   = function: 0x10a6ae1d0
+-         "lines"   = function: 0x10a6ae1f0
+-         "open"    = function: 0x10a6ae360
+-         "output"  = function: 0x10a6ae490
+-         "popen"   = function: 0x10a6ae4b0
+-         "read"    = function: 0x10a6ae560
+-         "stderr"  = file (0x7fff9db11240)
+-         "stdin"   = file (0x7fff9db11110)
+-         "stdout"  = file (0x7fff9db111a8)
+-         "tmpfile" = function: 0x10a6ae5c0
+-         "type"    = function: 0x10a6ae630
+-         "write"   = function: 0x10a6ae6a0
+-     }
+-     "ipairs"         = function: 0x10a6abc30
+-     "load"           = function: 0x10a6abd60
+-     "loadfile"       = function: 0x10a6abc80
+-     "math" = {
+-         "abs"        = function: 0x10a6afad0
+-         "acos"       = function: 0x10a6afb30
+-         "asin"       = function: 0x10a6afb60
+-         "atan"       = function: 0x10a6afb90
+-         "ceil"       = function: 0x10a6afbe0
+-         "cos"        = function: 0x10a6afc50
+-         "deg"        = function: 0x10a6afc80
+-         "exp"        = function: 0x10a6afcb0
+-         "floor"      = function: 0x10a6afd30
+-         "fmod"       = function: 0x10a6afda0
+-         "huge"       = inf
+-         "log"        = function: 0x10a6afeb0
+-         "max"        = function: 0x10a6aff70
+-         "maxinteger" = 9223372036854775807
+-         "min"        = function: 0x10a6b0010
+-         "mininteger" = -9223372036854775808
+-         "modf"       = function: 0x10a6b00b0
+-         "pi"         = 3.1415926535898
+-         "rad"        = function: 0x10a6b0170
+-         "random"     = function: 0x10a6b01a0
+-         "randomseed" = function: 0x10a6b02d0
+-         "sin"        = function: 0x10a6b0300
+-         "sqrt"       = function: 0x10a6b0330
+-         "tan"        = function: 0x10a6b0360
+-         "tointeger"  = function: 0x10a6afce0
+-         "type"       = function: 0x10a6b0390
+-         "ult"        = function: 0x10a6afe70
+-     }
+-     "next"           = function: 0x10a6abec0
+-     "os" = {
+-         "clock"     = function: 0x10a6b0440
+-         "date"      = function: 0x10a6b0490
+-         "difftime"  = function: 0x10a6b0760
+-         "execute"   = function: 0x10a6b07b0
+-         "exit"      = function: 0x10a6b0800
+-         "getenv"    = function: 0x10a6b0870
+-         "remove"    = function: 0x10a6b08b0
+-         "rename"    = function: 0x10a6b08f0
+-         "setlocale" = function: 0x10a6b0940
+-         "time"      = function: 0x10a6b09a0
+-         "tmpname"   = function: 0x10a6b0b10
+-     }
+-     "package" = {
+-         "config"     = "/
+;
+?
+!
+-
+"
+-         "cpath"      = "./luaclib/?.so"
+-         "loaded" = {
+-             "_G"                = *REF*
+-             "constants" = {
+-                 "LIMIT_VERSION" = "1.0.0"
+-                 "MAX_NUM_CHAR"  = 16
+-             }
+-             "coroutine"         = *REF*
+-             "csv" = {
+-                 "load" = function: 0x7fbdcfd23460
+-             }
+-             "debug"             = *REF*
+-             "io"                = *REF*
+-             "math"              = *REF*
+-             "os"                = *REF*
+-             "package"           = *REF*
+-             "profile" = {
+-                 "resume"    = function: 0x7fbdcfe57700
+-                 "resume_co" = function: 0x7fbdcfe577a0
+-                 "start"     = function: 0x7fbdcfe57660
+-                 "stop"      = function: 0x7fbdcfe576b0
+-                 "yield"     = function: 0x7fbdcfe57750
+-                 "yield_co"  = function: 0x7fbdcfe577f0
+-             }
+-             "sharedata" = {
+-                 "deepcopy" = function: 0x7fbdcfe64810
+-                 "delete"   = function: 0x7fbdcfe64140
+-                 "flush"    = function: 0x7fbdcfe64650
+-                 "new"      = function: 0x7fbdcfe64620
+-                 "query"    = function: 0x7fbdcfe64590
+-                 "update"   = function: 0x7fbdcfe64110
+-             }
+-             "sharedata.core" = {
+-                 "box"        = function: 0x10ad327e0
+-                 "decref"     = function: 0x10ad32780
+-                 "delete"     = function: 0x10ad32610
+-                 "getref"     = function: 0x10ad326b0
+-                 "hashlen"    = function: 0x10ad32ca0
+-                 "incref"     = function: 0x10ad32710
+-                 "index"      = function: 0x10ad32890
+-                 "isdirty"    = function: 0x10ad32cf0
+-                 "len"        = function: 0x10ad32c50
+-                 "markdirty"  = function: 0x10ad32660
+-                 "needupdate" = function: 0x10ad32d40
+-                 "new"        = function: 0x10ad32390
+-                 "nextkey"    = function: 0x10ad32a20
+-                 "update"     = function: 0x10ad32d80
+-             }
+-             "sharedata.corelib" = {
+-                 "box"    = function: 0x7fbdcfe640d0
+-                 "copy"   = function: 0x7fbdcfe64380
+-                 "flush"  = function: 0x7fbdcfe64190
+-                 "host" = {
+-                     "decref"    = function: 0x10ad32780
+-                     "delete"    = function: 0x10ad32610
+-                     "getref"    = function: 0x10ad326b0
+-                     "incref"    = function: 0x10ad32710
+-                     "markdirty" = function: 0x10ad32660
+-                     "new"       = function: 0x10ad32390
+-                 }
+-                 "next"   = function: 0x7fbdcfe64080
+-                 "update" = function: 0x7fbdcfe63f90
+-             }
+-             "skynet" = {
+-                 "PTYPE_CLIENT"              = 3
+-                 "PTYPE_DEBUG"               = 9
+-                 "PTYPE_ERROR"               = 7
+-                 "PTYPE_HARBOR"              = 5
+-                 "PTYPE_LUA"                 = 10
+-                 "PTYPE_MULTICAST"           = 2
+-                 "PTYPE_QUEUE"               = 8
+-                 "PTYPE_RESPONSE"            = 1
+-                 "PTYPE_SNAX"                = 11
+-                 "PTYPE_SOCKET"              = 6
+-                 "PTYPE_SYSTEM"              = 4
+-                 "PTYPE_TEXT"                = 0
+-                 "abort"                     = function: 0x7fbdcfe5d870
+-                 "address"                   = function: 0x7fbdcfe58b40
+-                 "cache" = {
+-                     "clear"    = function: 0x10a6ab540
+-                     "loadfile" = function: 0x10a6abc80
+-                     "mode"     = function: 0x10a6ab5b0
+-                 }
+-                 "call"                      = function: 0x7fbdcfe58680
+-                 "dispatch"                  = function: 0x7fbdcfe58800
+-                 "dispatch_message"          = function: 0x7fbdcfe58a10
+-                 "dispatch_unknown_request"  = function: 0x7fbdcfe58870
+-                 "dispatch_unknown_response" = function: 0x7fbdcfe58900
+-                 "endless"                   = function: 0x7fbdcfe59160
+-                 "error"                     = function: 0x7fbdcfe57150
+-                 "exit"                      = function: 0x7fbdcfe57a40
+-                 "filter"                    = function: 0x7fbdcfe5d9c0
+-                 "fork"                      = function: 0x7fbdcfe58950
+-                 "forward_type"              = function: 0x7fbdcfe5d960
+-                 "genid"                     = function: 0x7fbdcfe57090
+-                 "getenv"                    = function: 0x7fbdcfe58550
+-                 "harbor"                    = function: 0x7fbdcfe58b70
+-                 "info_func"                 = function: 0x7fbdcfe5a000
+-                 "init"                      = function: 0x7fbdcfe58d80
+-                 "init_service"              = function: 0x7fbdcfe59100
+-                 "kill"                      = function: 0x7fbdcfe5d810
+-                 "launch"                    = function: 0x7fbdcfe5d7c0
+-                 "localname"                 = function: 0x7fbdcfe57990
+-                 "memlimit"                  = function: 0x7fbdcfe59280
+-                 "monitor"                   = function: 0x7fbdcfe5da00
+-                 "mqlen"                     = function: 0x7fbdcfe59190
+-                 "name"                      = function: 0x7fbdcfe5d920
+-                 "newservice"                = function: 0x7fbdcfe58ab0
+-                 "now"                       = function: 0x7fbdcfe572d0
+-                 "pack"                      = function: 0x7fbdcfe571e0
+-                 "packstring"                = function: 0x7fbdcfe57240
+-                 "pcall"                     = function: 0x7fbdcfe590b0
+-                 "queryservice"              = function: 0x7fbdcfe58b10
+-                 "rawcall"                   = function: 0x7fbdcfe586f0
+-                 "rawsend"                   = function: 0x7fbdcfe585e0
+-                 "redirect"                  = function: 0x7fbdcfe58610
+-                 "register"                  = function: 0x7fbdcfe5d8d0
+-                 "register_protocol"         = function: 0x7fbdcfe57ac0
+-                 "response"                  = function: 0x7fbdcfe58760
+-                 "ret"                       = function: 0x7fbdcfe58730
+-                 "retpack"                   = function: 0x7fbdcfe58790
+-                 "self"                      = function: 0x7fbdcfe57910
+-                 "send"                      = function: 0x7fbdcfe585b0
+-                 "setenv"                    = function: 0x7fbdcfe58580
+-                 "sleep"                     = function: 0x7fbdcfe584b0
+-                 "start"                     = function: 0x7fbdcfe59130
+-                 "starttime"                 = function: 0x7fbdcfe579c0
+-                 "stat"                      = function: 0x7fbdcfe591c0
+-                 "task"                      = function: 0x7fbdcfe591f0
+-                 "term"                      = function: 0x7fbdcfe59230
+-                 "time"                      = function: 0x7fbdcfe57a10
+-                 "timeout"                   = function: 0x7fbdcfe58450
+-                 "tostring"                  = function: 0x7fbdcfe57180
+-                 "trash"                     = function: 0x7fbdcfe57270
+-                 "uniqueservice"             = function: 0x7fbdcfe58ae0
+-                 "unpack"                    = function: 0x7fbdcfe57210
+-                 "wait"                      = function: 0x7fbdcfe578c0
+-                 "wakeup"                    = function: 0x7fbdcfe587c0
+-                 "yield"                     = function: 0x7fbdcfe58500
+-             }
+-             "skynet.codecache"  = *REF*
+-             "skynet.core" = {
+-                 "callback"   = function: 0x7fbdcfe572a0
+-                 "command"    = function: 0x7fbdcfe570f0
+-                 "error"      = function: 0x7fbdcfe57150
+-                 "genid"      = function: 0x7fbdcfe57090
+-                 "harbor"     = function: 0x7fbdcfe571b0
+-                 "intcommand" = function: 0x7fbdcfe57120
+-                 "now"        = function: 0x7fbdcfe572d0
+-                 "pack"       = function: 0x7fbdcfe571e0
+-                 "packstring" = function: 0x7fbdcfe57240
+-                 "redirect"   = function: 0x7fbdcfe570c0
+-                 "send"       = function: 0x7fbdcfe57060
+-                 "tostring"   = function: 0x7fbdcfe57180
+-                 "trash"      = function: 0x7fbdcfe57270
+-                 "unpack"     = function: 0x7fbdcfe57210
+-             }
+-             "skynet.debug" = {
+-                 "init"         = function: 0x7fbdcfe59e50
+-                 "reg_debugcmd" = function: 0x7fbdcfe59ed0
+-             }
+-             "skynet.manager"    = *REF*
+-             "static_data" = {
+-                 "CreateConstantConfig"   = function: 0x7fbdcfd24210
+-                 "CreateLogicFilesConfig" = function: 0x7fbdcfd24130
+-                 "CreateMsgFilesConfig"   = function: 0x7fbdcfd240a0
+-                 "CreateResourceConfig"   = function: 0x7fbdcfd241e0
+-                 "LoadDefaultConfig"      = function: 0x7fbdcfd24030
+-                 "funcs" = {
+-                     "UpdateConfig" = function: 0x7fbdcfd24340
+-                 }
+-             }
+-             "string" = {
+-                 "byte"     = function: 0x10a6b0e70
+-                 "char"     = function: 0x10a6b0f90
+-                 "dump"     = function: 0x10a6b1070
+-                 "find"     = function: 0x10a6b1140
+-                 "format"   = function: 0x10a6b1150
+-                 "gmatch"   = function: 0x10a6b1b50
+-                 "gsub"     = function: 0x10a6b1c00
+-                 "len"      = function: 0x10a6b2220
+-                 "lower"    = function: 0x10a6b2250
+-                 "match"    = function: 0x10a6b2310
+-                 "pack"     = function: 0x10a6b2700
+-                 "packsize" = function: 0x10a6b3150
+-                 "rep"      = function: 0x10a6b2320
+-                 "reverse"  = function: 0x10a6b24c0
+-                 "split"    = function: 0x7fbdcff03450
+-                 "sub"      = function: 0x10a6b2570
+-                 "trim"     = function: 0x7fbdcff03420
+-                 "unpack"   = function: 0x10a6b3240
+-                 "upper"    = function: 0x10a6b2640
+-             }
+-             "table" = {
+-                 "concat" = function: 0x10a6b5090
+-                 "insert" = function: 0x10a6b51c0
+-                 "move"   = function: 0x10a6b5500
+-                 "pack"   = function: 0x10a6b52b0
+-                 "remove" = function: 0x10a6b5420
+-                 "sort"   = function: 0x10a6b56c0
+-                 "unpack" = function: 0x10a6b5350
+-             }
+-             "utf8" = {
+-                 "char"        = function: 0x10a6b61b0
+-                 "charpattern" = "[ -Â-ô][€-¿]*"
+-                 "codepoint"   = function: 0x10a6b5fe0
+-                 "codes"       = function: 0x10a6b64a0
+-                 "len"         = function: 0x10a6b62e0
+-                 "offset"      = function: 0x10a6b5e40
+-             }
+-             "utils" = {
+-                 "checkChinese"   = function: 0x7fbdcfd200b0
+-                 "checkEmoji"     = function: 0x7fbdcfd200e0
+-                 "convertTo32"    = function: 0x7fbdcfd203c0
+-                 "convertToDate"  = function: 0x7fbdcfd201b0
+-                 "dump"           = function: 0x7fbdcfd20350
+-                 "funcHotfix"     = function: 0x7fbdcfd20440
+-                 "getStrLength"   = function: 0x7fbdcfd1ff70
+-                 "getSubString"   = function: 0x7fbdcfd1ff00
+-                 "getTimeZone"    = function: 0x7fbdcfd1ff30
+-                 "getUpvalueNum"  = function: 0x7fbdcfd20410
+-                 "getWDay"        = function: 0x7fbdcfd20210
+-                 "greaterVersion" = function: 0x7fbdcfd20100
+-                 "handler"        = function: 0x7fbdcfd20130
+-                 "hotfix"         = function: 0x7fbdcfd204d0
+-                 "indexOf"        = function: 0x7fbdcfd20470
+-                 "indexOfByKey"   = function: 0x7fbdcfd202c0
+-                 "isEmoji"        = function: 0x7fbdcfd1fee0
+-                 "merge"          = function: 0x7fbdcfd202f0
+-                 "remove"         = function: 0x7fbdcfd20270
+-                 "replaceStr"     = function: 0x7fbdcfd1feb0
+-                 "sortByField"    = function: 0x7fbdcfd20150
+-                 "split"          = function: 0x7fbdcfd20050
+-                 "tableAddAttr"   = function: 0x7fbdcfd20320
+-                 "tableHotfix"    = function: 0x7fbdcfd204a0
+-                 "trim"           = function: 0x7fbdcfd20020
+-                 "utf8Chars"      = function: 0x7fbdcfd20080
+-                 "utf8Length"     = function: 0x7fbdcfd20240
+-             }
+-         }
+-         "loadlib"    = function: 0x10a6b6a60
+-         "path"       = "./game/static_data/?.lua;./lualib/?.lua;./lualib/?/init.lua"
+-         "preload" = {
+-         }
+-         "searchers" = {
+-             1 = function: 0x7fbdcfe51e40
+-             2 = function: 0x7fbdcfe51e70
+-             3 = function: 0x7fbdcfe51ea0
+-             4 = function: 0x7fbdcfe51ed0
+-         }
+-         "searchpath" = function: 0x10a6b6b00
+-     }
+-     "pairs"          = function: 0x10a6abf20
+-     "pcall"          = function: 0x10a6abfb0
+-     "print"          = function: 0x10a6ac040
+-     "rawequal"       = function: 0x10a6ac160
+-     "rawget"         = function: 0x10a6ac210
+-     "rawlen"         = function: 0x10a6ac1b0
+-     "rawset"         = function: 0x10a6ac260
+-     "require"        = function: 0x7fbdcfe52070
+-     "select"         = function: 0x10a6ac2c0
+-     "setmetatable"   = function: 0x10a6ac360
+-     "string"         = *REF*
+-     "table"          = *REF*
+-     "tonumber"       = function: 0x10a6ac400
+-     "tostring"       = function: 0x10a6ac640
+-     "txt"            = ""
+-     "type"           = function: 0x10a6ac670
+-     "utf8"           = *REF*
+-     "xpcall"         = function: 0x10a6ac6d0
+- }
