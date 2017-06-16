@@ -1,8 +1,9 @@
 local skynet = require "skynet"
-local static_data = require "static_data"
+require "skynet.manager"    -- import skynet.register
+
+local mysqllog = require "mysqllog"
 
 skynet.start(function()
-    static_data:LoadDefaultConfig()
     skynet.dispatch("lua", function(session, source, cmd, ...)
         if session > 0 then
             skynet.ret(skynet.pack(f(...)))
@@ -10,5 +11,7 @@ skynet.start(function()
             f(...)
         end
     end)
-    skynet.register(".static_data")
+    mysqllog:LoadDefault()
+
+    skynet.register(".mysqllog")
 end)

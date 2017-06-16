@@ -1,12 +1,26 @@
 local skynet = require "skynet"
-require "skynet.manager"    -- import skynet.register
 local mysql = require "mysql"
 local utils = require "utils"
 local gamedb 
-local CMD = {}
 local manager = {}
 --100W进行分表
 local MINUTE_NUM = 1000000
+
+function manager:LoadDefault()
+    local function on_connect(db)
+        db:query("set charset utf8");
+    end
+    gamedb = mysql.connect({
+        host="127.0.0.1",
+        port=3306,
+        user="root",
+        max_packet_size = 1024 * 1024,
+        on_connect = on_connect
+        })
+
+    manager:Init()
+end
+
 --------------------
 --初始化  创建所有需要的数据库以及表
 --------------------
@@ -138,7 +152,9 @@ end
 --比如name = "\\鹊起",存入数据库的是"\鹊起"
 --当再从数据拿出来的时候，name 变成了"\鹊起",而我们需要的是"\\鹊起",所以这里对有可能的转义字符进行转义
 --------------------
-function CMD.InsertLog(log_name,data,is_quote)
+local funcs = {}
+manager.funcs = funcs
+function funcs.InsertLog(log_name,data,is_quote)
      local sql = manager:ConvertInsertSql(log_name,data,is_quote)
      local ret = manager:DoQuery(sql)
      --大于100W进行分表  如果没有自增的ID的话 insert_id始终为0,所以如果需要自动分表,则必须有自增的ID
@@ -149,23 +165,4 @@ function CMD.InsertLog(log_name,data,is_quote)
      end
 end
 
-skynet.start(function()
-    skynet.dispatch("lua", function(session, source, cmd, ...)
-        local f = assert(CMD[cmd])
-        f(...)
-    end)
-     local function on_connect(db)
-        db:query("set charset utf8");
-    end
-    gamedb = mysql.connect({
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        max_packet_size = 1024 * 1024,
-        on_connect = on_connect
-        })
-
-    manager:Init()
-
-    skynet.register(".mysqllog")
-end)
+return manager
