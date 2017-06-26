@@ -41,7 +41,7 @@ server_id = 1
 
 time_zone = 8
 
-
+debug = true
 
 
 

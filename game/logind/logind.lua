@@ -12,6 +12,11 @@ local MAX_USER_ID = 4967000
 local logind = {}
 
 function logind:Check()
+    local debug = skynet.getenv("debug")
+    if debug then
+        return true
+    end
+    
     local content = {
         ["action"] = "login",
         ["account"] = account,
