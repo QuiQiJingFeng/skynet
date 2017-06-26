@@ -1,0 +1,4 @@
+ID,名称,介绍,资源产出列表,生物产出,坐标
+number,string,string,string,string,string
+ID,name,desc,resource_ids,master_ids,coordinate
+1,阴影谜团,,1;2;3;4;5;6;7;8;9,1;2;3;4;5;6;7;8;9,x=100;y=100
