@@ -3,7 +3,7 @@ function event_dispatcher:Init(msg_files)
     self.handlers = {} 
 
     for _,file_name in ipairs(msg_files) do
-        require("msg/"..file_name):Init()
+        require(file_name):Init()
     end
 end
 

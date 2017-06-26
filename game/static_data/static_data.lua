@@ -45,7 +45,7 @@ function static_data:LoadDefaultConfig()
     --事件中心配置
     sharedata.update("msg_files_config", self:CreateMsgFilesConfig())
     --逻辑中心配置
-    sharedata.update("logic_files_config", self:CreateLogicFilesConfig())
+    sharedata.update("logic_files_config", self:CreateModuleFilesConfig())
     
     
     --常量
@@ -60,10 +60,13 @@ function static_data:CreateMsgFilesConfig()
     fileLists = utils:replaceStr(fileLists,".lua","")
     local msg_files = utils:split(fileLists,"\n")
     table.remove(msg_files,#msg_files)
+    for k,v in pairs(msg_files) do
+        msg_files[k] = "msg/"..v
+    end
     return msg_files
 end
 
-function static_data:CreateLogicFilesConfig()
+function static_data:CreateModuleFilesConfig()
     local files = io.popen('ls game/agent/module')
     local fileLists = files:read("*all")
     fileLists = utils:replaceStr(fileLists,".lua","")
