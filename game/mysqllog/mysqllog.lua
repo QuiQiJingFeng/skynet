@@ -152,9 +152,8 @@ end
 --比如name = "\\鹊起",存入数据库的是"\鹊起"
 --当再从数据拿出来的时候，name 变成了"\鹊起",而我们需要的是"\\鹊起",所以这里对有可能的转义字符进行转义
 --------------------
-local funcs = {}
-manager.funcs = funcs
-function funcs.InsertLog(log_name,data,is_quote)
+local COMMAND = {}
+function COMMAND.InsertLog(log_name,data,is_quote)
      local sql = manager:ConvertInsertSql(log_name,data,is_quote)
      local ret = manager:DoQuery(sql)
      --大于100W进行分表  如果没有自增的ID的话 insert_id始终为0,所以如果需要自动分表,则必须有自增的ID
@@ -165,4 +164,4 @@ function funcs.InsertLog(log_name,data,is_quote)
      end
 end
 
-return manager
+return manager,COMMAND
