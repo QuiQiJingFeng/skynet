@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-require "skynet.manager"    -- import skynet.register
 local sharedata = require "sharedata"
 local utils = require "utils"
 local csv = require "csv"
@@ -7,27 +6,30 @@ local constants = require "constants"
 
 local static_data = {}
 
-function static_data:LoadDefaultConfig()
+function static_data:Init()
 
-    --redis配置    
+----------------------------------------------------
+--redis配置  
+----------------------------------------------------  
     local redis_ip = skynet.getenv("game_redis_host")
     local redis_port = skynet.getenv("game_redis_port")
     local redis_auth = skynet.getenv("game_redis_auth")
-    
-    sharedata.update("account_redis_conf", {
+
+    local conf = {
         host = redis_ip ,
         port = redis_port,
         db = 0,
         auth = redis_auth
-    })
+    }
+    for i=1,16 do
+        local id = i - 1
+        conf.db = id
+        sharedata.update("redis_conf_"..id, conf)
+    end
+----------------------------------------------------
+--mysql配置  
+----------------------------------------------------
 
-    sharedata.update("user_redis_conf", {
-        host = redis_ip ,
-        port = redis_port,
-        db = 1,
-        auth = redis_auth,
-    })
-    --mysql配置
     local mysql_ip = skynet.getenv("mysql_ip")
     local mysql_port = skynet.getenv("mysql_port")
     local mysql_user = skynet.getenv("mysql_user")
@@ -41,13 +43,17 @@ function static_data:LoadDefaultConfig()
         max_packet_size = 1024 * 1024
     })
 
-
+----------------------------------------------------
+--结构配置
+----------------------------------------------------
     --事件中心配置
     sharedata.update("msg_files_config", self:CreateMsgFilesConfig())
     --逻辑中心配置
     sharedata.update("logic_files_config", self:CreateModuleFilesConfig())
     
-    
+----------------------------------------------------
+--数据配置
+----------------------------------------------------  
     --常量
     sharedata.update("constants_config", self:CreateConstantConfig())
     --资源
@@ -92,12 +98,10 @@ function static_data:CreateConstantConfig()
     return load(data)()
 end
 
-local funcs = {}
-static_data.funcs = funcs
---热更
-function funcs.UpdateConfig(name)
+local COMMAND = {}
+
+function COMMAND.UpdateConfig(name)
     
-    utils:dump(_G,"FYD===========\n",100)
     if name == "constants_config" then
         sharedata.update("constants_config", CreateConstantConfig())
     elseif name == "resource_config" then
@@ -107,4 +111,4 @@ end
 
 
 
-return static_data
+return static_data,COMMAND
