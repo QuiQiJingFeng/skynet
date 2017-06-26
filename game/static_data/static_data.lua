@@ -58,6 +58,8 @@ function static_data:Init()
     sharedata.update("constants_config", self:CreateConstantConfig())
     --资源
     sharedata.update("resource_config", self:CreateResourceConfig())
+    --世界
+    sharedata.update("world_config", csv.load("data/world.csv"))
 end
 
 function static_data:CreateMsgFilesConfig()
@@ -106,6 +108,9 @@ function COMMAND.UpdateConfig(name)
         sharedata.update("constants_config", CreateConstantConfig())
     elseif name == "resource_config" then
         sharedata.update("resource_config", CreateResourceConfig())
+    elseif name == "world_config" then
+        --世界
+        sharedata.update("world_config", csv.load("data/world.csv"))
     end
 end
 

@@ -37,7 +37,7 @@ end
 --------------------------
 function user_info:Save()
     local user_info_key = "info:"..self.user_id
-    local config = sharedata.query("user_redis_conf")
+    local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
     db:multi()
     for _,module in pairs(self.logic_modules) do
