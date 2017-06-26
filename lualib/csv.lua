@@ -105,6 +105,22 @@ local function _parse_csv_line(line, key_col, keys)
             end
         end
     end
+    --添加数组和table的写法  使用符号 ; = 
+    for k,v in pairs(res) do
+        local exist = string.find(v,";")
+        if exist then
+            local istb = string.find(v,"=")
+            if istb then
+                v = string.gsub(v, ";", ",")
+                f = load("return {"..v.."}")
+                res[k] = f()
+            else
+                v = string.gsub(v, ";", ",")
+                f = load("return {"..v.."}")
+                res[k] = f()
+            end
+        end
+    end
 
     return res, key
 end
