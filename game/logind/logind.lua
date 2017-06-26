@@ -42,7 +42,7 @@ function logind:CreateUserId()
 end
 
 function logind:LoadDefault()
-    local conf = sharedata.query("account_redis_conf")
+    local conf = sharedata.query("redis_conf_0")
     account_redis = redis.connect(conf)
 
     if not account_redis:exists("user_id_generator") then
@@ -50,11 +50,10 @@ function logind:LoadDefault()
     end
 end
 
-local funcs = {}
-logind.funcs = funcs
+local COMMAND = {}
 
 --登录，如果账户不存在则新建一个
-function funcs.Login(data)
+function COMMAND.Login(data)
     local result = "success"
     
     -----登录校验------------
@@ -81,4 +80,4 @@ function funcs.Login(data)
     return result,user_id,is_new
 end 
 
-return logind
+return logind,COMMAND
