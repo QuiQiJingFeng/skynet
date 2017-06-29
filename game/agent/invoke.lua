@@ -77,8 +77,6 @@ function CMD.Start(gate,fd,ip,is_new_agent,user_id,data)
                         time = "NOW()"
                     }
     skynet.send(".mysqllog","lua","InsertLog","login_log",log_msg)
-
-    return true
 end
 --发送一个退出信息给客户端
 function CMD.Kick(reason)

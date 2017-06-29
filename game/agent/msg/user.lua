@@ -1,19 +1,24 @@
+local skynet = require "skynet"
 local event_dispatcher = require "event_dispatcher"
 local utils = require "utils"
-local user_center = require "module.user_center"
+local user_center = require "data/user_center"
 local config_manager = require "config_manager"
 local user = {}
 function user:Init()
     event_dispatcher:RegisterEvent("log_out",utils:handler(self,self.Logout)) 
     event_dispatcher:RegisterEvent("create_name",utils:handler(self,self.CreateName)) 
 end
-
+---------------------------------------------------------------
+--登出
+---------------------------------------------------------------
 function user:Logout(recv_msg)
     local ret = {reason = "success"}
     local send_msg = { reason = "success" }
     return "log_out_ret",ret
 end
+---------------------------------------------------------------
 --创建角色名
+---------------------------------------------------------------
 function user:CreateName(recv_msg)
     local ret = {result = "success"}
     local user_name = recv_msg.user_name
@@ -23,17 +28,17 @@ function user:CreateName(recv_msg)
         ret.result = "has_emoji"
         return "create_name_ret",ret
     end
-    --最大字符数量
-    local max_num =  config_manager.constants_config["MAX_NUM_CHAR"]
-    local num = #utils:strSplit(user_name)
-    print("num,max_num",num,max_num)
-    print(type(num),type(max_num))
-    if num > max_num then
-        ret.result = "max_num_char"
+
+    --检查名称是否已经存在
+    local user_id = user_center.base_info.user_id
+    local is_exist = skynet.call(".social","lua","CheckNewName",user_name,user_id)
+    if is_exist then
+        ret.result = "name_exist"
         return "create_name_ret",ret
     end
 
-    user_center:SetName(user_name)
+    user_center.base_info.user_name = user_name
+
     return "create_name_ret",ret
 end
 

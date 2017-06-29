@@ -21,12 +21,15 @@ function user_info:LoadFromDb(user_id)
     self.user_id = user_id
     local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
+
+    local info_key = "info:"..user_id
+    local data_center = {}
     --初始化数据处理模块
     self.data_modules = {}
     for _,file_name in ipairs(config_manager.data_files_config) do
         local mode = require(file_name)
         mode:Init()
-        mode:LoadFromDb(db,user_id)
+        mode:LoadFromDb(data_center,info_key)
         
         self.data_modules[file_name] = mode
     end
@@ -64,6 +67,7 @@ end
 --玩家登出后设置fd为-1,避免登出后仍向该客户端发送数据
 function user_info:Logout()
     self.client_fd = -1
+    --TODO LogoutLog
 end
 
 --向客户端发送数据

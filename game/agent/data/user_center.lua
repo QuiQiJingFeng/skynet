@@ -3,38 +3,34 @@ local config_manager = require "config_manager"
 
 local user_center = {}
 
-function user_center:Init(db,user_info_key)
-    self.last_login_time = math.ceil(skynet.time())
-    self.user_name = db:hget(user_info_key,"user_name")
-
-    --所有的标识位都写在这里,方便查看
-    self.user_name_flag = nil
-    self.login_time_flag = true
+function user_center:Init(db,user_id)
+    self.base_info = {user_id = user_id}
 end
 
-function user_center:Save(db,user_info_key)
-    --判断当前存储次数,可以将仅仅需要在登录的时候存储一次的
-    if self.login_time_flag then
-        db:hmset(user_info_key,"last_login_time",self.last_login_time)
-        self.login_time_flag = nil
+-------------------------------------------------------------
+--从数据库加载数据
+-------------------------------------------------------------
+function user_center:LoadFromDb(db,user_id)
+    local base_info_key = user_id .. ":base_info"
+    local data = db:hgetall(base_info_key) or {}
+    for i = 1, #data, 2 do
+        local key,value = data[i],data[i+1]
+        self.base_info[key] = value
     end
-    --设立标志位，这样可以仅仅在需要存储的时候存储
-    if self.user_name_flag then
-        db:hmset(user_info_key,"user_name", self.user_name)
-        self.user_name_flag = nil
-    end
+end
 
+function user_center:Save(db,user_id)
+    local base_info_key = user_id .. ":base_info"
+    local temp = {}
+    for key,value in pairs(self.base_info) do
+        table.insert(temp,key)
+        table.insert(temp,value)
+    end
+    db:hmset(base_info_key,unpack(temp))
 end
 
 function user_center:Close()
-    self.last_login_time = nil
-    self.user_name = nil
-    self.user_name_flag = nil
-end
---设置玩家名称
-function user_center:SetName(user_name)
-    self.user_name = user_name
-    self.user_name_flag = true
+    self.base_info = nil
 end
 
 return user_center

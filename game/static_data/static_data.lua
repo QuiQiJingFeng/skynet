@@ -75,7 +75,7 @@ function static_data:CreateMsgFilesConfig()
 end
 
 function static_data:CreateModuleFilesConfig()
-    local files = io.popen('ls game/agent/module')
+    local files = io.popen('ls game/agent/data')
     local fileLists = files:read("*all")
     fileLists = utils:replaceStr(fileLists,".lua","")
     local msg_files = utils:split(fileLists,"\n")
