@@ -43,25 +43,39 @@ end
 
 
 local CMD = {}
-
---玩家第一次登录
-function CMD.Start(gate,fd,ip,user_id,data)
-    --请求socket=>fd的消息转发到本服务
+--------------------------------------------------------------
+--玩家登录处理
+--------------------------------------------------------------
+function CMD.Start(gate,fd,ip,is_new_agent,user_id,data)
+    --通知gate 将fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
-    print("FYD=",user_id)
-    user_info:Init(user_id,data.server_id,data.channel,data.locale,fd,ip)
 
-    local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = TIME_ZONE}
+    user_info:Init(user_id,data.server_id,data.channel,data.locale,fd,ip)
+    if is_new_agent then
+        user_info:LoadFromDb(user_id)
+    end
+
+    local time_zone = utils:getTimeZone()
+    local send_msg = {  
+                        result = "success",
+                        server_time = skynet.time(),
+                        user_id = user_id,
+                        time_zone = time_zone
+                     }
     user_info:ResponseClient("login_ret",send_msg)
 
     local log_msg = {  
-                        user_id = user_id,server_id = data.server_id,
-                        account = data.account,ip = ip,
-                        platform = data.platform,channel = data.channel,
-                        net_mode = data.net_mode,device_id = data.device_id,
-                        device_type = data.device_type,time = "NOW()"
+                        user_id = user_id,
+                        server_id = data.server_id,
+                        account = data.account,
+                        ip = ip,
+                        platform = data.platform,
+                        channel = data.channel,
+                        net_mode = data.net_mode,
+                        device_id = data.device_id,
+                        device_type = data.device_type,
+                        time = "NOW()"
                     }
-    --登录日志
     skynet.send(".mysqllog","lua","InsertLog","login_log",log_msg)
 
     return true
@@ -100,7 +114,7 @@ end
 
 --该agent被回收
 function CMD.Close()
-    local succ, err = xpcall(user_info.Close,debug.traceback,user_info)
+    local succ, err = xpcall(user_info.Clear,debug.traceback,user_info)
     if not succ then
         skynet.error("ERROR CODE = 3001 errmsg = ",err)
     end

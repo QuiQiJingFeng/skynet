@@ -15,42 +15,49 @@ function user_info:Init(user_id,server_id,channel,locale,client_fd, client_ip)
 
     self.client_fd = client_fd
     self.client_ip = client_ip
+end
 
-    local config = sharedata.query("user_redis_conf")
+function user_info:LoadFromDb(user_id)
+    self.user_id = user_id
+    local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
-    local user_info_key = "info:"..self.user_id
-    --初始化逻辑处理模块
-    self.logic_modules = {}
-    for _,file_name in ipairs(config_manager.logic_files_config) do
-        local module = require("module/"..file_name)
-        module:Init(db,user_info_key)
-        self.logic_modules[file_name] = module
+    --初始化数据处理模块
+    self.data_modules = {}
+    for _,file_name in ipairs(config_manager.data_files_config) do
+        local mode = require(file_name)
+        mode:Init()
+        mode:LoadFromDb(db,user_id)
+        
+        self.data_modules[file_name] = mode
     end
     db:disconnect()
-
 end
 
 -------------------------
---
---保存到数据库的save 函数
---
+--保存玩家数据
 --------------------------
 function user_info:Save()
     local user_info_key = "info:"..self.user_id
     local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
     db:multi()
-    for _,module in pairs(self.logic_modules) do
-        module:Save(db,user_info_key)
+    for _,mode in pairs(self.data_modules) do
+        mode:Save(db,self.user_id)
     end
-    db:exec()
+    local ret = db:exec()
+    for i, v in ipairs(ret) do
+        if not (type(v) == "number" or v == "OK" ) then
+            skynet.error("redis save(user_info) index:" .. i .. ",error:" .. v)
+            suc = false
+        end
+    end
     db:disconnect()
 end
 
 --重用agent的时候需要重置lua vm中的用户数据
-function user_info:Close()
-    for _,module in pairs(self.logic_modules) do
-        module:Close()
+function user_info:Clear()
+    for _,module in pairs(self.data_modules) do
+        module:Clear()
     end
 end
 

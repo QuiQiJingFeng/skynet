@@ -106,7 +106,7 @@ function agent_manager:ProcessLogin(fd,data,ip)
         --注册日志
         skynet.send(".mysqllog","lua","InsertLog","register_log",register_msg)
     end
-
+    local is_new_agent = true
     --检测重复登录
     local agent = self.userid_to_agent[user_id]
     if agent then
@@ -117,10 +117,11 @@ function agent_manager:ProcessLogin(fd,data,ip)
             skynet.call(agent.service_id, "lua", "Kick", "repeated_login")
             skynet.call(gateserver, "lua", "kick", agent.fd)
         end
+        is_new_agent = false
     else
         agent = agent_pool:Dequeue()
     end
-    skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,user_id,data)
+    skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,is_new_agent,user_id,data)
 
     self.userid_to_agent[user_id] = agent
     agent.user_id = user_id

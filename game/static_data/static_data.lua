@@ -49,7 +49,7 @@ function static_data:Init()
     --事件中心配置
     sharedata.update("msg_files_config", self:CreateMsgFilesConfig())
     --逻辑中心配置
-    sharedata.update("logic_files_config", self:CreateModuleFilesConfig())
+    sharedata.update("data_files_config", self:CreateModuleFilesConfig())
     
 ----------------------------------------------------
 --数据配置
@@ -80,6 +80,9 @@ function static_data:CreateModuleFilesConfig()
     fileLists = utils:replaceStr(fileLists,".lua","")
     local msg_files = utils:split(fileLists,"\n")
     table.remove(msg_files,#msg_files)
+    for k,v in pairs(msg_files) do
+        msg_files[k] = "data/"..v
+    end
     return msg_files    
 end
 
