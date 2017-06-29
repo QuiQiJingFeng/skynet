@@ -1,12 +1,11 @@
 local skynet = require "skynet"
 local agent = require "agent"
-local AGENT_POOL_NUM = 1      --预留500个agent
+local AGENT_POOL_NUM = skynet.getenv("agent_pool_num") or 500;--预留500个agent
 
 local agent_pool = {}
 --预留
 function agent_pool:Init()
     self.reclaim_pool = {}
-
     for i = 1, AGENT_POOL_NUM do
         self:CreateAgent()
     end

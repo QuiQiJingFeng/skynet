@@ -437,7 +437,7 @@ address_port(lua_State *L, char *tmp, const char * addr, int port_index, int *po
 	}
 	return host;
 }
-
+//socketdriver.connect invoke
 static int
 lconnect(lua_State *L) {
 	size_t sz = 0;
@@ -675,7 +675,7 @@ ludp_address(lua_State *L) {
 	lua_pushinteger(L, port);
 	return 2;
 }
-
+//
 LUAMOD_API int
 luaopen_socketdriver(lua_State *L) {
 	luaL_checkversion(L);

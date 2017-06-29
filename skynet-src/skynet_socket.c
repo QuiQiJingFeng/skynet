@@ -143,7 +143,7 @@ skynet_socket_listen(struct skynet_context *ctx, const char *host, int port, int
 	uint32_t source = skynet_context_handle(ctx);
 	return socket_server_listen(SOCKET_SERVER, source, host, port, backlog);
 }
-
+//socket.connect invoke
 int 
 skynet_socket_connect(struct skynet_context *ctx, const char *host, int port) {
 	uint32_t source = skynet_context_handle(ctx);

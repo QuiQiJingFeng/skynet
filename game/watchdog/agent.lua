@@ -15,7 +15,6 @@ function agent:Init()
 end
 
 function agent:LoadDefault()
-    self.service_id = -1
     self.fd = -1
     self.user_id = ""
     self.save_time = 0              --下一次保存的时间点

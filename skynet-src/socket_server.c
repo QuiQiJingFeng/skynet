@@ -19,17 +19,17 @@
 #define MAX_INFO 128
 // MAX_SOCKET will be 2^MAX_SOCKET_P
 #define MAX_SOCKET_P 16
-#define MAX_EVENT 64
-#define MIN_READ_BUFFER 64
-#define SOCKET_TYPE_INVALID 0
-#define SOCKET_TYPE_RESERVE 1
-#define SOCKET_TYPE_PLISTEN 2
-#define SOCKET_TYPE_LISTEN 3
-#define SOCKET_TYPE_CONNECTING 4
-#define SOCKET_TYPE_CONNECTED 5
-#define SOCKET_TYPE_HALFCLOSE 6
-#define SOCKET_TYPE_PACCEPT 7
-#define SOCKET_TYPE_BIND 8
+#define MAX_EVENT 64					// 用于epoll_wait的第三个参数 每次返回事件的多少
+#define MIN_READ_BUFFER 64				// 最小分配的读缓冲大小 为了减少read的调用 尽可能分配大的读缓冲区
+#define SOCKET_TYPE_INVALID 0			// 无效的sock fd
+#define SOCKET_TYPE_RESERVE 1			// 预留已经被申请 即将被使用
+#define SOCKET_TYPE_PLISTEN 2			// listen fd但是未加入epoll管理
+#define SOCKET_TYPE_LISTEN 3			// 监听到套接字已经加入epoll管理
+#define SOCKET_TYPE_CONNECTING 4		// 尝试连接的socket fd
+#define SOCKET_TYPE_CONNECTED 5			// 已经建立连接的socket 主动conn或者被动accept的套接字 已经加入epoll管理
+#define SOCKET_TYPE_HALFCLOSE 6			// 已经在应用层关闭了fd 但是数据还没有发送完 还没有close
+#define SOCKET_TYPE_PACCEPT 7			// accept返回的fd 未加入epoll
+#define SOCKET_TYPE_BIND 8				// 其他类型的fd 如 stdin stdout等
 //1 左移16位=>65536
 #define MAX_SOCKET (1<<MAX_SOCKET_P)
 
@@ -75,10 +75,10 @@ struct socket {
 	struct wb_list high;
 	struct wb_list low;
 	int64_t wb_size;
-	int fd;
-	int id;
+	int fd;												// 对应内核分配的fd
+	int id;												// 应用层维护的一个与fd对应的id
 	uint16_t protocol;
-	uint16_t type;
+	uint16_t type;										// socket类型或者状态
 	union {
 		int size;
 		uint8_t udp_address[UDP_ADDRESS_SIZE];
@@ -241,7 +241,7 @@ socket_keepalive(int fd) {
 	int keepalive = 1;
 	setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive , sizeof(keepalive));  
 }
-
+//获取一个空闲的socket的id(应用层维护的id)
 static int
 reserve_id(struct socket_server *ss) {
 	int i;
@@ -251,7 +251,9 @@ reserve_id(struct socket_server *ss) {
 			id = ATOM_AND(&(ss->alloc_id), 0x7fffffff);
 		}
 		struct socket *s = &ss->slot[HASH_ID(id)];
+		//从socket 槽空间中取出一个空闲的socket结构体
 		if (s->type == SOCKET_TYPE_INVALID) {
+			//标记该socket 为预留 即将被使用
 			if (ATOM_CAS(&s->type, SOCKET_TYPE_INVALID, SOCKET_TYPE_RESERVE)) {
 				s->id = id;
 				s->fd = -1;
@@ -927,7 +929,7 @@ has_cmd(struct socket_server *ss) {
 	int retval;
 
 	FD_SET(ss->recvctrl_fd, &ss->rfds);
-
+	//获取套接字的状态
 	retval = select(ss->recvctrl_fd+1, &ss->rfds, NULL, NULL, &tv);
 	if (retval == 1) {
 		return 1;
@@ -1356,6 +1358,7 @@ send_request(struct socket_server *ss, struct request_package *request, char typ
 	request->header[6] = (uint8_t)type;
 	request->header[7] = (uint8_t)len;
 	for (;;) {
+		//想socket的写端 写入请求
 		int n = write(ss->sendctrl_fd, &request->header[6], len+2);
 		if (n<0) {
 			if (errno != EINTR) {
@@ -1375,6 +1378,7 @@ open_request(struct socket_server *ss, struct request_package *req, uintptr_t op
 		fprintf(stderr, "socket-server : Invalid addr %s.\n",addr);
 		return -1;
 	}
+	//获取一个空闲的socket id
 	int id = reserve_id(ss);
 	if (id < 0)
 		return -1;
@@ -1386,7 +1390,7 @@ open_request(struct socket_server *ss, struct request_package *req, uintptr_t op
 
 	return len;
 }
-
+//lua调用 创建一个新的socket连接
 int 
 socket_server_connect(struct socket_server *ss, uintptr_t opaque, const char * addr, int port) {
 	struct request_package request;
@@ -1557,7 +1561,7 @@ socket_server_bind(struct socket_server *ss, uintptr_t opaque, int fd) {
 	send_request(ss, &request, 'B', sizeof(request.u.bind));
 	return id;
 }
-
+//启动id对应的socket
 void 
 socket_server_start(struct socket_server *ss, uintptr_t opaque, int id) {
 	struct request_package request;

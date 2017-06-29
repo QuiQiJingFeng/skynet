@@ -25,9 +25,9 @@ socket_channel.error = socket_error
 
 function socket_channel.channel(desc)
 	local c = {
-		__host = assert(desc.host),
-		__port = assert(desc.port),
-		__backup = desc.backup,
+		__host = assert(desc.host),		--端口
+		__port = assert(desc.port),		--地址
+		__backup = desc.backup,			--连接备份,避免某个连接失败后有其他的连接可用
 		__auth = desc.auth,
 		__response = desc.response,	-- It's for session mode
 		__request = {},	-- request seq { response func or session }	-- It's for order mode
@@ -152,7 +152,7 @@ local function push_response(self, response, co)
 		end
 	end
 end
-
+--根据order分发
 local function dispatch_by_order(self)
 	while self.__sock do
 		local func, co = pop_response(self)
@@ -200,7 +200,7 @@ local function dispatch_function(self)
 		return dispatch_by_order
 	end
 end
-
+--如果某个连接失败后,可以有连接备份可用
 local function connect_backup(self)
 	if self.__backup then
 		for _, addr in ipairs(self.__backup) do
@@ -227,6 +227,7 @@ local function connect_once(self)
 		return false
 	end
 	assert(not self.__sock and not self.__authcoroutine)
+	--建立连接,如果失败,则尝试切换备份连接,如果备份仍然失败则返回错误
 	local fd,err = socket.open(self.__host, self.__port)
 	if not fd then
 		fd = connect_backup(self)
@@ -234,11 +235,16 @@ local function connect_once(self)
 			return false, err
 		end
 	end
+	--[[
+		TCP 就会采用 Nagle 算法自动将一些小的缓冲区连接到一个报文段中。这样可以通过最小化所发送的报文的数量来提高应用程序的效率，并减轻整体的网络拥塞问题。
+		但是有时候希望只发送一些较小的报文,比如连接建立的报文,设置nodelay就可以直接发送该报文
+	--]]
 	if self.__nodelay then
 		socketdriver.nodelay(fd)
 	end
 
 	self.__sock = setmetatable( {fd} , channel_socket_meta )
+	--fork一个线程作为事件分发的线程
 	self.__dispatch_thread = skynet.fork(dispatch_function(self), self)
 
 	if self.__auth then
@@ -286,7 +292,7 @@ local function try_connect(self , once)
 		t = t + 100
 	end
 end
-
+--检查是否已连接
 local function check_connection(self)
 	if self.__sock then
 		local authco = self.__authcoroutine
@@ -302,8 +308,9 @@ local function check_connection(self)
 		return false
 	end
 end
-
+--快速连接
 local function block_connect(self, once)
+	--检查当前是否已经连接上,如果已经连接
 	local r = check_connection(self)
 	if r ~= nil then
 		return r
@@ -334,8 +341,9 @@ local function block_connect(self, once)
 		return r
 	end
 end
-
+--连接redis
 function channel:connect(once)
+	--如果当前连接处于开启状态
 	if self.__closed then
 		if self.__dispatch_thread then
 			-- closing, wait
@@ -347,7 +355,7 @@ function channel:connect(once)
 		end
 		self.__closed = false
 	end
-
+	--block connect 快速连接
 	return block_connect(self, once)
 end
 

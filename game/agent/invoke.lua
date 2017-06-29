@@ -66,7 +66,7 @@ function CMD.Start(gate,fd,ip,user_id,data)
 
     return true
 end
-
+--发送一个退出信息给客户端
 function CMD.Kick(reason)
     user_info:ResponseClient("logout_ret", { reason = reason })
     return true
@@ -100,11 +100,12 @@ end
 
 --该agent被回收
 function CMD.Close()
-    user_info:Close()
+    local succ, err = xpcall(user_info.Close,debug.traceback,user_info)
+    if not succ then
+        skynet.error("ERROR CODE = 3001 errmsg = ",err)
+    end
     _G["SEASSION_PROCESS"] = false
     collectgarbage "collect"
-
-    return true
 end
 
 return AGENT_OP,CMD

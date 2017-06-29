@@ -41,6 +41,7 @@ end
 -- read skynet_socket.h for these macro
 -- SKYNET_SOCKET_TYPE_DATA = 1
 socket_message[1] = function(id, size, data)
+	--socket读端有数据到来，根据id获取对应的socket
 	local s = socket_pool[id]
 	if s == nil then
 		skynet.error("socket: drop package from " .. id)
@@ -154,7 +155,7 @@ socket_message[7] = function(id, size)
 		warning(id, size)
 	end
 end
-
+--注册协议 PTYPE_SOCKET 接收并派发事件
 skynet.register_protocol {
 	name = "socket",
 	id = skynet.PTYPE_SOCKET,	-- PTYPE_SOCKET = 6
@@ -180,6 +181,7 @@ local function connect(id, func)
 		protocol = "TCP",
 	}
 	assert(not socket_pool[id], "socket is not closed")
+	--将socket表跟id字段绑定,当收到fd过来的消息的时候可以取出来
 	socket_pool[id] = s
 	suspend(s)
 	local err = s.connecting
@@ -191,7 +193,7 @@ local function connect(id, func)
 		return nil, err
 	end
 end
-
+--根据ip和端口打开一个socket连接
 function socket.open(addr, port)
 	local id = driver.connect(addr,port)
 	return connect(id)

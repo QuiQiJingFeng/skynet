@@ -10,7 +10,7 @@ skynet.start(function()
             f(...)
         end
     end)
-    logind:LoadDefault()
+    logind:Init()
     
     skynet.register(".logind") 
 end)
