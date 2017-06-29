@@ -1,25 +1,22 @@
 local skynet = require "skynet"
 local event_dispatcher = require "event_dispatcher"
 local utils = require "utils"
-local user_center = require "data/user_center"
+local user_center = require "data.user_center"
 local config_manager = require "config_manager"
-local user = {}
-function user:Init()
-    event_dispatcher:RegisterEvent("log_out",utils:handler(self,self.Logout)) 
-    event_dispatcher:RegisterEvent("create_name",utils:handler(self,self.CreateName)) 
-end
+
 ---------------------------------------------------------------
 --登出
 ---------------------------------------------------------------
-function user:Logout(recv_msg)
+event_dispatcher:RegisterEvent("log_out",function(recv_msg)
     local ret = {reason = "success"}
     local send_msg = { reason = "success" }
     return "log_out_ret",ret
-end
+end)
+
 ---------------------------------------------------------------
 --创建角色名
 ---------------------------------------------------------------
-function user:CreateName(recv_msg)
+event_dispatcher:RegisterEvent("create_name",function(recv_msg)
     local ret = {result = "success"}
     local user_name = recv_msg.user_name
     --屏蔽emoji字符
@@ -40,6 +37,4 @@ function user:CreateName(recv_msg)
     user_center.base_info.user_name = user_name
 
     return "create_name_ret",ret
-end
-
-return user
+end)
