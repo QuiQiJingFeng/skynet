@@ -21,11 +21,11 @@
 typedef void (*timer_execute_func)(void *ud,void *arg);
 
 #define TIME_NEAR_SHIFT 8
-#define TIME_NEAR (1 << TIME_NEAR_SHIFT)
+#define TIME_NEAR (1 << TIME_NEAR_SHIFT)		//256
 #define TIME_LEVEL_SHIFT 6
-#define TIME_LEVEL (1 << TIME_LEVEL_SHIFT)
-#define TIME_NEAR_MASK (TIME_NEAR-1)
-#define TIME_LEVEL_MASK (TIME_LEVEL-1)
+#define TIME_LEVEL (1 << TIME_LEVEL_SHIFT)		//64
+#define TIME_NEAR_MASK (TIME_NEAR-1)			//255
+#define TIME_LEVEL_MASK (TIME_LEVEL-1)			//63
 
 struct timer_event {
 	uint32_t handle;
@@ -43,7 +43,7 @@ struct link_list {
 };
 
 struct timer {
-	struct link_list near[TIME_NEAR];
+	struct link_list near[TIME_NEAR];	//256刻度轮盘
 	struct link_list t[4][TIME_LEVEL];
 	struct spinlock lock;
 	uint32_t time;
@@ -69,24 +69,33 @@ link(struct link_list *list,struct timer_node *node) {
 	list->tail = node;
 	node->next=0;
 }
-
+/*
+	时间轮的实现。按8/6/6/6/6/分成5个轮盘部分，也就是有5个时钟，
+	这种分层方法的空间复杂度变为 256+64+64+64+64= 512个槽，
+	支持注册最长时间的tick是 256*64*64*64*64=2^32。
+*/
 static void
 add_node(struct timer *T,struct timer_node *node) {
+	//失效时间即tick触发的时间
 	uint32_t time=node->expire;
-	uint32_t current_time=T->time;
-	
+	//当前时间
+	uint32_t current_time=T->time;  
+	//将time和current_time的低8位置1,判断失效时间点是否在本轮时间刻度内触发
 	if ((time|TIME_NEAR_MASK)==(current_time|TIME_NEAR_MASK)) {
+		//获取time的低8位,找到time对应的刻度 安装事件
 		link(&T->near[time&TIME_NEAR_MASK],node);
-	} else {
+	} else {//如果不在本轮时间内触发则缓存下来
+		//256 左移6位 => 内圈的64刻度盘
 		int i;
 		uint32_t mask=TIME_NEAR << TIME_LEVEL_SHIFT;
 		for (i=0;i<3;i++) {
+			//找出该时间所在的时间刻度
 			if ((time|(mask-1))==(current_time|(mask-1))) {
 				break;
 			}
 			mask <<= TIME_LEVEL_SHIFT;
 		}
-
+		//在该刻度上安装事件
 		link(&T->t[i][((time>>(TIME_NEAR_SHIFT + i*TIME_LEVEL_SHIFT)) & TIME_LEVEL_MASK)],node);	
 	}
 }
@@ -98,8 +107,8 @@ timer_add(struct timer *T,void *arg,size_t sz,int time) {
 
 	SPIN_LOCK(T);
 
-		node->expire=time+T->time;
-		add_node(T,node);
+	node->expire=time+T->time;
+	add_node(T,node);
 
 	SPIN_UNLOCK(T);
 }
@@ -136,7 +145,7 @@ timer_shift(struct timer *T) {
 		}
 	}
 }
-
+//触发时间回调
 static inline void
 dispatch_list(struct timer_node *current) {
 	do {
@@ -157,8 +166,9 @@ dispatch_list(struct timer_node *current) {
 
 static inline void
 timer_execute(struct timer *T) {
-	int idx = T->time & TIME_NEAR_MASK;
-	
+	//取出来最外层刻度数 
+	int idx = T->time & TIME_NEAR_MASK; //<=> T->time % (TIME_NEAR_MASK + 1)
+	//判断该刻度下是否有事件列表,如果有则触发
 	while (T->near[idx].head.next) {
 		struct timer_node *current = link_clear(&T->near[idx]);
 		SPIN_UNLOCK(T);
