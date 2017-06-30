@@ -210,9 +210,33 @@ local function SaveTimer()
     agent_manager.online_num = online_num
     --TODO:添加online记录
 end
+----------------------------------------------------------------------------
+--整点调度
+----------------------------------------------------------------------------
+local function ClockTimer()
+    local t_now = skynet.time()
+    local date_now = os.date("*t", t_now)
+    local timer = 360000
+    skynet.timeout(math.ceil(timer), ClockTimer)
+    --0点时刻
+    if date_now.hour == 0 then
+
+    end 
+end
 
 do
     skynet.timeout(AGENT_POLL_TIME * 100, SaveTimer)
+
+    local t_now = shield.time()
+    --下一个整点的格林威治时间 多5s是怕时间调度不精准
+    local next_time = os.date("*t", t_now)
+    next_time.min = 0
+    next_time.sec = 5
+    next_time.hour = next_time.hour + 1
+
+    local clock_time = os.time(next_time)
+    local timer = (clock_time-t_now)*100
+    shield.timeout(math.ceil(timer), ClockTimer)
 end
 
 return agent_manager
