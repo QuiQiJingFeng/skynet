@@ -126,13 +126,14 @@ move_list(struct timer *T, int level, int idx) {
 static void
 timer_shift(struct timer *T) {
 	int mask = TIME_NEAR;
-	uint32_t ct = ++T->time;
+	uint32_t ct = ++T->time;   //time为8位无符号整形,如果下一刻等于0
 	if (ct == 0) {
+		//找到内层的刻度,将内层刻度为0的事件 添加到外层刻度
 		move_list(T, 3, 0);
 	} else {
 		uint32_t time = ct >> TIME_NEAR_SHIFT;
 		int i=0;
-
+		//逐层将更内层的刻度 往外层刻度移动
 		while ((ct & (mask-1))==0) {
 			int idx=time & TIME_LEVEL_MASK;
 			if (idx!=0) {
