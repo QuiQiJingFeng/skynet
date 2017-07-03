@@ -43,8 +43,8 @@ struct link_list {
 };
 
 struct timer {
-	struct link_list near[TIME_NEAR];	//256刻度轮盘
-	struct link_list t[4][TIME_LEVEL];
+	struct link_list near[TIME_NEAR];	//最外层刻度  256刻度轮盘
+	struct link_list t[4][TIME_LEVEL];  //内层刻度
 	struct spinlock lock;
 	uint32_t time;
 	uint32_t starttime;
@@ -201,11 +201,11 @@ timer_create_timer() {
 	memset(r,0,sizeof(*r));
 
 	int i,j;
-
+	//清理最外层的插槽事件
 	for (i=0;i<TIME_NEAR;i++) {
 		link_clear(&r->near[i]);
 	}
-
+	//清理内层的插槽事件
 	for (i=0;i<4;i++) {
 		for (j=0;j<TIME_LEVEL;j++) {
 			link_clear(&r->t[i][j]);
@@ -240,12 +240,14 @@ skynet_timeout(uint32_t handle, int time, int session) {
 
 	return session;
 }
-
+//获取当前系统的格林威治时间(单位1/100 s)
 // centisecond: 1/100 second
 static void
 systime(uint32_t *sec, uint32_t *cs) {
 #if !defined(__APPLE__)
 	struct timespec ti;
+	//CLOCK_REALTIME:系统实时时间,随系统实时时间改变而改变,即从UTC1970-1-1 0:0:0开始计时(精度纳秒)
+	//tv_sec; /* 秒*/   tv_nsec; /* 纳秒*/
 	clock_gettime(CLOCK_REALTIME, &ti);
 	*sec = (uint32_t)ti.tv_sec;
 	*cs = (uint32_t)(ti.tv_nsec / 10000000);
@@ -307,9 +309,14 @@ void
 skynet_timer_init(void) {
 	TI = timer_create_timer();
 	uint32_t current = 0;
+	//start_time以s为单位,current以1/100 s 为单位
 	systime(&TI->starttime, &current);
 	TI->current = current;
 	TI->current_point = gettime();
+
+	printf("starttime=>%d\n",TI->starttime);
+	printf("current=>%d\n",TI->current);
+	printf("current_point=>%d\n",TI->current_point);
 }
 
 // for profile

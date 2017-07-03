@@ -56,7 +56,7 @@ function COMMAND.NewUser(user_id,name,role_id)
         logout_time = nil       --记录登出的时间,如果为nil,则为在线
     }
     local all_relations_key = "social:all_relations"
-    self.union_db:lpush(social:all_relations,user_id)
+    self.union_db:lpush(social.all_relations,user_id)
     local user_key = "social:relations:"..user_id 
     self.union_db:hmset(user_key,"role_id",role_id,"name",name)
 end
@@ -126,9 +126,9 @@ function COMMAND.MakeInvitation(src_user_id, dest_user_id)
     self.union_db:hmset(user_key,"invitations",cjson.encode(dest_friend_info.invitations))
 
     --通知对方刷新申请列表
-    local agent = shield.call(".agent_manager", "lua", "GetAgentByUserId", dest_user_id)
+    local agent = skynet.call(".agent_manager", "lua", "GetAgentByUserId", dest_user_id)
     if agent then
-        shield.send(agent, "lua", "NewInvitation", src_friend_info)
+        skynet.send(agent, "lua", "NewInvitation", src_friend_info)
     end
     return "success"
 end
@@ -224,9 +224,9 @@ function COMMAND.RemoveFriend(src_user_id, dest_user_id)
         self.union_db:hmset(dest_user_key,"friends",cjson.encode(dest_friend_info.friends))
 
         --通知对方删除好友
-        local agent = shield.call(".notice_center", "lua", "GetAgentByUserId", dest_user_id)
+        local agent = skynet.call(".notice_center", "lua", "GetAgentByUserId", dest_user_id)
         if agent then
-            shield.send(agent, "lua", "RemoveFriend", src_user_id)
+            skynet.send(agent, "lua", "RemoveFriend", src_user_id)
         end
     end
 

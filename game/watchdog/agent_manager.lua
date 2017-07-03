@@ -227,7 +227,7 @@ end
 do
     skynet.timeout(AGENT_POLL_TIME * 100, SaveTimer)
 
-    local t_now = shield.time()
+    local t_now = math.floor(skynet.time())
     --下一个整点的格林威治时间 多5s是怕时间调度不精准
     local next_time = os.date("*t", t_now)
     next_time.min = 0
@@ -236,7 +236,7 @@ do
 
     local clock_time = os.time(next_time)
     local timer = (clock_time-t_now)*100
-    shield.timeout(math.ceil(timer), ClockTimer)
+    skynet.timeout(math.ceil(timer), ClockTimer)
 end
 
 return agent_manager
