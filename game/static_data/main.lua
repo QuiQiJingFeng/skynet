@@ -1,6 +1,8 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local static_data,COMMAND = require "static_data"
+local config = require "static_data"
+local static_data = config.static_data
+local COMMAND = config.COMMAND
 
 skynet.start(function() 
     skynet.dispatch("lua", function(session, source, cmd, ...)

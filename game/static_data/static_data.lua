@@ -103,20 +103,24 @@ function static_data:CreateConstantConfig()
     return load(data)()
 end
 
-local COMMAND = {}
-
-function COMMAND.UpdateConfig(name)
-    
+function static_data:UpdateConfig(name)
     if name == "constants_config" then
-        sharedata.update("constants_config", CreateConstantConfig())
+        sharedata.update("constants_config", self:CreateConstantConfig())
     elseif name == "resource_config" then
-        sharedata.update("resource_config", CreateResourceConfig())
+        sharedata.update("resource_config", self:CreateResourceConfig())
     elseif name == "world_config" then
         --世界
         sharedata.update("world_config", csv.load("data/world.csv"))
     end
+    return "OK"
+end
+
+local COMMAND = {}
+
+function COMMAND.UpdateConfig(name)
+    return static_data:UpdateConfig(name)
 end
 
 
 
-return static_data,COMMAND
+return {static_data = static_data ,COMMAND = COMMAND}

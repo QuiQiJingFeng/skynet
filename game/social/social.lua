@@ -238,4 +238,4 @@ end
 function COMMAND.QueryUserInfo(user_id)
     return social.relations[user_id]
 end
-return social,COMMAND
+return {social = social,COMMAND = COMMAND}

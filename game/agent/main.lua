@@ -6,8 +6,9 @@ local user_info = require "user_info"
 local config_manager = require "config_manager"
 local event_dispatcher = require "event_dispatcher"
 
-local AGENT_OP,CMD = require "invoke"
-
+local config = require "invoke"
+local AGENT_OP = config.AGENT_OP
+local CMD = config.CMD
 -- gate will use client protocol for client's data
 skynet.register_protocol( {
     name = "client",

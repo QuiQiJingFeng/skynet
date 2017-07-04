@@ -1,6 +1,7 @@
 local skynet = require "skynet"
-local logind,COMMAND = require "logind"
-
+local config = require "logind"
+local logind = config.logind
+local COMMAND = config.COMMAND
 skynet.start(function()
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = assert(COMMAND[cmd])

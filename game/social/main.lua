@@ -1,6 +1,8 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local social,COMMAND = require "social"
+local config = require "social"
+local social = config.social
+local COMMAND = config.COMMAND
 
 skynet.start(function() 
     skynet.dispatch("lua", function(session, source, cmd, ...)

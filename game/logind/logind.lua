@@ -91,4 +91,4 @@ function COMMAND.Login(data)
     return ret
 end 
 
-return logind,COMMAND
+return {logind = logind,COMMAND = COMMAND}

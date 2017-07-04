@@ -135,4 +135,4 @@ function CMD.Close()
     collectgarbage "collect"
 end
 
-return AGENT_OP,CMD
+return {AGENT_OP = AGENT_OP,CMD = CMD}

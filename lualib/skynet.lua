@@ -380,7 +380,7 @@ skynet.packstring = assert(c.packstring)
 skynet.unpack = assert(c.unpack)
 skynet.tostring = assert(c.tostring)
 skynet.trash = assert(c.trash)
-
+--挂起等待skynet.call的返回值
 local function yield_call(service, session)
 	watching_session[session] = service
 	local succ, msg, sz = coroutine_yield("CALL", session)
@@ -390,13 +390,15 @@ local function yield_call(service, session)
 	end
 	return msg,sz
 end
-
+--调用某个服务的方法,并返回响应的值
 function skynet.call(addr, typename, ...)
 	local p = proto[typename]
+	--发送消息过去,并返回本次消息对应的session值
 	local session = c.send(addr, p.id , nil , p.pack(...))
 	if session == nil then
 		error("call to invalid address " .. skynet.address(addr))
 	end
+	--挂起等待返回值 之后解包返回
 	return p.unpack(yield_call(addr, session))
 end
 

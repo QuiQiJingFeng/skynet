@@ -164,4 +164,4 @@ function COMMAND.InsertLog(log_name,data,is_quote)
      end
 end
 
-return manager,COMMAND
+return {manager = manager,COMMAND=COMMAND}

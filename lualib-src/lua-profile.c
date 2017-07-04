@@ -187,6 +187,7 @@ timing_yield(lua_State *L) {
 
 static int
 lyield(lua_State *L) {
+	// 压入一个所传递lua_State所对应的线程，如果此线程是主线程，则返回1
 	lua_pushthread(L);
 
 	return timing_yield(L);
