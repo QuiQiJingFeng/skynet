@@ -53,7 +53,7 @@ struct timer {
 };
 
 static struct timer * TI = NULL;
-
+//移除头结点并返回
 static inline struct timer_node *
 link_clear(struct link_list *list) {
 	struct timer_node * ret = list->head.next;
@@ -126,21 +126,29 @@ move_list(struct timer *T, int level, int idx) {
 static void
 timer_shift(struct timer *T) {
 	int mask = TIME_NEAR;
-	uint32_t ct = ++T->time;   //time为8位无符号整形,如果下一刻等于0
+	// 获取下一刻度 并将当前刻度转到下一刻度
+	uint32_t ct = ++T->time;   
+	//如果下一刻度等于0,说明int32的最大值到了,而时间轮8|6|6|6|6 的最大值也是2^32 所以如果等于下一个time = 0 说明走到了2^32=>即将和刻度0重合 
 	if (ct == 0) {
-		//找到内层的刻度,将内层刻度为0的事件 添加到外层刻度
+		//找到内层的刻度,将最内层刻度为0的事件 添加到外层刻度
 		move_list(T, 3, 0);
 	} else {
+		//右移动8位,则低6位位内层刻度
 		uint32_t time = ct >> TIME_NEAR_SHIFT;
 		int i=0;
-		//逐层将更内层的刻度 往外层刻度移动
+		//如果最外层刻度走到了0(意味着外层已经走了一圈了,需要从内层某个刻度拉出来一圈放到外层)
 		while ((ct & (mask-1))==0) {
+			//取内层刻度的值
 			int idx=time & TIME_LEVEL_MASK;
+			//如果内层刻度没有走到0,则将内层刻度拉出来放到外层
+			//循环的跳出条件为:必须有至少一个刻度盘是有值的,有个特殊情况 所有刻度都为0的情况,即是ct = 0的时候特殊处理↑↑↑
 			if (idx!=0) {
 				move_list(T, i, idx);
 				break;				
 			}
+			// => 1111 1111 0000 00 => (-1) => 0000 0000 1111 11
 			mask <<= TIME_LEVEL_SHIFT;
+			//计算更内圈刻度
 			time >>= TIME_LEVEL_SHIFT;
 			++i;
 		}
@@ -264,6 +272,7 @@ gettime() {
 	uint64_t t;
 #if !defined(__APPLE__)
 	struct timespec ti;
+	//CLOCK_MONOTONIC 系统启动以后流逝的时间，它不受任何系统time-of-day时钟修改的影响
 	clock_gettime(CLOCK_MONOTONIC, &ti);
 	t = (uint64_t)ti.tv_sec * 100;
 	t += ti.tv_nsec / 10000000;
@@ -275,19 +284,20 @@ gettime() {
 #endif
 	return t;
 }
-
+//调度时间线程
 void
 skynet_updatetime(void) {
 	uint64_t cp = gettime();
-	//如果当前时间 在记录的时间点之前(手动调整过时间) 则会输出time diff 之后记录当前时间点
+	//current_point 为系统启动后流逝的时间,如果cp比记录的小,说明往前修改过时间
 	if(cp < TI->current_point) {
 		skynet_error(NULL, "time diff error: change from %lld to %lld", cp, TI->current_point);
 		TI->current_point = cp;
-	} else if (cp != TI->current_point) {
+	} else if (cp != TI->current_point) { 
 		uint32_t diff = (uint32_t)(cp - TI->current_point);
 		TI->current_point = cp;
 		TI->current += diff;
-		//timer_update的单位是0.01s
+		//timer_update的单位是0.01s  因为diff的单位是1/100 所以每隔1/100s才会触发一次timer_update
+		//如果大于等于 则将中间的时间刻度事件(如果有的话)触发
 		int i;
 		for (i=0;i<diff;i++) {
 			timer_update(TI);
@@ -309,14 +319,11 @@ void
 skynet_timer_init(void) {
 	TI = timer_create_timer();
 	uint32_t current = 0;
-	//start_time以s为单位,current以1/100 s 为单位
+	//start_time以s为单位,返回格林威治时间
 	systime(&TI->starttime, &current);
 	TI->current = current;
+	//current_point 为当前系统启动以后的流逝时间
 	TI->current_point = gettime();
-
-	printf("starttime=>%d\n",TI->starttime);
-	printf("current=>%d\n",TI->current);
-	printf("current_point=>%d\n",TI->current_point);
 }
 
 // for profile

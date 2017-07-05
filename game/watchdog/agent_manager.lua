@@ -214,13 +214,12 @@ end
 --整点调度
 ----------------------------------------------------------------------------
 local function ClockTimer()
-    local t_now = skynet.time()
+    local t_now = math.floor(skynet.time())
     local date_now = os.date("*t", t_now)
     local timer = 360000
     skynet.timeout(math.ceil(timer), ClockTimer)
     --0点时刻
     if date_now.hour == 0 then
-
     end 
 end
 

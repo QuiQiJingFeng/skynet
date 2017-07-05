@@ -149,10 +149,11 @@ thread_timer(void *p) {
 	//标记时间线程 THREAD_TIMER
 	skynet_initthread(THREAD_TIMER);
 	for (;;) {
+		//更新时间线程
 		skynet_updatetime();
 		CHECK_ABORT
 		wakeup(m,m->count-1);
-		//把线程挂起2500微秒(微秒 = 百万分之一秒)
+		//把线程挂起2500微秒(微秒 = 百万分之一秒) =>0.25 |(1/100)s
 		usleep(2500);
 		if (SIG) {
 			signal_hup();
@@ -272,6 +273,7 @@ bootstrap(struct skynet_context * logger, const char * cmdline) {
 	char name[sz+1];
 	char args[sz+1];
 	sscanf(cmdline, "%s %s", name, args);
+	//创建snlua服务
 	struct skynet_context *ctx = skynet_context_new(name, args);
 	if (ctx == NULL) {
 		skynet_error(NULL, "Bootstrap error : %s\n", cmdline);
@@ -313,7 +315,7 @@ skynet_start(struct skynet_config * config) {
 		fprintf(stderr, "Can't launch %s service\n", config->logservice);
 		exit(1);
 	}
-	//启动驱动服务
+	//启动驱动服务 启动snlua 参数bootstrap
 	bootstrap(ctx, config->bootstrap);
 
 	start(config->thread);

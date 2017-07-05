@@ -99,6 +99,7 @@ end
 local coroutine_pool = setmetatable({}, { __mode = "kv" })
 
 local function co_create(f)
+	--为提高性能，采用了协程池。每个新请求，先从协程池中取，如果没有，就重新创建一个。处理完请求后，重新放入协程池。
 	local co = table.remove(coroutine_pool)
 	if co == nil then
 		co = coroutine.create(function(...)
@@ -477,6 +478,7 @@ local function raw_dispatch_message(prototype, msg, sz, session, source)
 			unknown_response(session, source, msg, sz)
 		else
 			session_id_coroutine[session] = nil
+
 			suspend(co, coroutine_resume(co, true, msg, sz))
 		end
 	else
