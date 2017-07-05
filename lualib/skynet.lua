@@ -99,13 +99,14 @@ end
 local coroutine_pool = setmetatable({}, { __mode = "kv" })
 
 local function co_create(f)
-	--为提高性能，采用了协程池。每个新请求，先从协程池中取，如果没有，就重新创建一个。处理完请求后，重新放入协程池。
+	--为提高性能，采用了协程池。每个新请求，先从协程池中取，如果没有，就重新创建一个。
 	local co = table.remove(coroutine_pool)
 	if co == nil then
 		co = coroutine.create(function(...)
 			f(...)
 			while true do
 				f = nil
+				--处理完请求后，重新放入协程池。
 				coroutine_pool[#coroutine_pool+1] = co
 				f = coroutine_yield "EXIT"
 				f(coroutine_yield())
