@@ -101,7 +101,7 @@ lcallback(lua_State *L) {
 
 	return 0;
 }
-
+//lua 发送命令  
 static int
 lcommand(lua_State *L) {
 	struct skynet_context * context = lua_touserdata(L, lua_upvalueindex(1));

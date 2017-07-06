@@ -427,13 +427,14 @@ cmd_timeout(struct skynet_context * context, const char * param) {
 	sprintf(context->result, "%d", session);
 	return context->result;
 }
-
+//返回当前服务的地址
 static const char *
 cmd_reg(struct skynet_context * context, const char * param) {
+	//如果没有参数或者参数是个空字符串,那么返回当前服务的地址
 	if (param == NULL || param[0] == '\0') {
 		sprintf(context->result, ":%x", context->handle);
 		return context->result;
-	} else if (param[0] == '.') {
+	} else if (param[0] == '.') { //如果有参数 同时参数的第一个字符是. 那么将handle和name进行绑定 并返回name
 		return skynet_handle_namehandle(context->handle, param + 1);
 	} else {
 		skynet_error(context, "Can't register global name %s in C", param);
@@ -687,10 +688,11 @@ static struct command_func cmd_funcs[] = {
 	{ "SIGNAL", cmd_signal },
 	{ NULL, NULL },
 };
-
+//发送命令  
 const char * 
 skynet_command(struct skynet_context * context, const char * cmd , const char * param) {
 	struct command_func * method = &cmd_funcs[0];
+	//循环找到命令对应的函数指针,调用该函数并返回
 	while(method->name) {
 		if (strcmp(cmd, method->name) == 0) {
 			return method->func(context, param);

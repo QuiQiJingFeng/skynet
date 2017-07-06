@@ -299,10 +299,11 @@ function skynet.self()
 	if self_handle then
 		return self_handle
 	end
+	--返回当前服务的地址
 	self_handle = string_to_handle(c.command("REG"))
 	return self_handle
 end
-
+--通过名称返回对应的服务的地址
 function skynet.localname(name)
 	local addr = c.command("QUERY", name)
 	if addr then
@@ -313,14 +314,14 @@ end
 skynet.now = c.now
 
 local starttime
-
+--返回服务器启动的时间(时间线程启动的时间,格林威治时间)
 function skynet.starttime()
 	if not starttime then
 		starttime = c.intcommand("STARTTIME")
 	end
 	return starttime
 end
-
+--skynet.now ->系统启动后经过的时间(单位/s)   + starttime => 当前的格林威治时间
 function skynet.time()
 	return skynet.now()/100 + (starttime or skynet.starttime())
 end
@@ -554,7 +555,7 @@ function skynet.queryservice(global, ...)
 		return assert(skynet.call(".service", "lua", "QUERY", global, ...))
 	end
 end
-
+--adress 为字符串且 开头有:字符
 function skynet.address(addr)
 	if type(addr) == "number" then
 		return string.format(":%08x",addr)

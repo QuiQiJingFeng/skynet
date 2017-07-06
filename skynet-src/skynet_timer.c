@@ -319,8 +319,9 @@ void
 skynet_timer_init(void) {
 	TI = timer_create_timer();
 	uint32_t current = 0;
-	//start_time以s为单位,返回格林威治时间
+	//start_time以s为单位 系统的开启时间
 	systime(&TI->starttime, &current);
+	//系统开始之后经过的时间 
 	TI->current = current;
 	//current_point 为当前系统启动以后的流逝时间
 	TI->current_point = gettime();
