@@ -458,7 +458,29 @@ function utils:hotfix(source,loaded_key)
         origintable[k] = v
     end
     collectgarbage "collect"
-end    
+end
+---------------------------
+-- 将list随机打乱顺序
+---------------------------
+function utils:randomSort(list,seed)
+    seed = seed or os.time() 
+    local temp = {}
+    math.randomseed(seed)
+    while true do
+        local num = #list
+        if num <= 0 then
+            break
+        end
+        local idx = math.random(1,num)
+        local var = table.remove(list,idx)
+        table.insert(temp,var)
+    end
+    for i,v in ipairs(temp) do
+        list[i] = v
+    end
+end
+
+
 
 return utils;
  
