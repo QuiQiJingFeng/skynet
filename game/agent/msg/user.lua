@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local event_dispatcher = require "event_dispatcher"
 local utils = require "utils"
-local user_center = require "data.user_center"
+local user_info = require "user_info"
 local config_manager = require "config_manager"
 
 ---------------------------------------------------------------

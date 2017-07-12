@@ -1,19 +1,14 @@
 local skynet = require "skynet"
-local protobuf = require "protobuf"
 local agent_manager = require "agent_manager"
-local ipaddrs = {}
-local gate
-
 local watchdog = {}
 local CMD = {}
 local SOCKET = {}
 watchdog.SOCKET = SOCKET
 watchdog.CMD = CMD
-
+local gate
+local ipaddrs
 function watchdog:Init()
-    protobuf.register_file(skynet.getenv("protobuf"))
-    gate = skynet.newservice("gate")
-    agent_manager:Init(gate)
+    gate = agent_manager:Init()
 end
 
 ----------------------------------------------
@@ -22,7 +17,6 @@ end
 
 function SOCKET.open(fd, ipaddr)
     local ip = string.match(ipaddr, "([%d.]+):")
-    ipaddrs[fd] = ip
     skynet.call(gate, "lua", "accept", fd)
 end
 
@@ -53,10 +47,6 @@ end
 --开启gate网关服务,监控外部网络连接
 function CMD.start(conf)    
     skynet.call(gate, "lua", "open" , conf)
-end
-
-function CMD.GetAgentByUserId(user_id)
-    return agent_manager:GetAgentByUserId(user_id)
 end
 
 return watchdog

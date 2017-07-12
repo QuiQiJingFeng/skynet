@@ -17,3 +17,11 @@ message CreateNameRet {
     required Result result = 1;             
 }
 
+message HeartBeat {
+}
+
+message HeartBeatRet {
+}
+
+message ErrorRet {
+}

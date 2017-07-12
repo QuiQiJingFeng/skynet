@@ -568,7 +568,15 @@ function skynet.harbor(addr)
 	return c.harbor(addr)
 end
 
-skynet.error = c.error
+skynet.error = function(...) 
+	local arg = {...}
+	local date = os.date("%Y-%m-%d %H:%M:%S",skynet.time());
+	local adress = skynet.self()
+	local prefix = adress .. " " .. date
+	c.error(prefix,table.unpack(arg))
+end
+
+
 
 ----- register protocol
 do
