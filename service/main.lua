@@ -16,7 +16,7 @@ skynet.start(function()
 
     skynet.newservice("debug_console",8000)
 
-    skynet.newservice("social")
+    skynet.newservice("webclient")
     
     local game_port = skynet.getenv("game_port")
     local max_client = skynet.getenv("max_client")

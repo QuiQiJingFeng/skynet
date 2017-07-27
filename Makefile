@@ -17,11 +17,6 @@ LUA_INC ?= 3rd/lua
 $(LUA_STATICLIB) :
 	cd 3rd/lua && $(MAKE) CC='$(CC) -std=gnu99' $(PLAT)
 
-#添加cjson库
-cjson :
-	cd 3rd/cjson && make clean && make
-	mv 3rd/cjson/cjson.so luaclib/
-
 # jemalloc 
 
 JEMALLOC_STATICLIB := 3rd/jemalloc/lib/libjemalloc_pic.a
@@ -53,7 +48,7 @@ CSERVICE = snlua logger gate harbor
 LUA_CLIB = skynet socketdriver bson mongo md5 netpack websocketnetpack \
   clientsocket clientwebsocket memory profile multicast \
   cluster crypt sharedata stm sproto lpeg \
-  mysqlaux debugchannel protobuf
+  mysqlaux debugchannel protobuf webclient 
 
 SKYNET_SRC = skynet_main.c skynet_handle.c skynet_module.c skynet_mq.c \
   skynet_server.c skynet_start.c skynet_timer.c skynet_error.c \
@@ -63,7 +58,12 @@ SKYNET_SRC = skynet_main.c skynet_handle.c skynet_module.c skynet_mq.c \
 all : \
   $(SKYNET_BUILD_PATH)/skynet \
   $(foreach v, $(CSERVICE), $(CSERVICE_PATH)/$(v).so) \
-  $(foreach v, $(LUA_CLIB), $(LUA_CLIB_PATH)/$(v).so) 
+  $(foreach v, $(LUA_CLIB), $(LUA_CLIB_PATH)/$(v).so) \
+
+# FYD CUSTOM added cjson.so
+all:
+	cd 3rd/cjson && make clean && make
+	mv 3rd/cjson/cjson.so luaclib/
 
 $(SKYNET_BUILD_PATH)/skynet : $(foreach v, $(SKYNET_SRC), skynet-src/$(v)) $(LUA_LIB) $(MALLOC_STATICLIB)
 	$(CC) $(CFLAGS) -o $@ $^ -Iskynet-src -I$(JEMALLOC_INC) $(LDFLAGS) $(EXPORT) $(SKYNET_LIBS) $(SKYNET_DEFINES)
@@ -141,6 +141,7 @@ $(LUA_CLIB_PATH)/mysqlaux.so : lualib-src/lua-mysqlaux.c | $(LUA_CLIB_PATH)
 $(LUA_CLIB_PATH)/debugchannel.so : lualib-src/lua-debugchannel.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -Iskynet-src $^ -o $@	
 
+#FYD CUSTOM ==>protobuf.so
 PROTOBUFSRC = \
   3rd/pbc/context.c \
   3rd/pbc/varint.c \
@@ -158,6 +159,10 @@ PROTOBUFSRC = \
 
 $(LUA_CLIB_PATH)/protobuf.so : $(PROTOBUFSRC) 3rd/pbc/pbc-lua.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -I3rd/pbc $^ -o $@	
+
+$(LUA_CLIB_PATH)/webclient.so : 3rd/webclient/webclient.c | $(LUA_CLIB_PATH)
+	$(CC) $(CFLAGS) $(SHARED) -I3rd/webclient $^ -o $@
+
 
 clean :
 	rm -f $(SKYNET_BUILD_PATH)/skynet $(CSERVICE_PATH)/*.so $(LUA_CLIB_PATH)/*.so
