@@ -112,6 +112,9 @@ function static_data:UpdateConfig(name)
         --世界
         sharedata.update("world_config", csv.load("data/world.csv"))
     end
+    local post = {account=self.username, passwd=base64_digest, salt=salt}
+    local ret = skynet.call(".webclient","lua","request","http://account.mu77.com/v1/signin.json",nil,post)
+    print("FYD====>>RET = ",ret)
     return "OK"
 end
 
