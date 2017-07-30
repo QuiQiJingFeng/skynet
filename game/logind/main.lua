@@ -1,17 +1,16 @@
 local skynet = require "skynet"
-local config = require "logind"
-local logind = config.logind
-local COMMAND = config.COMMAND
+require "skynet.manager"    -- import skynet.register
+local command = require "command"
+
 skynet.start(function()
     skynet.dispatch("lua", function(session, source, cmd, ...)
-        local f = assert(COMMAND[cmd])
+        local f = assert(command[cmd])
         if session > 0 then
             skynet.ret(skynet.pack(f(...)))
         else
             f(...)
         end
     end)
-    logind:Init()
-    
-    skynet.register(".logind") 
+
+    skynet.register(".logind")
 end)

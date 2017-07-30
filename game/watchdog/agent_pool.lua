@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local agent = require "agent"
 --预留500个agent
-local AGENT_POOL_NUM = skynet.getenv("agent_pool_num") or 500
+local AGENT_POOL_NUM = skynet.getenv("agent_pool_num") or 1
 
 local agent_pool = {}
 ------------------------------------------------------

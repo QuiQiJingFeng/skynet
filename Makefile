@@ -160,8 +160,12 @@ PROTOBUFSRC = \
 $(LUA_CLIB_PATH)/protobuf.so : $(PROTOBUFSRC) 3rd/pbc/pbc-lua.c | $(LUA_CLIB_PATH)
 	$(CC) $(CFLAGS) $(SHARED) -I3rd/pbc $^ -o $@	
 
+INCLUDE = -Iusr/local/curl/include
+LDFLAGS = -Lusr/local/curl/lib 
+LDLIBS = -lcurl
+
 $(LUA_CLIB_PATH)/webclient.so : 3rd/webclient/webclient.c | $(LUA_CLIB_PATH)
-	$(CC) $(CFLAGS) $(SHARED) -I3rd/webclient $^ -o $@
+	$(CC) $(INCLUDE) $(CFLAGS) $(SHARED) $(LDFLAGS) $(LDLIBS) -I3rd/webclient $^ -o $@
 
 
 clean :

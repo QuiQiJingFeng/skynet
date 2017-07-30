@@ -74,21 +74,23 @@ end
 --处理登录
 ----------------------------------------------------------------------------
 function agent_manager:ProcessLogin(fd,data,ip)
+
     local greater = utils:greaterVersion(data.version,constants_config.LIMIT_VERSION)
     if not greater then
         send_msg = {login_ret = { result = "version_too_low"} }
         self:SendToClient(fd,send_msg)
         return false
     end
+
+    local server_id,account,password,platform,logintype = data.server_id,data.account,data.password,data.platform,data.logintype
     --登录校验
-    local ret = skynet.call(".logind","lua","Login",data)
-    if ret.result ~= "success" then
-        send_msg = {login_ret = ret }
+    local err,is_new,user_id = skynet.call(".logind","lua","Login",server_id,account,password,platform,logintype)
+    if err then
+        send_msg = {login_ret = err }
         self:SendToClient(fd,send_msg)
         return true
     end 
 
-    local user_id,is_new = ret.user_id,ret.is_new
     assert(user_id)
     if is_new then
         local register_msg = {  
@@ -121,6 +123,7 @@ function agent_manager:ProcessLogin(fd,data,ip)
     else
         agent = agent_pool:Dequeue()
     end
+    --FYD111111111
     skynet.call(agent.service_id, "lua", "Start",gateserver,fd,ip,is_new_agent,user_id,data)
 
     self.userid_to_agent[user_id] = agent

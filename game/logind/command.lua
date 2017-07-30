@@ -100,6 +100,16 @@ function request(url, get, post, no_reply)
 end
 -------------------------------------------|||||||||-----------------------------------------------------
 
+
+local LOGIN_OPTION = {
+    ["FYDGAMES"] = {
+        method = "POST",
+        url = "127.0.0.1:3000/login",
+        post = '{"action":"login","account":"%s","password"="%s"}',
+        check = {result = true}
+    }
+}
+
 -----------------------------------------------------------------
 --生成user_id
 --@server_id 区服ID
@@ -108,10 +118,21 @@ end
 local function GeneralId(server_id)
     local max_id = account_redis:incrby("user_id_generator", 1)
     if max_id >= constant_config["MAX_USER_ID"] then
-        return constant_config["ERROR_CODE"]["PARAMATER_ERROR"]
+        return constant_config["ERROR_CODE"]["OVER_MAX_ID"]
     end
     local user_id = tonumber(string.format("%d%07d", server_id, max_id))
     return nil,utils:convertTo32(user_id)
+end
+
+--检查tb2中是否存在和tb1一样的key
+local function compare(tb1,tb2)
+    for k,v in pairs(tb1) do
+        if type(v) == "table" and type(tb2[k]) == "table" then
+            return compare(v,tb2[k])
+        elseif v == tb2[k] then
+            return true
+        end
+    end
 end
 
 -----------------------------------------------------------------
@@ -119,37 +140,54 @@ end
 --@return err
 -----------------------------------------------------------------
 local function LoginCheck(account,password,logintype)
+    local check_error = nil
     local debug = skynet.getenv("debug")
     if debug then
-        return nil
+        return check_error
     end
 
-    local content = {
-        ["action"] = "login",
-        ["account"] = account,
-        ["password"] = password
-    }
-
-    local recvheader = {}
-    local check_server = "127.0.0.1:3000"
-    local success, status, body = pcall(httpc.post, check_server, "/login", content, recvheader)
-    if not success or status ~= 200 then
-        return "false"
+    local option = LOGIN_OPTION[logintype]
+    if not option then
+        check_error = constant_config["ERROR_CODE"]["ERROR_LOGIN_TYPE"]
+        return check_error
+    end
+    local get,post,url
+    if option.method == "POST" then
+        local post_str = string.format(option.post,account,password)
+        local content = cjson.decode(post_str)
+        post = content
+        url = option.url
+    elseif option.method == "GET" then
+        local get_str = string.format(option.get,account,password)
+        local content = cjson.decode(get_str)
+        get = content
+        url = option.url
+    end
+ 
+    local success,content = request(url,get,post)
+    if not success then
+        skynet.error("ERROR: ",content)
+        check_error = constant_config["ERROR_CODE"]["HTTP_ERROR"]
+        return check_error
     end
 
-    body = cjson.decode(body)
-    if body.result == "success" then
-        return nil
-    end
+    body = cjson.decode(content)
+    local check = compare(option.check,body)
 
-    return false
+    if check then
+        check_error = nil
+        return check_error
+    else
+        check_error = constant_config["ERROR_CODE"]["LOGIN_CHECK_ERROR"]
+        return check_error
+    end
 end
 
 local command = {}
 -----------------------------------------------------------------
 --登录模块初始化
 -----------------------------------------------------------------
-function command:init()
+function command.Init()
     local conf = sharedata.query("redis_conf_0")
     account_redis = redis.connect(conf)
 
@@ -160,20 +198,19 @@ function command:init()
     constant_config = sharedata.query("constants_config")
 end
 
-function command:request(...)
+function command.Request(...)
     request(...)
 end
  
 -----------------------------------------------------------------
 --登录处理
---@version  客户端版本号
 --@account  账户
 --@password 密码
 --@platform 平台  appstore/google play/360 store/taptap/...
 --@logintype  登录方式 gamecenter/facebook/google/...
 --@return err,new_user,user_id
 -----------------------------------------------------------------
-function command.Login(server_id,version,account,password,platform,logintype)
+function command.Login(server_id,account,password,platform,logintype)
 
     local ret = {result = "success"}
     local err = LoginCheck(account,password,logintype)
@@ -197,7 +234,5 @@ function command.Login(server_id,version,account,password,platform,logintype)
 
     return nil,new_user,user_id
 end 
-
-
 
 return command

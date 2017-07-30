@@ -112,9 +112,15 @@ function static_data:UpdateConfig(name)
         --世界
         sharedata.update("world_config", csv.load("data/world.csv"))
     end
-    local post = {account=self.username, passwd=base64_digest, salt=salt}
-    local ret = skynet.call(".webclient","lua","request","http://account.mu77.com/v1/signin.json",nil,post)
-    print("FYD====>>RET = ",ret)
+    local post = {openid = "ZX43ASFG4",access_token="FALSDFJEIGNK"}
+    local a,b,c,d = skynet.call(".webclient","lua","request","https://api.weixin.qq.com/sns/auth?",nil,post)
+    print("a=",a)
+    print("b=",b)
+    print("c=",c)
+    print("d=",d)
+
+ 
+
     return "OK"
 end
 
