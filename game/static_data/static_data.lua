@@ -48,18 +48,12 @@ function static_data:Init()
 ----------------------------------------------------
     --事件中心配置
     sharedata.update("msg_files_config", self:CreateMsgFilesConfig())
-    --逻辑中心配置
-    sharedata.update("data_files_config", self:CreateModuleFilesConfig())
     
 ----------------------------------------------------
 --数据配置
 ----------------------------------------------------  
     --常量
     sharedata.update("constants_config", self:CreateConstantConfig())
-    --资源
-    sharedata.update("resource_config", self:CreateResourceConfig())
-    --世界
-    sharedata.update("world_config", csv.load("data/world.csv"))
 end
 
 function static_data:CreateMsgFilesConfig()
@@ -74,28 +68,6 @@ function static_data:CreateMsgFilesConfig()
     return msg_files
 end
 
-function static_data:CreateModuleFilesConfig()
-    local files = io.popen('ls game/agent/data')
-    local fileLists = files:read("*all")
-    fileLists = utils:replaceStr(fileLists,".lua","")
-    local msg_files = utils:split(fileLists,"\n")
-    table.remove(msg_files,#msg_files)
-    for k,v in pairs(msg_files) do
-        msg_files[k] = "data/"..v
-    end
-    return msg_files    
-end
-
-function static_data:CreateResourceConfig()
-    local file = csv.load("data/resource.csv")
-    local config = {}
-    for ID,data in ipairs(file) do
-        config[data.key] = data 
-    end
-
-    return config
-end
-
 function static_data:CreateConstantConfig()
     local file = io.open("lualib/constants.lua","r")
     local data = file:read("*a")
@@ -106,18 +78,13 @@ end
 function static_data:UpdateConfig(name)
     if name == "constants_config" then
         sharedata.update("constants_config", self:CreateConstantConfig())
-    elseif name == "resource_config" then
-        sharedata.update("resource_config", self:CreateResourceConfig())
-    elseif name == "world_config" then
-        --世界
-        sharedata.update("world_config", csv.load("data/world.csv"))
     end
-    local post = {openid = "ZX43ASFG4",access_token="FALSDFJEIGNK"}
-    local a,b,c,d = skynet.call(".webclient","lua","request","https://api.weixin.qq.com/sns/auth?",nil,post)
-    print("a=",a)
-    print("b=",b)
-    print("c=",c)
-    print("d=",d)
+    -- local post = {openid = "ZX43ASFG4",access_token="FALSDFJEIGNK"}
+    -- local a,b,c,d = skynet.call(".logind","lua","Request","https://api.weixin.qq.com/sns/auth?",nil,post)
+    -- print("a=",a)
+    -- print("b=",b)
+    -- print("c=",c)
+    -- print("d=",d)
 
  
 

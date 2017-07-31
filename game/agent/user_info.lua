@@ -7,45 +7,56 @@ local config_manager = require "config_manager"
 local redis = require "redis"
 local user_info = {}
 
-function user_info:Init(user_id,server_id,channel,locale,client_fd, client_ip)
+function user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)
+    self.client_fd = fd
+    self.client_ip = ip
     self.user_id = user_id
     self.server_id = server_id
-    self.channel = channel
+    self.platform = platform
+    self.logintype = logintype
     self.locale = locale
-
-    self.client_fd = client_fd
-    self.client_ip = client_ip
 end
 
+function user_info:LoadDefault()
+    self._info = {}
+    self._info.base_info = {}
+end
+
+-------------------------
+--加载玩家数据
+--------------------------
 function user_info:LoadFromDb(user_id)
     self.user_id = user_id
     local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
 
-    local info_key = "info:"..user_id
-    local data_center = {}
-    --初始化数据处理模块
-    self.data_modules = {}
-    for _,file_name in ipairs(config_manager.data_files_config) do
-        local mode = require(file_name)
-        mode:Init()
-        mode:LoadFromDb(data_center,info_key)
-        
-        self.data_modules[file_name] = mode
+    local info_key = "info:" .. self.user_id
+    if not db:exists(info_key) then
+        db:disconnect()
+        return false
+    end
+
+    local content = db:hgetall(info_key)
+    for i = 1, #content, 2 do
+      local key = content[i]
+      local value = content[i+1]
+      self._info[key] = cjson.decode(value)
     end
     db:disconnect()
+    return true
 end
 
 -------------------------
 --保存玩家数据
 --------------------------
 function user_info:Save()
-    local user_info_key = "info:"..self.user_id
     local config = sharedata.query("redis_conf_1")
     local db = redis.connect(config)
     db:multi()
-    for _,mode in pairs(self.data_modules) do
-        mode:Save(db,self.user_id)
+    local info_key = "info:" .. self.user_id
+    for key,value in pairs(self._info) do
+        local content = cjson.encode(value)
+        db:hmset(info_key,key,content)
     end
     local ret = db:exec()
     for i, v in ipairs(ret) do
@@ -55,13 +66,6 @@ function user_info:Save()
         end
     end
     db:disconnect()
-end
-
---重用agent的时候需要重置lua vm中的用户数据
-function user_info:Clear()
-    for _,module in pairs(self.data_modules) do
-        module:Clear()
-    end
 end
 
 --玩家登出后设置fd为-1,避免登出后仍向该客户端发送数据

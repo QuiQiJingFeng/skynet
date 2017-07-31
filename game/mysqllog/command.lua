@@ -58,7 +58,7 @@ function command.Init()
         db:query("set charset utf8");
     end
 
-    for i=1,50 do
+    for i=1,1 do
         gamedb[i] = mysql.connect({
                 host="127.0.0.1",
                 port=3306,
@@ -69,11 +69,12 @@ function command.Init()
             })
     end
 
-    command.DoQuery("create database if not exists `game`;")
+    DoQuery("create database if not exists `game`;")
+    DoQuery("use `game`;")
     --register_log
-    command.DoQuery("CREATE TABLE IF NOT EXISTS register_log ( id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL,platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '',net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME, PRIMARY KEY (id),key(user_id,server_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    DoQuery("CREATE TABLE IF NOT EXISTS register_log ( id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL,platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '',net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME, PRIMARY KEY (id),key(user_id,server_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     --login_log
-    command.DoQuery("CREATE TABLE IF NOT EXISTS `login_log`(id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL, platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '', net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME,PRIMARY KEY (id),KEY(user_id,server_id))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+    DoQuery("CREATE TABLE IF NOT EXISTS `login_log`(id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL, platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '', net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME,PRIMARY KEY (id),KEY(user_id,server_id))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
 end
 
 function command.InsertLog(log_name,data,is_quote)
