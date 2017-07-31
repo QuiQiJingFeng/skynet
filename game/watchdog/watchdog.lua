@@ -84,12 +84,12 @@ function watchdog:ProcessLogin(fd,data,ip)
     local server_id,account,password,platform,logintype,locale = data.server_id,data.account,data.password,data.platform,data.logintype,data.locale
     --登录校验
     local err,is_new,user_id = skynet.call(".logind","lua","Login",server_id,account,password,platform,logintype)
+    print("||||||",err,is_new,user_id)
     if err then
-        send_msg = {login_ret = err }
+        send_msg = {login_ret = {result = "auth_failure"} }
         self:SendToClient(fd,send_msg)
         return true
     end 
-
     assert(user_id)
     if is_new then
         --TODO register_log

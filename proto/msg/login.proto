@@ -9,6 +9,7 @@ enum Result {
     version_too_low = 5;    //当前版本太低,请升级版本
     server_is_busy = 6;     //系统繁忙
     repeated_login = 7;     //重复登录
+    create_role = 8;      //创建角色
 }
 //-------------------
 //      登录        
@@ -20,7 +21,7 @@ message Login {
     required int32  server_id = 4;          //选择的服务器ID
     required string locale = 5;             //当前语言类型
     required string platform = 6;           //发布平台  appstore/google/360商店/应用宝...
-    required string channel = 7;            //登录渠道  gamecenter/facebook/google/weichat...
+    required string logintype = 7;          //登录渠道  gamecenter/facebook/google/weichat...
     required string device_type = 8;        //设备类型 ios-8.0/android-MI4/web-chrome
     required string net_mode = 9;           //网络状态 2G/3G/WIFI 
 }

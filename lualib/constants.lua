@@ -2,6 +2,8 @@ local constants = {}
 
 constants["LIMIT_VERSION"] = "1.0.0"
 
+constants["MAX_USER_ID"] = 4967000
+
 constants["ERROR_CODE"] = {
 	ERROR_LOGIN_TYPE = "ERROR_LOGIN_TYPE",
 	OVER_MAX_ID = "OVER_MAX_ID",

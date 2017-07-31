@@ -55,10 +55,13 @@ function COMMAND.NewUser(user_id,name,role_id)
         invitations = {},       --好友申请列表
         logout_time = nil       --记录登出的时间,如果为nil,则为在线
     }
+    print("+++++++++++1111111111")
     local all_relations_key = "social:all_relations"
-    self.union_db:lpush(social.all_relations,user_id)
+    social.union_db:lpush(all_relations_key,user_id)
+    print("+++++++++++222222222222")
     local user_key = "social:relations:"..user_id 
-    self.union_db:hmset(user_key,"role_id",role_id,"name",name)
+    social.union_db:hmset(user_key,"role_id",role_id,"name",name)
+    print("+++++++++++3333333333")
 end
 ---------------------------------------------------------------
 --更新玩家的登出时间
@@ -68,7 +71,7 @@ function COMMAND.UpdateLogoutTime(user_id,time)
     if info then
         info.logout_time = time
         local user_key = "social:relations:" .. user_id 
-        self.union_db:hmset(user_key,"logout_time",time)
+        social.union_db:hmset(user_key,"logout_time",time)
     end
 end
 ---------------------------------------------------------------

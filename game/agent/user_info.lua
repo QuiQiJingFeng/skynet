@@ -5,6 +5,7 @@ local protobuf = require "protobuf"
 local sharedata = require "sharedata"
 local config_manager = require "config_manager"
 local redis = require "redis"
+local cjson = require "cjson"
 local user_info = {}
 
 function user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)

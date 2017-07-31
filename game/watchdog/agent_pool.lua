@@ -17,6 +17,7 @@ end
 function agent_pool:CreateAgent()
     local new = agent:New()
     table.insert(self.reclaim_pool,new)
+    return new
 end
 
 --取出一个可用的agent

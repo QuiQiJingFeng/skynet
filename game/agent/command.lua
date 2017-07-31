@@ -69,19 +69,27 @@ local CMD = {}
 function CMD.Start(gate,fd,ip,is_new_agent,user_id,server_id,platform,logintype,locale)
     --通知gate 将fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
+    local is_create_leader = false
     --如果是新的agent
     if is_new_agent then
         --加载默认数据
         user_info:LoadDefault()
         --加载数据库数据
-        user_info:LoadFromDb(user_id)
+        local has_data = user_info:LoadFromDb(user_id)
+        if not has_data then
+            is_create_leader = true
+        end
     end
 
     user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)
     local time_zone = utils:getTimeZone()
-    local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = time_zone}
-    user_info:ResponseClient("login_ret",send_msg)
-
+    if not is_create_leader then
+        local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = time_zone}
+        user_info:ResponseClient("login_ret",send_msg)
+    else
+        local send_msg = {result = "create_role",server_time = skynet.time(),user_id = user_id,time_zone = time_zone}
+        user_info:ResponseClient("login_ret",send_msg)
+    end
     --TODO login_log
 end
 --发送一个退出信息给客户端
@@ -129,7 +137,7 @@ end
 
 local command = {AGENT_OP = AGENT_OP,CMD = CMD}
 
-function command.init()
+function command.Init()
     config_manager:Init()
     protobuf.register_file(skynet.getenv("protobuf"))
     event_dispatcher:Init(config_manager.msg_files_config)

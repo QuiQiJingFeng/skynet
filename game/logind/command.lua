@@ -1,4 +1,6 @@
 local skynet = require "skynet"
+local redis = require "redis"
+local utils = require "utils"
 local sharedata = require "sharedata"
 local webclientlib = require "webclient"
 local webclient = webclientlib.create()
@@ -211,28 +213,29 @@ end
 --@return err,new_user,user_id
 -----------------------------------------------------------------
 function command.Login(server_id,account,password,platform,logintype)
+    local response = skynet.response()
 
-    local ret = {result = "success"}
     local err = LoginCheck(account,password,logintype)
     if err then
         skynet.error("ERROR_CODE:",err)
-        return err
+        response(true,err)
+        return 
     end
-
     local user_key = string.format("%s:%s",platform,account)
     local user_id = account_redis:hget(user_key, server_id)
     local new_user = false
     if not user_id then
-        local err,user_id = GeneralId(server_id)
+        err,user_id = GeneralId(server_id)
         if err then
             skynet.error("ERROR_CODE:",err)
-            return err
+            response(true,err)
+            return
         end
         account_redis:hset(user_key, server_id, user_id)
         new_user = true
     end
-
-    return nil,new_user,user_id
+    print("user_id ==>",user_id)
+    response(true,nil,new_user,user_id)
 end 
 
 return command

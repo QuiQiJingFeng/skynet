@@ -18,7 +18,6 @@ skynet.register_protocol( {
     end,
 
     dispatch = function (_, _, msg, pbc_error)
-
         if pbc_error or not msg then
             skynet.error("PBC_ERROR:",pbc_error)
             return
@@ -31,7 +30,9 @@ skynet.register_protocol( {
         while _G["SAVE_FLAG"] do
             skynet.yield()
         end
+        local msg_name,data = next(msg)
         local succ, proto, send_msg = xpcall(event_dispatcher.DispatchEvent, debug.traceback, event_dispatcher, msg_name, data)
+        print("FYD===>>>",succ, proto, send_msg)
         if succ and proto then
             local succ, err = pcall(user_info.ResponseClient, user_info, proto, send_msg)
             if not succ then

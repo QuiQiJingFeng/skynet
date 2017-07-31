@@ -19,6 +19,7 @@ end)
 event_dispatcher:RegisterEvent("create_name",function(recv_msg)
     local ret = {result = "success"}
     local user_name = recv_msg.user_name
+    print("user_name = ",user_name)
     --屏蔽emoji字符
     local is_emoji = utils:checkEmoji(user_name)
     if is_emoji then
@@ -27,16 +28,15 @@ event_dispatcher:RegisterEvent("create_name",function(recv_msg)
     end
 
     local role_id = recv_msg.role_id
-
     --检查名称是否已经存在
-    local user_id = user_info._info.base_info.user_id
+    local user_id = user_info.user_id
     local is_exist = skynet.call(".social","lua","CheckNewName",user_name,user_id)
     if is_exist then
         ret.result = "name_exist"
         return "create_name_ret",ret
     end
-    user_center.base_info.user_name = user_name
-    shield.call(".social", "lua", "NewUser", user_id, user_name, role_id)
 
+    user_info._info.base_info.user_name = user_name
+    skynet.call(".social", "lua", "NewUser", user_id, user_name, role_id)
     return "create_name_ret",ret
 end)

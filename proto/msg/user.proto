@@ -11,6 +11,7 @@ enum Result {
 //-------------------
 message CreateName {
     required string user_name = 1;            //角色名
+    required int32 role_id = 2;
 }
 
 message CreateNameRet {

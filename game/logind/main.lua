@@ -7,6 +7,6 @@ skynet.start(function()
         local f = assert(command[cmd])
         f(...)
     end)
-
+    command.Init()
     skynet.register(".logind")
 end)

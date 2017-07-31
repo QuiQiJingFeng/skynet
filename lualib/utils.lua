@@ -78,7 +78,7 @@ end
 ---------------------------
 function utils:utf8Chars(utf8str)
     local chars = {}
-    for p,c in utf8.codes(str) do
+    for p,c in utf8.codes(utf8str) do
         table.insert(chars,c)
     end
     return chars
@@ -141,7 +141,7 @@ end
 
 --检查字符串中是否包含emoji
 function utils:checkEmoji(str)
-    for uchar in self:utf8Chars() do
+    for _,uchar in ipairs(self:utf8Chars(str)) do
         if self:isEmoji(uchar) then
             return true
         end
