@@ -7,16 +7,12 @@ skynet.start(function()
 
     --共享数据服务
     skynet.newservice("static_data")
-
     --登录校验服务
     skynet.uniqueservice("logind")
-    
     --mysqllog服务
     skynet.newservice("mysqllog")
 
     skynet.newservice("debug_console",8000)
-
-    skynet.newservice("webclient")
     
     local game_port = skynet.getenv("game_port")
     local max_client = skynet.getenv("max_client")
