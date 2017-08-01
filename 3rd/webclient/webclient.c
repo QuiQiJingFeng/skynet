@@ -334,7 +334,8 @@ static int webclient_sethttpheader(lua_State* l)
         return luaL_argerror(l, 2, "parameter index invalid");
     
     int top = lua_gettop(l);
-    for (int i = 3; i <= top; ++i) {
+    int i = 3;
+    for (; i <= top; ++i) {
         const char* str = lua_tostring(l, i);
         webrequest->header = curl_slist_append(webrequest->header, str);
     }
