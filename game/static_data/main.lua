@@ -11,6 +11,6 @@ skynet.start(function()
             f(...)
         end
     end)
-    command:Init()
+    command.Init()
     skynet.register(".static_data")
 end)

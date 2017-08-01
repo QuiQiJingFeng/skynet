@@ -69,17 +69,17 @@ function command.Init()
 
     sharedata.update("msg_files_config", CreateMsgFilesConfig())
     
-    --常量
     sharedata.update("constants_config", CreateConstantConfig())
 
-    sharedata.update("products_config",CreatePaymentConfig)
+    sharedata.update("products_config", CreatePaymentConfig())
+
 end
 
 function command.UpdateConfig(name)
     if name == "constants_config" then
         sharedata.update("constants_config", CreateConstantConfig())
     elseif name == "products_config" then
-        sharedata.update("products_config",CreatePaymentConfig)
+        sharedata.update("products_config",CreatePaymentConfig())
     end
 
     return "OK"

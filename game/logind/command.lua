@@ -102,7 +102,7 @@ function request(url, get, post, no_reply)
 end
 -------------------------------------------|||||||||-----------------------------------------------------
 
-
+--登录校验配置
 local LOGIN_OPTION = {
     ["FYDGAMES"] = {
         method = "POST",
@@ -234,7 +234,7 @@ function command.Login(server_id,account,password,platform,logintype)
         account_redis:hset(user_key, server_id, user_id)
         new_user = true
     end
-    print("user_id ==>",user_id)
+
     response(true,nil,new_user,user_id)
 end 
 
