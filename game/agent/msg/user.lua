@@ -19,7 +19,6 @@ end)
 event_dispatcher:RegisterEvent("create_name",function(recv_msg)
     local ret = {result = "success"}
     local user_name = recv_msg.user_name
-    print("user_name = ",user_name)
     --屏蔽emoji字符
     local is_emoji = utils:checkEmoji(user_name)
     if is_emoji then
@@ -36,7 +35,18 @@ event_dispatcher:RegisterEvent("create_name",function(recv_msg)
         return "create_name_ret",ret
     end
 
-    user_info._info.base_info.user_name = user_name
+    user_info.data_center.base_info.user_name = user_name
+    user_info.data_center.base_info.role_id = role_id
+    
     skynet.call(".social", "lua", "NewUser", user_id, user_name, role_id)
     return "create_name_ret",ret
+end)
+
+---------------------------------------------------------------
+--查询用户基本信息
+---------------------------------------------------------------
+event_dispatcher:RegisterEvent("query_base_info",function(recv_msg)
+    local ret = {result = "success"}
+    ret.base_info = user_info.data_center.base_info
+    return "query_base_info_ret",ret
 end)

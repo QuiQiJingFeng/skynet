@@ -19,8 +19,8 @@ function user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)
 end
 
 function user_info:LoadDefault()
-    self._info = {}
-    self._info.base_info = {}
+    self.data_center = {}
+    self.data_center.base_info = {}
 end
 
 -------------------------
@@ -41,7 +41,7 @@ function user_info:LoadFromDb(user_id)
     for i = 1, #content, 2 do
       local key = content[i]
       local value = content[i+1]
-      self._info[key] = cjson.decode(value)
+      self.data_center[key] = cjson.decode(value)
     end
     db:disconnect()
     return true
@@ -55,7 +55,7 @@ function user_info:Save()
     local db = redis.connect(config)
     db:multi()
     local info_key = "info:" .. self.user_id
-    for key,value in pairs(self._info) do
+    for key,value in pairs(self.data_center) do
         local content = cjson.encode(value)
         db:hmset(info_key,key,content)
     end

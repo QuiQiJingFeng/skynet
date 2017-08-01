@@ -1,18 +1,16 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local config = require "social"
-local social = config.social
-local COMMAND = config.COMMAND
+local command = require "command"
 
 skynet.start(function() 
     skynet.dispatch("lua", function(session, source, cmd, ...)
-        local f = assert(COMMAND[cmd])
+        local f = assert(command[cmd])
         if session > 0 then
             skynet.ret(skynet.pack(f(...)))
         else
             f(...)
         end
     end)
-    social:Init()
+    command.Init()
     skynet.register(".social")
 end)
