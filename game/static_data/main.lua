@@ -1,18 +1,16 @@
 local skynet = require "skynet"
 require "skynet.manager"
-local config = require "static_data"
-local static_data = config.static_data
-local COMMAND = config.COMMAND
+local command = require "command"
 
 skynet.start(function() 
     skynet.dispatch("lua", function(session, source, cmd, ...)
-        local f = assert(COMMAND[cmd])
+        local f = assert(command[cmd])
         if session > 0 then
             skynet.ret(skynet.pack(f(...)))
         else
             f(...)
         end
     end)
-    static_data:Init()
+    command:Init()
     skynet.register(".static_data")
 end)

@@ -1,6 +1,7 @@
 local redis = require "redis"
 local sharedata = require "sharedata"
 local cjson = require "cjson"
+local skynet = require "skynet"
 local name_to_id = {}
 
 local relations
