@@ -28,7 +28,7 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = /Users/mu77/SKYNET/skynet;
+			buildWorkingDirectory = /Users/jingfeng/SKYNET/skynet;
 			dependencies = (
 			);
 			name = skynet;
