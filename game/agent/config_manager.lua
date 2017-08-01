@@ -5,6 +5,7 @@ local config_manager = {}
 function config_manager:Init()
     self.msg_files_config = sharedata.query("msg_files_config")
     self.constants_config = sharedata.query("constants_config")
+    self.products_config = sharedata.query("products_config")
 end
 
 return config_manager

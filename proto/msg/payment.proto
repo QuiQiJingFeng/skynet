@@ -1,0 +1,24 @@
+package msg.payment;
+
+enum Result {
+    success = 0;             
+    failure = 1;  
+    ptype_is_nil = 2;      
+}
+
+message GoodItem {
+    required int32 good_id = 1;
+    required string product_id = 2;
+    required string name = 3;
+    required double price = 4;
+    required int32 num = 5;             //充值数量
+    optional int32 first_pay_gift = 6;  //首冲赠送
+    optional int32 gift = 7;            //购买赠送
+}
+message QueryProducts {
+    required int32 type = 1;        
+}
+message QueryProductsRet {
+    required Result result = 1;
+    repeated GoodItem good_list = 2;
+}

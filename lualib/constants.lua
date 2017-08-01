@@ -11,4 +11,9 @@ constants["ERROR_CODE"] = {
 	LOGIN_CHECK_ERROR = "LOGIN_CHECK_ERROR",
 }
 
+constants["PRODUCTS_TYPE"] = {
+    [1] = "appstore",
+    [2] = "google"
+}
+
 return constants

@@ -1,6 +1,7 @@
 local sharedata = require "sharedata"
 local skynet = require "skynet"
 local utils = require "utils"
+local csv = require "csv"
 local command = {}
 
 local function CreateMsgFilesConfig()
@@ -20,6 +21,15 @@ local function CreateConstantConfig()
     local data = file:read("*a")
     file:close()
     return load(data)()
+end
+
+local function CreatePaymentConfig()
+    local file = csv.load("data/products.csv")
+    local config = {}
+    for _,cell in pairs(file) do
+        config[cell.good_id] = cell
+    end
+    return config
 end
 
 function command.Init()
@@ -61,11 +71,15 @@ function command.Init()
     
     --常量
     sharedata.update("constants_config", CreateConstantConfig())
+
+    sharedata.update("products_config",CreatePaymentConfig)
 end
 
 function command.UpdateConfig(name)
     if name == "constants_config" then
         sharedata.update("constants_config", CreateConstantConfig())
+    elseif name == "products_config" then
+        sharedata.update("products_config",CreatePaymentConfig)
     end
 
     return "OK"

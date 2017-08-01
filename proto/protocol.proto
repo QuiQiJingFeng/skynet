@@ -1,16 +1,19 @@
 import "msg/login.proto";
 import "msg/user.proto";
+import "msg/payment.proto";
 
 message C2GS {
 	optional msg.login.Login login = 3;						//登录
 	optional msg.login.Logout logout = 4;					//登出
     optional msg.user.CreateName create_name = 5;          //创建用户名称		
-    optional msg.user.QueryBaseInfo query_base_info = 6;			
+    optional msg.user.QueryBaseInfo query_base_info = 6;
+    optional msg.payment.QueryProducts query_products = 7;	 //查询商品列表		
 }
 
 message GS2C {
 	optional msg.login.LoginRet login_ret = 3;				//登录
 	optional msg.login.LogoutRet logout_ret = 4;			//登出	
     optional msg.user.CreateNameRet create_name_ret = 5;          //创建用户名称  
-    optional msg.user.QueryBaseInfoRet query_base_info_ret = 6;            
+    optional msg.user.QueryBaseInfoRet query_base_info_ret = 6;   
+    optional msg.payment.QueryProductsRet query_products_ret = 7;         
 }
