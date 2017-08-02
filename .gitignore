@@ -1,13 +1,13 @@
-*.o
-*.a
 /skynet
 /skynet.pid
 3rd/lua/lua
 3rd/lua/luac
+3rd/*/*.o
+3rd/*/*.a
 /cservice
-/luaclib
-*.so
+/luaclib/*
 *.dSYM
 .DS_Store
 /.vscode
 /xcode
+
