@@ -16,6 +16,14 @@ if [ ! -f "$CONF_DIR_PATH/redis.conf" ]; then
     exit 1
 fi
 
+if [ ! -f "$CONF_DIR_PATH/data/" ]; then
+    mkdir $CONF_DIR_PATH/data
+fi
+
+if [ ! -f "$CONF_DIR_PATH/log/" ]; then
+    mkdir $CONF_DIR_PATH/log
+fi
+
 if [ ! -n "$MODE" ]; then
     nohup ./$REDIS config/redis/redis.conf > config/redis/log/redis.log 2>&1 &
 elif [ "$MODE" = "debug" ]; then
