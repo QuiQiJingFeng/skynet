@@ -19,7 +19,7 @@ if [ ! -d "$LOG_DIR_PATH" ]; then
     mkdir "$LOG_DIR_PATH"
 fi
 
-ulimit -n 20
+ulimit -n 65535
 #对生成的 core 文件的大小不进行限制。
 ulimit -c unlimited
 

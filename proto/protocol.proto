@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "msg/login.proto";
 import "msg/user.proto";
 import "msg/payment.proto";
