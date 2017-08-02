@@ -7,6 +7,16 @@ if [ ! -f "config/conf/config.lua" ]; then
     exit 1
 fi
 
+#替换so文件
+if [ "$(uname)" == "Darwin" ]; then
+    # Do something under Mac OS X platform
+    cp -r luaclib-mac/* luaclib/
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    # Do something under Linux platform
+    cp -r luaclib-linux/* luaclib/
+fi
+
+
 #创建数据文件夹
 DATA_DIR_PATH="config/data/"
 if [ ! -d "$DATA_DIR_PATH" ]; then
