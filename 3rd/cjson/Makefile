@@ -9,8 +9,9 @@
 ## IEEE_BIG_ENDIAN:         Required on big endian architectures.
 ## MULTIPLE_THREADS:        Must be set when Lua CJSON may be used in a
 ##                          multi-threaded application. Requries _pthreads_.
-
+#FYD MAC
 MAC_CJSON_LDFLAGS = -bundle -undefined dynamic_lookup
+#FYD LINUX
 LINUX_CJSON_LDFLAGS = -shared
 
 ##### Build defaults #####
