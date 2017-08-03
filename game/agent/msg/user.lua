@@ -46,7 +46,7 @@ end)
 --查询用户基本信息
 ---------------------------------------------------------------
 event_dispatcher:RegisterEvent("query_base_info",function(recv_msg)
-    local ret = {result = "success"}
-    ret.base_info = user_info.data_center.base_info
+    ret = user_info.data_center.base_info
+    ret.result = "success"
     return "query_base_info_ret",ret
 end)
