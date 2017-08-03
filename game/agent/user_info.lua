@@ -20,8 +20,12 @@ end
 
 function user_info:LoadDefault()
     self.data_center = {}
-    self.data_center.base_info = {}
-    self.data_center.base_info.card_num = 0
+    self.data_center.base_info = {
+        user_id=self.user_id,
+        card_num = 0,
+        user_name = "",
+        role_id = nil,
+    }
 end
 
 -------------------------

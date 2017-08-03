@@ -69,6 +69,9 @@ local CMD = {}
 function CMD.Start(gate,fd,ip,is_new_agent,user_id,server_id,platform,logintype,locale)
     --通知gate 将fd的消息转发到本服务
     skynet.call(gate, "lua", "forward", fd)
+    
+    user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)
+
     local is_create_leader = false
     --如果是新的agent
     if is_new_agent then
@@ -81,7 +84,6 @@ function CMD.Start(gate,fd,ip,is_new_agent,user_id,server_id,platform,logintype,
         end
     end
 
-    user_info:Init(fd,ip,user_id,server_id,platform,logintype,locale)
     local time_zone = utils:getTimeZone()
     if not is_create_leader then
         local send_msg = {result = "success",server_time = skynet.time(),user_id = user_id,time_zone = time_zone}
