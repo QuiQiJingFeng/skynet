@@ -26,5 +26,6 @@ message QueryBaseInfoRet {
     required Result result = 1;
     required string user_name = 2;
     required int32 role_id = 3;
-    required int32 card_num = 4;            
+    required int32 card_num = 4; 
+    required string user_id = 5; 
 }
