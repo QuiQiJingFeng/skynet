@@ -52,8 +52,8 @@ end
 -- @bool[opt] no_reply 使用skynet.call则要设置为nil或false，使用skynet.send则要设置为true
 -- @treturn bool 请求是否成功
 -- @treturn string 当成功时，返回内容，当失败时，返回出错原因 
--- @usage skynet.call(webclient, "lua", "request", "http://www.dpull.com")
--- @usage skynet.send(webclient, "lua", "request", "http://www.dpull.com", nil, nil, true)
+-- @usage skynet.call(webclient, "lua", "Request", "http://www.dpull.com")
+-- @usage skynet.send(webclient, "lua", "Request", "http://www.dpull.com", nil, nil, true)
 function request(url, get, post, no_reply)
     if get then
         local i = 0

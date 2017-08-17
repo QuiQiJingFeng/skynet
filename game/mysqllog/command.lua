@@ -5,16 +5,8 @@ local gamedb = {}
 local cur_db_index = 1
 local command = {}
 
-local function UpdateDbIndex()
-    cur_db_index = cur_db_index + 1
-    if cur_db_index > #gamedb then
-        cur_db_index = 1
-    end
-end
-
 local function DoQuery(sql)
-    UpdateDbIndex()
-    local ret = gamedb[cur_db_index]:query(sql) or {}
+    local ret = gamedb:query(sql) or {}
     if ret.badresult then
         skynet.error("SQL ERROR:",ret.err)
         skynet.error("SQL :",sql)
@@ -57,24 +49,22 @@ function command.Init()
     local function on_connect(db)
         db:query("set charset utf8");
     end
+    gamedb = mysql.connect({
+        host="127.0.0.1",
+        port=3306,
+        user="root",
+        max_packet_size = 1024 * 1024,
+        on_connect = on_connect
+    })
+    DoQuery("create database if not exists `game` charset=utf8mb4;")
 
-    for i=1,1 do
-        gamedb[i] = mysql.connect({
-                host="127.0.0.1",
-                port=3306,
-                user="root",
-                database = "game",
-                max_packet_size = 1024 * 1024,
-                on_connect = on_connect
-            })
-    end
-
-    DoQuery("create database if not exists `game`;")
     DoQuery("use `game`;")
     --register_log
     DoQuery("CREATE TABLE IF NOT EXISTS register_log ( id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL,platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '',net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME, PRIMARY KEY (id),key(user_id,server_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
     --login_log
     DoQuery("CREATE TABLE IF NOT EXISTS `login_log`(id INT NOT NULL AUTO_INCREMENT,server_id INT NOT NULL,user_id   VARCHAR(16) NOT NULL,account   VARCHAR(32) NOT NULL, ip  VARCHAR(16) NOT NULL, platform  VARCHAR(16) DEFAULT '', channel   VARCHAR(16) DEFAULT '', net_mode   VARCHAR(16) DEFAULT '',device_id VARCHAR(32) DEFAULT '',device_type VARCHAR(32) DEFAULT '',time DATETIME,PRIMARY KEY (id),KEY(user_id,server_id))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
+
+    DoQuery("CREATE TABLE IF NOT EXISTS `book`(id INT NOT NULL AUTO_INCREMENT,book_name VARCHAR(100) NOT NULL,author   VARCHAR(100) NOT NULL,book_desc TEXT, total_chars float,total_click float,total_recommend float, PRIMARY KEY (id),KEY(book_name))ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;")
 end
 
 function command.InsertLog(log_name,data,is_quote)

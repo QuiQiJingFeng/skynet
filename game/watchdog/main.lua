@@ -15,6 +15,16 @@ skynet.start(function()
     end)
 
     command.Init()
+
+    
+
+
+
+
+
+
+
+
     
     skynet.register(".watchdog")
 end)
